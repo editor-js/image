@@ -1,0 +1,54 @@
+/*.cdx-image {}*/
+
+/*.cdx-image .cdx-loader {*/
+  /*min-height: 200px;*/
+/*}*/
+
+/*.cdx-image .cdx-input {*/
+  /*margin-top: 10px;*/
+/*}*/
+
+.cdx-image img {
+  max-width: 100%;
+  vertical-align: bottom;
+}
+
+/*.cdx-image__picture--with-background {*/
+  /*background: #eff2f5;*/
+  /*padding: 10px;*/
+/*}*/
+
+/*.cdx-image__picture--with-background img {*/
+  /*display: block;*/
+  /*max-width: 60%;*/
+  /*margin: 0 auto;*/
+/*}*/
+
+/*.cdx-image__picture--with-border {*/
+  /*border: 1px solid #e8e8eb;*/
+  /*padding: 1px;*/
+/*}*/
+
+/*.cdx-image__picture--stretched img {*/
+  /*max-width: none;*/
+  /*width: 100%;*/
+/*}*/
+
+.cdx-image__upload-button {
+  height: 300px;
+  background-color: lightblue;
+  cursor: pointer;
+}
+
+.cdx-image--noselect {
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none; /* Safari */
+  -khtml-user-select: none; /* Konqueror HTML */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* Internet Explorer/Edge */
+  user-select: none; /* Non-prefixed version, currently supported by Chrome and Opera */
+}
+
+.cdx-image--display-none {
+  display: none;
+}
