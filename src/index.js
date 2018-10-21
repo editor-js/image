@@ -172,6 +172,57 @@ class Image {
     return wrapper;
   }
 
+
+  /**
+   * Read pasted image and convert it to base64
+   *
+   * @static
+   * @param {File} file
+   * @returns {Promise<SimpleImageData>}
+   */
+  static onDropHandler(file) {
+    const reader = new FileReader();
+
+    reader.readAsDataURL(file);
+
+    return new Promise(resolve => {
+      reader.onload = (event) => {
+        resolve({
+          url: event.target.result,
+          caption: file.name
+        });
+      };
+    });
+  }
+
+  /**
+   * Specify paste substitutes
+   * @see {@link ../../../docs/tools.md#paste-handling}
+   * @public
+   */
+  static get onPaste() {
+    return {
+      patterns: {
+        image: /https?:\/\/\S+\.(gif|jpe?g|tiff|png)$/i
+      },
+      tags: [ 'img' ],
+      files: {
+        mimeTypes: [ 'image/*' ]
+      },
+      fileHandler: Image.onDropHandler,
+      handler: (img) => {
+        return {
+          url: img.src
+        };
+      },
+      patternHandler: (text) => {
+        return {
+          url: text
+        };
+      },
+    };
+  }
+
   _createButton() {
     let button = this._make('div', this.CSS.button);
 
