@@ -21,6 +21,7 @@ const ajax = require('@codexteam/ajax');
  * @typedef {object} ImageConfig
  * @description
  * @property {string} url - upload endpoint
+ * @property {string} field - field name for uploaded image
  * @property {string} types - available mime-types
  */
 
@@ -70,6 +71,7 @@ class Image {
      */
     this.config = {
       url: config.url || '',
+      field: config.field || '',
       types: config.types || 'image/*'
     };
 
@@ -133,6 +135,20 @@ class Image {
     return this.nodes.wrapper;
   }
 
+  save() {
+    let image = this.nodes.wrapper.querySelector('img');
+    // caption = this.nodes.wrapper.querySelector('.' + this.CSS.input);
+
+    if (!image) {
+      return this.data;
+    }
+
+    return Object.assign(this.data, {
+      url: image.src,
+      // caption: caption.innerHTML
+    });
+  }
+
   /**
    * Makes buttons with tunes: add background, add border, stretch image
    * @return {HTMLDivElement}
@@ -156,20 +172,6 @@ class Image {
       wrapper.appendChild(el);
     });
     return wrapper;
-  }
-
-  save() {
-    let image = this.nodes.wrapper.querySelector('img');
-    // caption = this.nodes.wrapper.querySelector('.' + this.CSS.input);
-
-    if (!image) {
-      return this.data;
-    }
-
-    return Object.assign(this.data, {
-      url: image.src,
-      // caption: caption.innerHTML
-    });
   }
 
   _createWrapper() {
@@ -198,6 +200,7 @@ class Image {
         url: this.config.url,
         accept: this.config.types,
         progress: this._progressCallback,
+        fieldName: this.config.field
       })
         .then((response) => {
           this._updateImageSrc(response.url);
