@@ -1,12 +1,12 @@
 .cdx-image {}
 
-/*.cdx-image .cdx-loader {*/
-  /*min-height: 200px;*/
-/*}*/
+.cdx-image .cdx-loader {
+  min-height: 200px;
+}
 
-/*.cdx-image .cdx-input {*/
-  /*margin-top: 10px;*/
-/*}*/
+.cdx-image .cdx-input {
+  margin-top: 10px;
+}
 
 .cdx-image img {
   max-width: 100%;
@@ -38,17 +38,4 @@
   height: 100px;
   background-color: lightblue;
   cursor: pointer;
-}
-
-.cdx-image--noselect {
-  -webkit-touch-callout: none; /* iOS Safari */
-  -webkit-user-select: none; /* Safari */
-  -khtml-user-select: none; /* Konqueror HTML */
-  -moz-user-select: none; /* Firefox */
-  -ms-user-select: none; /* Internet Explorer/Edge */
-  user-select: none; /* Non-prefixed version, currently supported by Chrome and Opera */
-}
-
-.cdx-image--display-none {
-  display: none;
 }

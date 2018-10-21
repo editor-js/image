@@ -90,16 +90,13 @@ class Image {
        */
       wrapper: 'cdx-image',
       button: 'cdx-image__upload-button',
-      image: 'cdx-image__picture',
-      noselection: 'cdx-image--noselect',
-      displaynone: 'cdx-image--display-none'
+      imageHolder: 'cdx-image__picture',
     };
 
     this.nodes = {
       wrapper: null,
       button: null,
-      // loader: null,
-      image: null
+      imageHolder: null
     };
 
     /**
@@ -120,24 +117,24 @@ class Image {
       },
     ];
 
-    this._createWrapper();
+    // this._createWrapper();
   }
 
   render() {
-    if (!this.data.url) {
-      this.nodes.button.click();
+    this.nodes.wrapper = this._make('div', [this.CSS.baseClass, this.CSS.wrapper]);
 
-      this.nodes.button.classList.remove(this.CSS.displaynone);
+    if (!this.data.url) {
+      this._createButton();
     } else {
-      this._updateImageSrc(this.data.url);
+      this._createImage(this.data.url);
     }
 
     return this.nodes.wrapper;
   }
 
   save() {
-    let image = this.nodes.wrapper.querySelector('img');
-    // caption = this.nodes.wrapper.querySelector('.' + this.CSS.input);
+    let image = this.nodes.wrapper.querySelector('img'),
+      caption = this.nodes.wrapper.querySelector('.' + this.CSS.input);
 
     if (!image) {
       return this.data;
@@ -145,7 +142,7 @@ class Image {
 
     return Object.assign(this.data, {
       url: image.src,
-      // caption: caption.innerHTML
+      caption: caption.innerHTML
     });
   }
 
@@ -154,12 +151,11 @@ class Image {
    * @return {HTMLDivElement}
    */
   renderSettings() {
-    let wrapper = document.createElement('div');
+    let wrapper = this._make('div');
 
     this.settings.forEach( tune => {
-      let el = document.createElement('div');
+      let el = this._make('div', this.CSS.settingsButton);
 
-      el.classList.add(this.CSS.settingsButton);
       el.innerHTML = tune.icon;
 
       el.addEventListener('click', () => {
@@ -171,28 +167,13 @@ class Image {
 
       wrapper.appendChild(el);
     });
+
     return wrapper;
   }
 
-  _createWrapper() {
-    this.nodes = {
-      wrapper: document.createElement('DIV'),
-      button: this._createButton(),
-      // loader: this._createLoader(),
-      image: this._createImage()
-    };
-
-    this.nodes.wrapper.classList.add(this.CSS.wrapper, this.CSS.baseClass);
-
-    this.nodes.wrapper.appendChild(this.nodes.button);
-    // this.nodes.wrapper.appendChild(this.nodes.loader);
-    this.nodes.wrapper.appendChild(this.nodes.image);
-  }
-
   _createButton() {
-    let button = document.createElement('DIV');
+    let button = this._make('div', this.CSS.button);
 
-    button.classList.add(this.CSS.button, this.CSS.noselection, this.CSS.displaynone, this.CSS.loading);
     button.innerHTML = 'Click to upload image';
 
     button.addEventListener('click', () => {
@@ -203,36 +184,53 @@ class Image {
         fieldName: this.config.field
       })
         .then((response) => {
-          this._updateImageSrc(response.url);
+          this._createImage(response.url);
+          button.remove();
         })
         .catch(console.error);
     });
 
-    return button;
+    this.nodes.button = button;
+
+    this.nodes.wrapper.appendChild(button);
   }
 
-  _createImage() {
-    let image = document.createElement('IMG');
+  _createImage(url) {
+    let loader = this._make('div', this.CSS.loading),
+      imageHolder = this._make('div', this.CSS.imageHolder),
+      image = this._make('img'),
+      caption = this._make('div', this.CSS.input, {
+        contentEditable: 'true',
+        innerHTML: this.data.caption || ''
+      });
 
-    image.classList.add(this.CSS.displaynone);
+    caption.dataset.placeholder = 'Enter a caption';
 
-    return image;
-  }
+    image.src = url;
+    this.nodes.wrapper.appendChild(loader);
 
-  _progressCallback(percentage) {
-    document.title = `${percentage}%`;
-  }
+    image.onload = () => {
+      this.nodes.wrapper.classList.remove(this.CSS.loading);
 
-  _updateImageSrc(path) {
-    this.nodes.image.src = path;
+      imageHolder.appendChild(image);
 
-    this.nodes.image.onload = () => {
-      this.nodes.button.classList.add(this.CSS.displaynone);
-      this.nodes.image.classList.remove(this.CSS.displaynone);
+      this.nodes.wrapper.appendChild(imageHolder);
+      this.nodes.wrapper.appendChild(caption);
+
+      loader.remove();
 
       this._acceptTuneView();
     };
+
+    image.onerror = () => {
+      // @todo use api.Notifies.show() to show error notification
+      console.error('Failed to load an image');
+    };
+
+    this.nodes.imageHolder = imageHolder;
   }
+
+  _progressCallback(percentage) {}
 
   /**
    * Click on the Settings Button
@@ -249,12 +247,36 @@ class Image {
    */
   _acceptTuneView() {
     this.settings.forEach( tune => {
-      this.nodes.wrapper.classList.toggle(this.CSS.image + '--' + tune.name.replace(/([A-Z])/g, (g) => `-${g[0].toLowerCase()}`), !!this.data[tune.name]);
+      this.nodes.imageHolder.classList.toggle(this.CSS.imageHolder + '--' + tune.name.replace(/([A-Z])/g, (g) => `-${g[0].toLowerCase()}`), !!this.data[tune.name]);
 
       if (tune.name === 'stretched') {
         this.api.blocks.stretchBlock(this.api.blocks.getCurrentBlockIndex(), !!this.data.stretched);
       }
     });
+  }
+
+  /**
+   * Helper for making Elements with attributes
+   *
+   * @param  {string} tagName           - new Element tag name
+   * @param  {array|string} classNames  - list or name of CSS classname(s)
+   * @param  {Object} attributes        - any attributes
+   * @return {Element}
+   */
+  _make(tagName, classNames = null, attributes = {}) {
+    let el = document.createElement(tagName);
+
+    if ( Array.isArray(classNames) ) {
+      el.classList.add(...classNames);
+    } else if( classNames ) {
+      el.classList.add(classNames);
+    }
+
+    for (let attrName in attributes) {
+      el[attrName] = attributes[attrName];
+    }
+
+    return el;
   }
 }
 
