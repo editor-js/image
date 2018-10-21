@@ -71,7 +71,7 @@ class Image {
      */
     this.config = {
       url: config.url || '',
-      field: config.field || '',
+      field: config.field || 'image',
       types: config.types || 'image/*'
     };
 
@@ -96,6 +96,7 @@ class Image {
     this.nodes = {
       wrapper: null,
       button: null,
+      loader: null,
       imageHolder: null
     };
 
@@ -116,8 +117,6 @@ class Image {
         icon: `<svg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10.043 8.265l3.183-3.183h-2.924L4.75 10.636v2.923l4.15-4.15v2.351l-2.158 2.159H8.9v2.137H4.7c-1.215 0-2.2-.936-2.2-2.09v-8.93c0-1.154.985-2.09 2.2-2.09h10.663l.033-.033.034.034c1.178.04 2.12.96 2.12 2.089v3.23H15.3V5.359l-2.906 2.906h-2.35zM7.951 5.082H4.75v3.201l3.201-3.2zm5.099 7.078v3.04h4.15v-3.04h-4.15zm-1.1-2.137h6.35c.635 0 1.15.489 1.15 1.092v5.13c0 .603-.515 1.092-1.15 1.092h-6.35c-.635 0-1.15-.489-1.15-1.092v-5.13c0-.603.515-1.092 1.15-1.092z"/></svg>`
       },
     ];
-
-    // this._createWrapper();
   }
 
   render() {
@@ -125,7 +124,9 @@ class Image {
 
     if (!this.data.url) {
       this._createButton();
+      this.nodes.button.click();
     } else {
+      this._createLoader();
       this._createImage(this.data.url);
     }
 
@@ -174,6 +175,8 @@ class Image {
   _createButton() {
     let button = this._make('div', this.CSS.button);
 
+    this.nodes.button = button;
+
     button.innerHTML = 'Click to upload image';
 
     button.addEventListener('click', () => {
@@ -182,22 +185,42 @@ class Image {
         accept: this.config.types,
         progress: this._progressCallback,
         fieldName: this.config.field
+        /**
+         * @todo create 'before' param
+         *
+         * before: () => {
+         *   this._createLoader();
+         * }
+         */
+        //
       })
         .then((response) => {
-          this._createImage(response.url);
-          button.remove();
+          this.nodes.button.remove();
+
+          /**
+           * TEMP loader
+           */
+          this._createLoader();
+
+          this._createImage(response.data.url);
         })
         .catch(console.error);
     });
 
-    this.nodes.button = button;
-
     this.nodes.wrapper.appendChild(button);
   }
 
+  _createLoader() {
+    let loader = this._make('div', this.CSS.loading);
+
+    this.nodes.wrapper.appendChild(loader);
+
+    this.nodes.loader = loader;
+  }
+
   _createImage(url) {
-    let loader = this._make('div', this.CSS.loading),
-      imageHolder = this._make('div', this.CSS.imageHolder),
+    // let loader = this._make('div', this.CSS.loading),
+    let imageHolder = this._make('div', this.CSS.imageHolder),
       image = this._make('img'),
       caption = this._make('div', this.CSS.input, {
         contentEditable: 'true',
@@ -207,7 +230,7 @@ class Image {
     caption.dataset.placeholder = 'Enter a caption';
 
     image.src = url;
-    this.nodes.wrapper.appendChild(loader);
+    // this.nodes.wrapper.appendChild(loader);
 
     image.onload = () => {
       this.nodes.wrapper.classList.remove(this.CSS.loading);
@@ -217,17 +240,21 @@ class Image {
       this.nodes.wrapper.appendChild(imageHolder);
       this.nodes.wrapper.appendChild(caption);
 
-      loader.remove();
+      this.nodes.loader.remove();
 
       this._acceptTuneView();
     };
 
+    this.nodes.imageHolder = imageHolder;
+
     image.onerror = () => {
       // @todo use api.Notifies.show() to show error notification
       console.error('Failed to load an image');
-    };
 
-    this.nodes.imageHolder = imageHolder;
+      this.nodes.loader.remove();
+      this.nodes.imageHolder.remove();
+      this._createButton();
+    };
   }
 
   _progressCallback(percentage) {}
