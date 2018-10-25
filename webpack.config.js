@@ -1,5 +1,4 @@
 module.exports = {
-  entry: './src/index.js',
   module: {
     rules: [
       {
@@ -11,8 +10,18 @@ module.exports = {
         test: /\.css$/,
         use: [
           "style-loader",
-          "css-loader"
+          "css-loader",
+          {
+            loader: "postcss-loader",
+            options: {
+              plugins: []
+            }
+          }
         ]
+      },
+      {
+        test: /\.svg$/,
+        loader: 'svg-inline-loader?removeSVGTagAttrs=false'
       }
     ]
   },
@@ -20,7 +29,11 @@ module.exports = {
     path: __dirname + '/dist',
     publicPath: '/',
     filename: 'bundle.js',
-    library: "Image",
-    libraryTarget: 'umd'
+    library: "ImageTool",
+    libraryTarget: 'umd',
+    libraryExport: 'default'
+  },
+  optimization: {
+    minimize: false
   }
 };

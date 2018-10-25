@@ -1,4 +1,11 @@
-.cdx-image {}
+.image-tool {
+  &__tune {
+    svg {
+
+    }
+  }
+
+}
 
 .cdx-image .cdx-loader {
   min-height: 200px;

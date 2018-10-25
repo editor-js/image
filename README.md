@@ -19,7 +19,7 @@ npm i --save-dev codex.editor.image
 Include module at your application
 
 ```javascript
-const Image = require('codex.editor.image');
+const ImageTool = require('codex.editor.image');
 ```
 
 ### Download to your project's source dir
@@ -50,10 +50,9 @@ var editor = CodexEditor({
   tools: {
     ...
     image: {
-      class: Image,
+      class: ImageTool,
       config: {
         url: 'http://localhost:3000/uploadImage',
-        types: 'image/*'
       }
     }
   }

@@ -14,7 +14,7 @@
     "build": "webpack --config ./webpack.config.js --mode production --watch"
   },
   "author": {
-    "name": "CodeX Team",
+    "name": "CodeX",
     "email": "team@ifmo.su"
   },
   "devDependencies": {
@@ -23,7 +23,10 @@
     "babel-loader": "^7.1.5",
     "babel-preset-env": "^1.7.0",
     "css-loader": "^1.0.0",
+    "formidable": "^1.2.1",
+    "postcss-loader": "^3.0.0",
     "style-loader": "^0.21.0",
+    "svg-inline-loader": "^0.8.0",
     "webpack": "^4.16.3",
     "webpack-cli": "^3.1.0"
   },

@@ -1,14 +1,7 @@
 /**
- * Build styles
- */
-require('./index.css').toString();
-
-const ajax = require('@codexteam/ajax');
-
-/**
  * Image Tool for the CodeX Editor
  *
- * @typedef {object} ImageData
+ * @typedef {object} ImageToolData
  * @description Tool's input and output data format
  * @property {string} url — image URL
  * @property {string} caption — image caption
@@ -16,6 +9,11 @@ const ajax = require('@codexteam/ajax');
  * @property {boolean} withBackground - should image be rendered with background
  * @property {boolean} stretched - should image be stretched to full width of container
  */
+
+import css from './index.css';
+import Ui from './ui';
+import Tunes from './tunes';
+
 
 /**
  * @typedef {object} ImageConfig
@@ -25,7 +23,7 @@ const ajax = require('@codexteam/ajax');
  * @property {string} types - available mime-types
  */
 
-class Image {
+export default class ImageTool {
   /**
    * Should this tools be displayed at the Editor's Toolbox
    * @return {boolean}
@@ -43,28 +41,17 @@ class Image {
   }
 
   /**
-   * Render plugin`s main Element and fill it with saved data
-   *
-   * @param {{data: ImageData, config: ImageConfig, api: object}}
-   *   data — previously saved data
-   *   config - user config for Tool
-   *   api - CodeX Editor API
+   * @param {ImageToolData} data - previously saved data
+   * @param {ImageConfig} config - user config for Tool
+   * @param {object} api - CodeX Editor API
    */
   constructor({data, config, api}) {
-    this.data = data;
-    this.api = api;
-    this.config = config;
 
     /**
-     * Tool's initial data
+     * Initial data
      */
-    this.data = {
-      url: data.url || '',
-      caption: data.caption || '',
-      withBorder: data.withBorder !== undefined ? data.withBorder : false,
-      withBackground: data.withBackground !== undefined ? data.withBackground : false,
-      stretched: data.stretched !== undefined ? data.stretched : false,
-    };
+    this._data = {};
+    this.data = data;
 
     /**
      * Tool's initial config
@@ -75,24 +62,6 @@ class Image {
       types: config.types || 'image/*'
     };
 
-    /**
-     * Styles
-     */
-    this.CSS = {
-      baseClass: this.api.styles.block,
-      loading: this.api.styles.loader,
-      input: this.api.styles.input,
-      settingsButton: this.api.styles.settingsButton,
-      settingsButtonActive: this.api.styles.settingsButtonActive,
-
-      /**
-       * Tool's classes
-       */
-      wrapper: 'cdx-image',
-      button: 'cdx-image__upload-button',
-      imageHolder: 'cdx-image__picture',
-    };
-
     this.nodes = {
       wrapper: null,
       button: null,
@@ -100,76 +69,55 @@ class Image {
       imageHolder: null
     };
 
-    /**
-     * Available Image settings
-     */
-    this.settings = [
-      {
-        name: 'withBorder',
-        icon: `<svg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M15.8 10.592v2.043h2.35v2.138H15.8v2.232h-2.25v-2.232h-2.4v-2.138h2.4v-2.28h2.25v.237h1.15-1.15zM1.9 8.455v-3.42c0-1.154.985-2.09 2.2-2.09h4.2v2.137H4.15v3.373H1.9zm0 2.137h2.25v3.325H8.3v2.138H4.1c-1.215 0-2.2-.936-2.2-2.09v-3.373zm15.05-2.137H14.7V5.082h-4.15V2.945h4.2c1.215 0 2.2.936 2.2 2.09v3.42z"/></svg>`
-      },
-      {
-        name: 'stretched',
-        icon: `<svg width="17" height="10" viewBox="0 0 17 10" xmlns="http://www.w3.org/2000/svg"><path d="M13.568 5.925H4.056l1.703 1.703a1.125 1.125 0 0 1-1.59 1.591L.962 6.014A1.069 1.069 0 0 1 .588 4.26L4.38.469a1.069 1.069 0 0 1 1.512 1.511L4.084 3.787h9.606l-1.85-1.85a1.069 1.069 0 1 1 1.512-1.51l3.792 3.791a1.069 1.069 0 0 1-.475 1.788L13.514 9.16a1.125 1.125 0 0 1-1.59-1.591l1.644-1.644z"/></svg>`
-      },
-      {
-        name: 'withBackground',
-        icon: `<svg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10.043 8.265l3.183-3.183h-2.924L4.75 10.636v2.923l4.15-4.15v2.351l-2.158 2.159H8.9v2.137H4.7c-1.215 0-2.2-.936-2.2-2.09v-8.93c0-1.154.985-2.09 2.2-2.09h10.663l.033-.033.034.034c1.178.04 2.12.96 2.12 2.089v3.23H15.3V5.359l-2.906 2.906h-2.35zM7.951 5.082H4.75v3.201l3.201-3.2zm5.099 7.078v3.04h4.15v-3.04h-4.15zm-1.1-2.137h6.35c.635 0 1.15.489 1.15 1.092v5.13c0 .603-.515 1.092-1.15 1.092h-6.35c-.635 0-1.15-.489-1.15-1.092v-5.13c0-.603.515-1.092 1.15-1.092z"/></svg>`
-      },
-    ];
+    this.ui = new Ui({api, config: this.config});
+    this.tunes = new Tunes({api});
   }
 
+  /**
+   * @param {ImageToolData} data
+   */
+  set data(data){
+      this._data.url = data.url || '';
+      this._data.caption = data.caption || '';
+      this._data.withBorder = data.withBorder !== undefined ? data.withBorder : false;
+      this._data.withBackground =  data.withBackground !== undefined ? data.withBackground : false;
+      this._data.stretched = data.stretched !== undefined ? data.stretched : false;
+  }
+
+  /**
+   * @return {ImageToolData} data
+   */
+  get data(){
+    return this._data;
+  }
+
+  /**
+   * @return {HTMLDivElement}
+   */
   render() {
-    this.nodes.wrapper = this._make('div', [this.CSS.baseClass, this.CSS.wrapper]);
-
-    if (!this.data.url) {
-      this._createButton();
-      this.nodes.button.click();
-    } else {
-      this._createLoader();
-      this._createImage(this.data.url);
-    }
-
-    return this.nodes.wrapper;
+    return this.ui.render(this.data);
   }
 
   save() {
-    let image = this.nodes.wrapper.querySelector('img'),
-      caption = this.nodes.wrapper.querySelector('.' + this.CSS.input);
-
-    if (!image) {
-      return this.data;
-    }
+    // let image = this.nodes.wrapper.querySelector('img'),
+    //   caption = this.nodes.wrapper.querySelector('.' + this.CSS.input);
+    //
+    // if (!image) {
+    //   return this.data;
+    // }
 
     return Object.assign(this.data, {
-      url: image.src,
-      caption: caption.innerHTML
+      // url: image.src,
+      // caption: caption.innerHTML
     });
   }
 
   /**
    * Makes buttons with tunes: add background, add border, stretch image
-   * @return {HTMLDivElement}
+   * @return {Element}
    */
   renderSettings() {
-    let wrapper = this._make('div');
-
-    this.settings.forEach( tune => {
-      let el = this._make('div', this.CSS.settingsButton);
-
-      el.innerHTML = tune.icon;
-
-      el.addEventListener('click', () => {
-        this._toggleTune(tune.name);
-        el.classList.toggle(this.CSS.settingsButtonActive);
-      });
-
-      el.classList.toggle(this.CSS.settingsButtonActive, this.data[tune.name]);
-
-      wrapper.appendChild(el);
-    });
-
-    return wrapper;
+    return this.tunes.render();
   }
 
 
@@ -205,9 +153,9 @@ class Image {
       patterns: {
         image: /https?:\/\/\S+\.(gif|jpe?g|tiff|png)$/i
       },
-      tags: [ 'img' ],
+      tags: ['img'],
       files: {
-        mimeTypes: [ 'image/*' ]
+        mimeTypes: ['image/*']
       },
       fileHandler: Image.onDropHandler,
       handler: (img) => {
@@ -221,44 +169,6 @@ class Image {
         };
       },
     };
-  }
-
-  _createButton() {
-    let button = this._make('div', this.CSS.button);
-
-    this.nodes.button = button;
-
-    button.innerHTML = 'Click to upload image';
-
-    button.addEventListener('click', () => {
-      ajax.transport({
-        url: this.config.url,
-        accept: this.config.types,
-        progress: this._progressCallback,
-        fieldName: this.config.field
-        /**
-         * @todo create 'before' param
-         *
-         * before: () => {
-         *   this._createLoader();
-         * }
-         */
-        //
-      })
-        .then((response) => {
-          this.nodes.button.remove();
-
-          /**
-           * TEMP loader
-           */
-          this._createLoader();
-
-          this._createImage(response.data.url);
-        })
-        .catch(console.error);
-    });
-
-    this.nodes.wrapper.appendChild(button);
   }
 
   _createLoader() {
@@ -332,30 +242,4 @@ class Image {
       }
     });
   }
-
-  /**
-   * Helper for making Elements with attributes
-   *
-   * @param  {string} tagName           - new Element tag name
-   * @param  {array|string} classNames  - list or name of CSS classname(s)
-   * @param  {Object} attributes        - any attributes
-   * @return {Element}
-   */
-  _make(tagName, classNames = null, attributes = {}) {
-    let el = document.createElement(tagName);
-
-    if ( Array.isArray(classNames) ) {
-      el.classList.add(...classNames);
-    } else if( classNames ) {
-      el.classList.add(classNames);
-    }
-
-    for (let attrName in attributes) {
-      el[attrName] = attributes[attrName];
-    }
-
-    return el;
-  }
 }
-
-module.exports = Image;
