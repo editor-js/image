@@ -1,18 +1,21 @@
 /**
  * Image Tool for the CodeX Editor
- *
- * @typedef {object} ImageToolData
+ */
+
+/** @typedef {object} ImageToolData
  * @description Tool's input and output data format
- * @property {string} url — image URL
  * @property {string} caption — image caption
  * @property {boolean} withBorder - should image be rendered with border
  * @property {boolean} withBackground - should image be rendered with background
  * @property {boolean} stretched - should image be stretched to full width of container
+ * @property {object} file — Image file data returned from backend
+ * @property {string} file.url — image URL
  */
 
 import css from './index.css';
 import Ui from './ui';
 import Tunes from './tunes';
+import ToolboxIcon from './svg/toolbox.svg';
 
 
 /**
@@ -21,6 +24,17 @@ import Tunes from './tunes';
  * @property {string} url - upload endpoint
  * @property {string} field - field name for uploaded image
  * @property {string} types - available mime-types
+ */
+
+/**
+ * @typedef {object} UploadResponseFormat
+ * @description This format expected from backend on file uploading
+ * @property {number} success - 1 for successful uploading, 0 for failure
+ * @property {object} file - Object with file data.
+ *                           'url' is required,
+ *                           also can contain any additional data that will be saved and passed back
+ * @property {string} file.url - [Required] image source URL
+ *
  */
 
 export default class ImageTool {
@@ -37,7 +51,7 @@ export default class ImageTool {
    * @return {string}
    */
   static get toolboxIcon() {
-    return '<svg width="17" height="15" viewBox="0 0 336 276" xmlns="http://www.w3.org/2000/svg"><path d="M291 150.242V79c0-18.778-15.222-34-34-34H79c-18.778 0-34 15.222-34 34v42.264l67.179-44.192 80.398 71.614 56.686-29.14L291 150.242zm-.345 51.622l-42.3-30.246-56.3 29.884-80.773-66.925L45 174.187V197c0 18.778 15.222 34 34 34h178c17.126 0 31.295-12.663 33.655-29.136zM79 0h178c43.63 0 79 35.37 79 79v118c0 43.63-35.37 79-79 79H79c-43.63 0-79-35.37-79-79V79C0 35.37 35.37 0 79 0z"/></svg>';
+    return ToolboxIcon;
   }
 
   /**
@@ -46,13 +60,6 @@ export default class ImageTool {
    * @param {object} api - CodeX Editor API
    */
   constructor({data, config, api}) {
-
-    /**
-     * Initial data
-     */
-    this._data = {};
-    this.data = data;
-
     /**
      * Tool's initial config
      */
@@ -62,26 +69,34 @@ export default class ImageTool {
       types: config.types || 'image/*'
     };
 
-    this.nodes = {
-      wrapper: null,
-      button: null,
-      loader: null,
-      imageHolder: null
-    };
+    this.ui = new Ui({
+      api,
+      config: this.config,
+      onUpload: (response) => this.onUpload(response)
+    });
 
-    this.ui = new Ui({api, config: this.config});
     this.tunes = new Tunes({api});
+
+    /**
+     * Set saved state
+     */
+    this._data = {};
+    this.data = data;
   }
 
   /**
    * @param {ImageToolData} data
    */
   set data(data){
-      this._data.url = data.url || '';
-      this._data.caption = data.caption || '';
-      this._data.withBorder = data.withBorder !== undefined ? data.withBorder : false;
-      this._data.withBackground =  data.withBackground !== undefined ? data.withBackground : false;
-      this._data.stretched = data.stretched !== undefined ? data.stretched : false;
+
+    console.log('data', data);
+
+    this.image = data.file;
+
+    this._data.caption = data.caption || '';
+    this._data.withBorder = data.withBorder !== undefined ? data.withBorder : false;
+    this._data.withBackground =  data.withBackground !== undefined ? data.withBackground : false;
+    this._data.stretched = data.stretched !== undefined ? data.stretched : false;
   }
 
   /**
@@ -89,6 +104,18 @@ export default class ImageTool {
    */
   get data(){
     return this._data;
+  }
+
+  /**
+   * @param {object} file - uploaded file data
+   */
+  set image(file) {
+    console.log(file);
+    this._data.file = file;
+    if (file && file.url) {
+      console.log('file.url', file.url);
+      this.ui.showImage(file.url);
+    }
   }
 
   /**
@@ -118,6 +145,16 @@ export default class ImageTool {
    */
   renderSettings() {
     return this.tunes.render();
+  }
+
+  /**
+   * Field uploading callback
+   * @param {UploadResponseFormat} response
+   */
+  onUpload(response){
+    console.log('UploadResponseFormat', response);
+    this.image = response.file;
+    // this.data =
   }
 
 

@@ -2,12 +2,15 @@ import buttonIcon from './svg/button-icon.svg';
 import ajax from '@codexteam/ajax';
 
 export default class Ui {
-  constructor({api, config}){
+  constructor({api, config, onUpload}){
     this.api = api;
     this.config = config;
+    this.onUpload = onUpload;
     this.nodes = {
       wrapper: undefined,
       fileButton: undefined,
+      imageContainer: undefined,
+      imageEl: undefined,
     }
   }
   get CSS() {
@@ -21,6 +24,8 @@ export default class Ui {
        * Tool's classes
        */
       wrapper: 'image-tool',
+      imageContainer: 'image-tool__image',
+      imageEl: 'image-tool__image-picture',
     }
   };
 
@@ -30,8 +35,10 @@ export default class Ui {
    */
   render(toolData) {
     this.nodes.wrapper = make('div', [this.CSS.baseClass, this.CSS.wrapper]);
+    this.nodes.imageContainer = make('div', [this.CSS.imageContainer]);
     this.nodes.fileButton = this.createFileButton();
 
+    this.nodes.wrapper.appendChild(this.nodes.imageContainer);
     this.nodes.wrapper.appendChild(this.nodes.fileButton);
 
     return this.nodes.wrapper;
@@ -57,7 +64,7 @@ export default class Ui {
       fieldName: this.config.field
     })
     .then((response) => {
-      this.fileUploaded(response);
+      this.onUpload(response);
     })
     .catch((error) => {
       console.log('uploading error', error);
@@ -68,8 +75,17 @@ export default class Ui {
     console.log('percentage', percentage);
   }
 
-  fileUploaded(response){
-    console.log('response', response);
+  /**
+   * Shows an image
+   * @param {string} url
+   */
+  showImage(url){
+    console.log('url>>', url);
+    this.nodes.imageEl = make('img', this.CSS.imageEl, {
+      src: url
+    });
+
+    this.nodes.imageContainer.appendChild(this.nodes.imageEl);
     // this.nodes.button.remove();
 
     /**

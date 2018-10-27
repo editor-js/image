@@ -46,9 +46,12 @@ const server = http.createServer(
         let image = files.image;
 
         responseJson.success = 1;
-        responseJson.url = image.path;
-        responseJson.name = image.name;
-        responseJson.size = image.size;
+        responseJson.file = {
+          url: image.path,
+          name: image.name,
+          size: image.size
+        };
+
       }
 
       response.writeHead(200, {'Content-Type': 'application/json'});

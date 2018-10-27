@@ -1,4 +1,9 @@
 .image-tool {
+  &__image {
+    &-picture {
+      max-width: 100%;
+    }
+  }
   &__tune {
     svg {
 
