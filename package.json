@@ -18,7 +18,7 @@
     "email": "team@ifmo.su"
   },
   "devDependencies": {
-    "@codexteam/ajax": "^3.1.1",
+    "@codexteam/ajax": "^3.2.1",
     "babel-core": "^6.26.3",
     "babel-loader": "^7.1.5",
     "babel-preset-env": "^1.7.0",
@@ -26,6 +26,7 @@
     "formidable": "^1.2.1",
     "postcss-loader": "^3.0.0",
     "postcss-nested": "^4.1.0",
+    "postcss-nested-ancestors": "^2.0.0",
     "style-loader": "^0.21.0",
     "svg-inline-loader": "^0.8.0",
     "webpack": "^4.16.3",

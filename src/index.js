@@ -16,6 +16,7 @@ import css from './index.css';
 import Ui from './ui';
 import Tunes from './tunes';
 import ToolboxIcon from './svg/toolbox.svg';
+import Converter from './coverter';
 
 
 /**
@@ -34,9 +35,7 @@ import ToolboxIcon from './svg/toolbox.svg';
  *                           'url' is required,
  *                           also can contain any additional data that will be saved and passed back
  * @property {string} file.url - [Required] image source URL
- *
  */
-
 export default class ImageTool {
   /**
    * Should this tools be displayed at the Editor's Toolbox
@@ -85,62 +84,32 @@ export default class ImageTool {
   }
 
   /**
-   * @param {ImageToolData} data
-   */
-  set data(data){
-
-    console.log('data', data);
-
-    this.image = data.file;
-
-    this._data.caption = data.caption || '';
-    this._data.withBorder = data.withBorder !== undefined ? data.withBorder : false;
-    this._data.withBackground =  data.withBackground !== undefined ? data.withBackground : false;
-    this._data.stretched = data.stretched !== undefined ? data.stretched : false;
-  }
-
-  /**
-   * @return {ImageToolData} data
-   */
-  get data(){
-    return this._data;
-  }
-
-  /**
-   * @param {object} file - uploaded file data
-   */
-  set image(file) {
-    console.log(file);
-    this._data.file = file;
-    if (file && file.url) {
-      console.log('file.url', file.url);
-      this.ui.showImage(file.url);
-    }
-  }
-
-  /**
+   * Renders Block content
+   * @public
+   *
    * @return {HTMLDivElement}
    */
   render() {
     return this.ui.render(this.data);
   }
 
+  /**
+   * Return Block data
+   * @public
+   *
+   * @return {ImageToolData}
+   */
   save() {
-    // let image = this.nodes.wrapper.querySelector('img'),
-    //   caption = this.nodes.wrapper.querySelector('.' + this.CSS.input);
-    //
-    // if (!image) {
-    //   return this.data;
-    // }
+    const caption = this.ui.nodes.caption;
+    this._data.caption = caption.innerHTML;
 
-    return Object.assign(this.data, {
-      // url: image.src,
-      // caption: caption.innerHTML
-    });
+    return this.data;
   }
 
   /**
    * Makes buttons with tunes: add background, add border, stretch image
+   * @public
+   *
    * @return {Element}
    */
   renderSettings() {
@@ -148,135 +117,99 @@ export default class ImageTool {
   }
 
   /**
-   * Field uploading callback
-   * @param {UploadResponseFormat} response
+   * Fires after clicks on the Toolbox Image Icon
+   * Initiates click on the Select File button
+   * @public
    */
-  onUpload(response){
-    console.log('UploadResponseFormat', response);
-    this.image = response.file;
-    // this.data =
+  appendCallback() {
+    this.ui.nodes.fileButton.click();
   }
 
-
-  /**
-   * Read pasted image and convert it to base64
-   *
-   * @static
-   * @param {File} file
-   * @returns {Promise<SimpleImageData>}
-   */
-  static onDropHandler(file) {
-    const reader = new FileReader();
-
-    reader.readAsDataURL(file);
-
-    return new Promise(resolve => {
-      reader.onload = (event) => {
-        resolve({
-          url: event.target.result,
-          caption: file.name
-        });
-      };
-    });
-  }
 
   /**
    * Specify paste substitutes
-   * @see {@link ../../../docs/tools.md#paste-handling}
    * @public
+   *
+   * @see {@link ../../../docs/tools.md#paste-handling}
    */
   static get onPaste() {
     return {
-      patterns: {
-        image: /https?:\/\/\S+\.(gif|jpe?g|tiff|png)$/i
-      },
+      /**
+       * Paste HTML into Editor
+       */
       tags: ['img'],
+      handler: Converter.fromHtml,
+
+      /**
+       * Drag n drop file from into the Editor
+       */
       files: {
         mimeTypes: ['image/*']
       },
-      fileHandler: Image.onDropHandler,
-      handler: (img) => {
-        return {
-          url: img.src
-        };
+      fileHandler: Converter.fromDroppedFile,
+
+      /**
+       * Paste URL of image into the Editor
+       */
+      patterns: {
+        image: /https?:\/\/\S+\.(gif|jpe?g|tiff|png)$/i
       },
-      patternHandler: (text) => {
-        return {
-          url: text
-        };
-      },
-    };
-  }
-
-  _createLoader() {
-    let loader = this._make('div', this.CSS.loading);
-
-    this.nodes.wrapper.appendChild(loader);
-
-    this.nodes.loader = loader;
-  }
-
-  _createImage(url) {
-    // let loader = this._make('div', this.CSS.loading),
-    let imageHolder = this._make('div', this.CSS.imageHolder),
-      image = this._make('img'),
-      caption = this._make('div', this.CSS.input, {
-        contentEditable: 'true',
-        innerHTML: this.data.caption || ''
-      });
-
-    caption.dataset.placeholder = 'Enter a caption';
-
-    image.src = url;
-    // this.nodes.wrapper.appendChild(loader);
-
-    image.onload = () => {
-      this.nodes.wrapper.classList.remove(this.CSS.loading);
-
-      imageHolder.appendChild(image);
-
-      this.nodes.wrapper.appendChild(imageHolder);
-      this.nodes.wrapper.appendChild(caption);
-
-      this.nodes.loader.remove();
-
-      this._acceptTuneView();
-    };
-
-    this.nodes.imageHolder = imageHolder;
-
-    image.onerror = () => {
-      // @todo use api.Notifies.show() to show error notification
-      console.error('Failed to load an image');
-
-      this.nodes.loader.remove();
-      this.nodes.imageHolder.remove();
-      this._createButton();
-    };
-  }
-
-  _progressCallback(percentage) {}
-
-  /**
-   * Click on the Settings Button
-   * @private
-   */
-  _toggleTune(tune) {
-    this.data[tune] = !this.data[tune];
-    this._acceptTuneView();
+      patternHandler: Converter.fromPastedUrl,
+    }
   }
 
   /**
-   * Add specified class corresponds with activated tunes
-   * @private
+   * Private methods
+   * ̿̿ ̿̿ ̿̿ ̿'̿'\̵͇̿̿\з= ( ▀ ͜͞ʖ▀) =ε/̵͇̿̿/’̿’̿ ̿ ̿̿ ̿̿ ̿̿
    */
-  _acceptTuneView() {
-    this.settings.forEach( tune => {
-      this.nodes.imageHolder.classList.toggle(this.CSS.imageHolder + '--' + tune.name.replace(/([A-Z])/g, (g) => `-${g[0].toLowerCase()}`), !!this.data[tune.name]);
 
-      if (tune.name === 'stretched') {
-        this.api.blocks.stretchBlock(this.api.blocks.getCurrentBlockIndex(), !!this.data.stretched);
-      }
-    });
+  /**
+   * Stores all Tool's data
+   * @private
+   *
+   * @param {ImageToolData} data
+   */
+  set data(data){
+    this.image = data.file;
+
+    this._data.caption = data.caption || '';
+    this.ui.fillCaption(this._data.caption);
+
+    this._data.withBorder = data.withBorder !== undefined ? data.withBorder : false;
+    this._data.withBackground =  data.withBackground !== undefined ? data.withBackground : false;
+    this._data.stretched = data.stretched !== undefined ? data.stretched : false;
+  }
+
+  /**
+   * Return Tool data
+   * @private
+   *
+   * @return {ImageToolData} data
+   */
+  get data(){
+    return this._data;
+  }
+
+  /**
+   * Set new image file
+   * @private
+   *
+   * @param {object} file - uploaded file data
+   */
+  set image(file) {
+    this._data.file = file || {};
+    if (file && file.url) {
+      this.ui.fillImage(file.url);
+    }
+  }
+
+  /**
+   * Field uploading callback
+   * @private
+   *
+   * @param {UploadResponseFormat} response
+   */
+  onUpload(response){
+    this.image = response.file;
   }
 }

@@ -7,11 +7,31 @@ export default class Ui {
     this.config = config;
     this.onUpload = onUpload;
     this.nodes = {
-      wrapper: undefined,
-      fileButton: undefined,
-      imageContainer: undefined,
+      wrapper: make('div', [this.CSS.baseClass, this.CSS.wrapper]),
+      imageContainer: make('div', [this.CSS.imageContainer]),
+      fileButton: this.createFileButton(),
       imageEl: undefined,
-    }
+      imagePreloader: make('div', this.CSS.imagePreloader),
+      caption: make('div', [this.CSS.input, this.CSS.caption], {
+        contentEditable: true
+      }),
+    };
+
+    /**
+     * Create base structure
+     *  <wrapper>
+     *    <image-container>
+     *      <image-preloader />
+     *    </image-container>
+     *    <caption />
+     *    <select-file-button />
+     *  </wrapper>
+     */
+    this.nodes.caption.dataset.placeholder = 'Caption';
+    this.nodes.imageContainer.appendChild(this.nodes.imagePreloader);
+    this.nodes.wrapper.appendChild(this.nodes.imageContainer);
+    this.nodes.wrapper.appendChild(this.nodes.caption);
+    this.nodes.wrapper.appendChild(this.nodes.fileButton);
   }
   get CSS() {
     return {
@@ -25,25 +45,45 @@ export default class Ui {
        */
       wrapper: 'image-tool',
       imageContainer: 'image-tool__image',
+      imagePreloader: 'image-tool__image-preloader',
       imageEl: 'image-tool__image-picture',
+      caption: 'image-tool__caption',
     }
   };
+
+  /**
+   * Ui statuses:
+   * - empty
+   * - uploading
+   * - filled
+   * @return {{EMPTY: string, UPLOADING: string, FILLED: string}}
+   */
+  static get status(){
+    return {
+      EMPTY: 'empty',
+      UPLOADING: 'loading',
+      FILLED: 'filled',
+    }
+  }
 
   /**
    * @param {ImageToolData} toolData
    * @return {HTMLDivElement}
    */
   render(toolData) {
-    this.nodes.wrapper = make('div', [this.CSS.baseClass, this.CSS.wrapper]);
-    this.nodes.imageContainer = make('div', [this.CSS.imageContainer]);
-    this.nodes.fileButton = this.createFileButton();
-
-    this.nodes.wrapper.appendChild(this.nodes.imageContainer);
-    this.nodes.wrapper.appendChild(this.nodes.fileButton);
+    if (!toolData.file || Object.keys(toolData.file).length === 0){
+      this.toggleStatus(Ui.status.EMPTY);
+    } else {
+      this.toggleStatus(Ui.status.UPLOADING);
+    }
 
     return this.nodes.wrapper;
   }
 
+  /**
+   * Creates upload-file button
+   * @return {Element}
+   */
   createFileButton(){
     let button = make('div', [this.CSS.button]);
 
@@ -56,11 +96,18 @@ export default class Ui {
     return button;
   }
 
+  /**
+   * Handle clicks on the upload file button
+   * @fires ajax.transport()
+   * @fires this.onUpload() - callback passed to the constructor
+   */
   selectFile(){
     ajax.transport({
       url: this.config.url,
       accept: this.config.types,
-      progress: (percentage) => this.uploadingProgress(percentage),
+      beforeSend: (files) => {
+        this.beforeSend(files[0]);
+      },
       fieldName: this.config.field
     })
     .then((response) => {
@@ -71,29 +118,70 @@ export default class Ui {
     });
   }
 
-  uploadingProgress(percentage){
-    console.log('percentage', percentage);
+  /**
+   * Called before sending, accepts uploaded file
+   * Uses to sho preview and loader
+   * @param {File} fileUploaded
+   */
+  beforeSend(fileUploaded){
+    const reader = new FileReader();
+    reader.readAsDataURL(fileUploaded);
+
+    reader.onload = ( e ) => {
+      this.showPreloader(e.target.result);
+    };
+  }
+
+  /**
+   * Shows uploading preloader
+   * @param {string} src - preview source
+   */
+  showPreloader(src){
+    this.nodes.imagePreloader.style.backgroundImage = `url(${src})`;
+
+    this.toggleStatus(Ui.status.UPLOADING);
   }
 
   /**
    * Shows an image
    * @param {string} url
    */
-  showImage(url){
-    console.log('url>>', url);
+  fillImage(url){
     this.nodes.imageEl = make('img', this.CSS.imageEl, {
       src: url
     });
 
     this.nodes.imageContainer.appendChild(this.nodes.imageEl);
-    // this.nodes.button.remove();
+    this.nodes.imageEl.addEventListener('load', () => {
+      this.toggleStatus(Ui.status.FILLED);
 
-    /**
-     * TEMP loader
-     */
-    // this._createLoader();
+      // preloader does not exists on first rendering with presaved data
+      if (this.nodes.imagePreloader) {
+        this.nodes.imagePreloader.style.backgroundImage = '';
+      }
+    })
+  }
 
-    // this._createImage(response.data.url);
+  /**
+   * Shows caption input
+   * @param {string} text - caption text
+   */
+  fillCaption(text){
+    if (this.nodes.caption){
+      this.nodes.caption.innerHTML = text;
+    }
+  }
+
+  /**
+   * Changes UI status
+   * @param {string} status - see {@link Ui.status} constants
+   */
+  toggleStatus(status){
+    for (const statusType in Ui.status){
+      if (Ui.status.hasOwnProperty(statusType)){
+        this.nodes.wrapper.classList.toggle(`${this.CSS.wrapper}--${Ui.status[statusType]}`, status === Ui.status[statusType]);
+      }
+    }
   }
 }
 

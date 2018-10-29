@@ -1,53 +1,99 @@
 .image-tool {
+  --bg-color: #CDD1E0;
+  --front-color: #388AE5;
+  --border-color: #E8E8EB;
+
   &__image {
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 10px;
+
     &-picture {
       max-width: 100%;
+      vertical-align: bottom;
+    }
+
+    &-preloader {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background-size: cover;
+      margin: auto;
+      position: relative;
+      background-color: var(--bg-color);
+
+      &::after {
+        content: '';
+        position: absolute;
+        z-index: 3;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        border: 2px solid var(--bg-color);
+        border-top-color: var(--front-color);
+        left: 50%;
+        top: 50%;
+        margin-top: -30px;
+        margin-left: -30px;
+        animation: image-preloader-spin 2s infinite linear;
+        box-sizing: border-box;
+      }
     }
   }
+  &--empty {
+    ^&__image {
+      display: none;
+    }
+  }
+
+  &--empty,
+  &--loading {
+    ^&__caption {
+      display: none;
+    }
+  }
+
+  &--filled {
+    .cdx-button {
+      display: none;
+    }
+
+    ^&__image {
+      &-preloader {
+        display: none;
+      }
+    }
+  }
+
+  &--loading {
+    ^&__image {
+      min-height: 200px;
+      display: flex;
+      border: 1px solid var(--border-color);
+      background-color: #fff;
+
+      &-picture {
+        display: none;
+      }
+    }
+
+    .cdx-button {
+      display: none;
+    }
+  }
+
   &__tune {
     svg {
 
     }
   }
-
 }
 
-.cdx-image .cdx-loader {
-  min-height: 200px;
-}
-
-.cdx-image .cdx-input {
-  margin-top: 10px;
-}
-
-.cdx-image img {
-  max-width: 100%;
-  vertical-align: bottom;
-}
-
-.cdx-image__picture--with-background {
-  background: #eff2f5;
-  padding: 10px;
-}
-
-.cdx-image__picture--with-background img {
-  display: block;
-  max-width: 60%;
-  margin: 0 auto;
-}
-
-.cdx-image__picture--with-border {
-  border: 1px solid #e8e8eb;
-  padding: 1px;
-}
-
-.cdx-image__picture--stretched img {
-  max-width: none;
-  width: 100%;
-}
-
-.cdx-image__upload-button {
-  height: 100px;
-  background-color: lightblue;
-  cursor: pointer;
+@keyframes image-preloader-spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
