@@ -309,6 +309,18 @@ var Ui = function () {
         }
       }
     }
+
+    /**
+     * Apply visual representation of activated tune
+     * @param {string} tuneName - one of available tunes {@link Tunes.tunes}
+     * @param {boolean} status - true for enable, false for disable
+     */
+
+  }, {
+    key: 'applyTune',
+    value: function applyTune(tuneName, status) {
+      this.nodes.wrapper.classList.toggle(this.CSS.wrapper + '--' + tuneName, status);
+    }
   }, {
     key: 'CSS',
     get: function get() {
@@ -489,6 +501,7 @@ var ImageTool = function () {
 
     _classCallCheck(this, ImageTool);
 
+    this.api = api;
     /**
      * Tool's initial config
      */
@@ -506,7 +519,12 @@ var ImageTool = function () {
       }
     });
 
-    this.tunes = new _tunes2.default({ api: api });
+    this.tunes = new _tunes2.default({
+      api: api,
+      onChange: function onChange(tuneName) {
+        return _this.tuneToggled(tuneName);
+      }
+    });
 
     /**
      * Set saved state
@@ -555,7 +573,7 @@ var ImageTool = function () {
   }, {
     key: 'renderSettings',
     value: function renderSettings() {
-      return this.tunes.render();
+      return this.tunes.render(this.data);
     }
 
     /**
@@ -590,6 +608,43 @@ var ImageTool = function () {
     value: function onUpload(response) {
       this.image = response.file;
     }
+
+    /**
+     * Callback fired when Block Tune is activated
+     * @private
+     *
+     * @param {string} tuneName - tune that has been clicked
+     */
+
+  }, {
+    key: 'tuneToggled',
+    value: function tuneToggled(tuneName) {
+      // inverse tune state
+      this.setTune(tuneName, !this._data[tuneName]);
+    }
+
+    /**
+     * Set one tune
+     * @param {string} tuneName - {@link Tunes.tunes}
+     * @param {boolean} value - tune state
+     */
+
+  }, {
+    key: 'setTune',
+    value: function setTune(tuneName, value) {
+      var _this2 = this;
+
+      this._data[tuneName] = value;
+
+      this.ui.applyTune(tuneName, value);
+
+      if (tuneName === 'stretched') {
+        var blockId = this.api.blocks.getCurrentBlockIndex();
+        setTimeout(function () {
+          _this2.api.blocks.stretchBlock(blockId, value);
+        }, 0); // wait api is ready
+      }
+    }
   }, {
     key: 'data',
 
@@ -606,14 +661,18 @@ var ImageTool = function () {
      * @param {ImageToolData} data
      */
     set: function set(data) {
+      var _this3 = this;
+
       this.image = data.file;
 
       this._data.caption = data.caption || '';
       this.ui.fillCaption(this._data.caption);
 
-      this._data.withBorder = data.withBorder !== undefined ? data.withBorder : false;
-      this._data.withBackground = data.withBackground !== undefined ? data.withBackground : false;
-      this._data.stretched = data.stretched !== undefined ? data.stretched : false;
+      _tunes2.default.tunes.forEach(function (_ref2) {
+        var tune = _ref2.name;
+
+        _this3.setTune(tune, data[tune] !== undefined ? data[tune] : false);
+      });
     }
 
     /**
@@ -710,7 +769,7 @@ exports = module.exports = __webpack_require__(4)(false);
 
 
 // module
-exports.push([module.i, ".image-tool {\n  --bg-color: #CDD1E0;\n  --front-color: #388AE5;\n  --border-color: #E8E8EB;\n}\n\n  .image-tool__image {\n    border-radius: 3px;\n    overflow: hidden;\n    margin-bottom: 10px;\n  }\n\n  .image-tool__image-picture {\n      max-width: 100%;\n      vertical-align: bottom;\n    }\n\n  .image-tool__image-preloader {\n      width: 50px;\n      height: 50px;\n      border-radius: 50%;\n      background-size: cover;\n      margin: auto;\n      position: relative;\n      background-color: var(--bg-color);\n    }\n\n  .image-tool__image-preloader::after {\n        content: '';\n        position: absolute;\n        z-index: 3;\n        width: 60px;\n        height: 60px;\n        border-radius: 50%;\n        border: 2px solid var(--bg-color);\n        border-top-color: var(--front-color);\n        left: 50%;\n        top: 50%;\n        margin-top: -30px;\n        margin-left: -30px;\n        animation: image-preloader-spin 2s infinite linear;\n        box-sizing: border-box;\n      }\n\n  .image-tool--empty .image-tool__image {\n      display: none;\n    }\n\n  .image-tool--empty .image-tool__caption, .image-tool--loading .image-tool__caption {\n      display: none;\n    }\n\n  .image-tool--filled .cdx-button {\n      display: none;\n    }\n\n  .image-tool--filled .image-tool__image-preloader {\n        display: none;\n      }\n\n  .image-tool--loading .image-tool__image {\n      min-height: 200px;\n      display: flex;\n      border: 1px solid var(--border-color);\n      background-color: #fff;\n    }\n\n  .image-tool--loading .image-tool__image-picture {\n        display: none;\n      }\n\n  .image-tool--loading .cdx-button {\n      display: none;\n    }\n\n  .image-tool__tune svg {\n\n    }\n\n@keyframes image-preloader-spin {\n  0% {\n    transform: rotate(0deg);\n  }\n  100% {\n    transform: rotate(360deg);\n  }\n}", ""]);
+exports.push([module.i, ".image-tool {\n  --bg-color: #CDD1E0;\n  --front-color: #388AE5;\n  --border-color: #E8E8EB;\n}\n\n  .image-tool__image {\n    border-radius: 3px;\n    overflow: hidden;\n    margin-bottom: 10px;\n  }\n\n  .image-tool__image-picture {\n      max-width: 100%;\n      vertical-align: bottom;\n      display: block;\n    }\n\n  .image-tool__image-preloader {\n      width: 50px;\n      height: 50px;\n      border-radius: 50%;\n      background-size: cover;\n      margin: auto;\n      position: relative;\n      background-color: var(--bg-color);\n    }\n\n  .image-tool__image-preloader::after {\n        content: '';\n        position: absolute;\n        z-index: 3;\n        width: 60px;\n        height: 60px;\n        border-radius: 50%;\n        border: 2px solid var(--bg-color);\n        border-top-color: var(--front-color);\n        left: 50%;\n        top: 50%;\n        margin-top: -30px;\n        margin-left: -30px;\n        animation: image-preloader-spin 2s infinite linear;\n        box-sizing: border-box;\n      }\n\n  .image-tool--empty .image-tool__image {\n      display: none;\n    }\n\n  .image-tool--empty .image-tool__caption, .image-tool--loading .image-tool__caption {\n      display: none;\n    }\n\n  .image-tool--filled .cdx-button {\n      display: none;\n    }\n\n  .image-tool--filled .image-tool__image-preloader {\n        display: none;\n      }\n\n  .image-tool--loading .image-tool__image {\n      min-height: 200px;\n      display: flex;\n      border: 1px solid var(--border-color);\n      background-color: #fff;\n    }\n\n  .image-tool--loading .image-tool__image-picture {\n        display: none;\n      }\n\n  .image-tool--loading .cdx-button {\n      display: none;\n    }\n\n  /**\n   * Tunes\n   * ----------------\n   */\n\n  .image-tool--withBorder .image-tool__image {\n      border: 1px solid var(--border-color);\n    }\n\n  .image-tool--withBackground .image-tool__image {\n      padding: 15px;\n      background: var(--bg-color);\n    }\n\n  .image-tool--withBackground .image-tool__image-picture {\n        max-width: 60%;\n        margin: 0 auto;\n      }\n\n  .image-tool--stretched .image-tool__image-picture {\n        width: 100%;\n      }\n\n@keyframes image-preloader-spin {\n  0% {\n    transform: rotate(0deg);\n  }\n  100% {\n    transform: rotate(360deg);\n  }\n}", ""]);
 
 // exports
 
@@ -1323,11 +1382,14 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 var Tunes = function () {
   function Tunes(_ref) {
-    var api = _ref.api;
+    var api = _ref.api,
+        onChange = _ref.onChange;
 
     _classCallCheck(this, Tunes);
 
     this.api = api;
+    this.onChange = onChange;
+    this.buttons = [];
   }
   /**
    * Available Image tunes
@@ -1340,14 +1402,15 @@ var Tunes = function () {
 
     /**
      * Makes buttons with tunes: add background, add border, stretch image
+     * @param {ImageToolData} toolData
      * @return {Element}
      */
-    value: function render() {
+    value: function render(toolData) {
       var _this = this;
 
       var wrapper = (0, _ui.make)('div', this.CSS.wrapper);
 
-      this.tunes.forEach(function (tune) {
+      Tunes.tunes.forEach(function (tune) {
         var el = (0, _ui.make)('div', [_this.CSS.buttonBase, _this.CSS.button], {
           innerHTML: tune.icon
         });
@@ -1356,7 +1419,10 @@ var Tunes = function () {
           _this.tuneClicked(tune.name);
         });
 
-        // el.classList.toggle(this.CSS.buttonActive, this.data[tune.name]);
+        el.dataset.tune = tune.name;
+        el.classList.toggle(_this.CSS.buttonActive, toolData[tune.name]);
+
+        _this.buttons.push(el);
 
         wrapper.appendChild(el);
       });
@@ -1372,9 +1438,25 @@ var Tunes = function () {
   }, {
     key: 'tuneClicked',
     value: function tuneClicked(tuneName) {
-      console.log('clicked', tuneName);
+      var button = this.buttons.find(function (el) {
+        return el.dataset.tune === tuneName;
+      });
+
+      button.classList.toggle(this.CSS.buttonActive, !button.classList.contains(this.CSS.buttonActive));
+
+      this.onChange(tuneName);
     }
   }, {
+    key: 'CSS',
+    get: function get() {
+      return {
+        wrapper: '',
+        buttonBase: this.api.styles.settingsButton,
+        button: 'image-tool__tune',
+        buttonActive: this.api.styles.settingsButtonActive
+      };
+    }
+  }], [{
     key: 'tunes',
     get: function get() {
       return [{
@@ -1387,16 +1469,6 @@ var Tunes = function () {
         name: 'withBackground',
         icon: _background2.default
       }];
-    }
-  }, {
-    key: 'CSS',
-    get: function get() {
-      return {
-        wrapper: '',
-        buttonBase: this.api.styles.settingsButton,
-        button: 'image-tool__tune',
-        buttonActive: this.api.styles.settingsButtonActive
-      };
     }
   }]);
 

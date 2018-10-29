@@ -11,6 +11,7 @@
     &-picture {
       max-width: 100%;
       vertical-align: bottom;
+      display: block;
     }
 
     &-preloader {
@@ -82,9 +83,34 @@
     }
   }
 
-  &__tune {
-    svg {
+  /**
+   * Tunes
+   * ----------------
+   */
 
+  &--withBorder {
+    ^&__image {
+      border: 1px solid var(--border-color);
+    }
+  }
+
+  &--withBackground {
+    ^&__image {
+      padding: 15px;
+      background: var(--bg-color);
+
+      &-picture {
+        max-width: 60%;
+        margin: 0 auto;
+      }
+    }
+  }
+
+  &--stretched {
+    ^&__image {
+      &-picture {
+        width: 100%;
+      }
     }
   }
 }

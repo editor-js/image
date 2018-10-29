@@ -59,6 +59,7 @@ export default class ImageTool {
    * @param {object} api - CodeX Editor API
    */
   constructor({data, config, api}) {
+    this.api = api;
     /**
      * Tool's initial config
      */
@@ -74,7 +75,10 @@ export default class ImageTool {
       onUpload: (response) => this.onUpload(response)
     });
 
-    this.tunes = new Tunes({api});
+    this.tunes = new Tunes({
+      api,
+      onChange: (tuneName) => this.tuneToggled(tuneName)
+    });
 
     /**
      * Set saved state
@@ -113,7 +117,7 @@ export default class ImageTool {
    * @return {Element}
    */
   renderSettings() {
-    return this.tunes.render();
+    return this.tunes.render(this.data);
   }
 
   /**
@@ -175,9 +179,9 @@ export default class ImageTool {
     this._data.caption = data.caption || '';
     this.ui.fillCaption(this._data.caption);
 
-    this._data.withBorder = data.withBorder !== undefined ? data.withBorder : false;
-    this._data.withBackground =  data.withBackground !== undefined ? data.withBackground : false;
-    this._data.stretched = data.stretched !== undefined ? data.stretched : false;
+    Tunes.tunes.forEach( ({name: tune}) => {
+      this.setTune(tune, data[tune] !== undefined ? data[tune] : false)
+    });
   }
 
   /**
@@ -211,5 +215,34 @@ export default class ImageTool {
    */
   onUpload(response){
     this.image = response.file;
+  }
+
+  /**
+   * Callback fired when Block Tune is activated
+   * @private
+   *
+   * @param {string} tuneName - tune that has been clicked
+   */
+  tuneToggled(tuneName){
+    // inverse tune state
+    this.setTune(tuneName, !this._data[tuneName]);
+  }
+
+  /**
+   * Set one tune
+   * @param {string} tuneName - {@link Tunes.tunes}
+   * @param {boolean} value - tune state
+   */
+  setTune(tuneName, value) {
+    this._data[tuneName] = value;
+
+    this.ui.applyTune(tuneName, value);
+
+    if (tuneName === 'stretched'){
+      const blockId = this.api.blocks.getCurrentBlockIndex();
+      setTimeout(() => {
+        this.api.blocks.stretchBlock(blockId, value);
+      }, 0) // wait api is ready
+    }
   }
 }

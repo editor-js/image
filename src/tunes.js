@@ -4,13 +4,15 @@ import borderIcon from './svg/border.svg';
 import stretchedIcon from './svg/stretched.svg';
 
 export default class Tunes {
-  constructor({api}){
+  constructor({api, onChange}){
     this.api = api;
+    this.onChange = onChange;
+    this.buttons = [];
   }
   /**
    * Available Image tunes
    */
-  get tunes(){
+  static get tunes(){
     return [
       {
         name: 'withBorder',
@@ -38,12 +40,13 @@ export default class Tunes {
 
   /**
    * Makes buttons with tunes: add background, add border, stretch image
+   * @param {ImageToolData} toolData
    * @return {Element}
    */
-  render() {
+  render(toolData) {
     let wrapper = make('div', this.CSS.wrapper);
 
-    this.tunes.forEach( tune => {
+    Tunes.tunes.forEach( tune => {
       let el = make('div', [this.CSS.buttonBase, this.CSS.button], {
         innerHTML: tune.icon
       });
@@ -52,7 +55,10 @@ export default class Tunes {
         this.tuneClicked(tune.name);
       });
 
-      // el.classList.toggle(this.CSS.buttonActive, this.data[tune.name]);
+      el.dataset.tune = tune.name;
+      el.classList.toggle(this.CSS.buttonActive, toolData[tune.name]);
+
+      this.buttons.push(el);
 
       wrapper.appendChild(el);
     });
@@ -65,7 +71,10 @@ export default class Tunes {
    * @param {string} tuneName - clicked tune name
    */
   tuneClicked(tuneName){
-    console.log('clicked', tuneName);
-  }
+    let button = this.buttons.find(el => el.dataset.tune === tuneName);
 
+    button.classList.toggle(this.CSS.buttonActive, !button.classList.contains(this.CSS.buttonActive));
+
+    this.onChange(tuneName);
+  }
 }
