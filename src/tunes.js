@@ -16,15 +16,18 @@ export default class Tunes {
     return [
       {
         name: 'withBorder',
-        icon: borderIcon
+        icon: borderIcon,
+        title: 'With border'
       },
       {
         name: 'stretched',
-        icon: stretchedIcon
+        icon: stretchedIcon,
+        title: 'Stretch image'
       },
       {
         name: 'withBackground',
-        icon: bgIcon
+        icon: bgIcon,
+        title: 'With background'
       },
     ]
   }
@@ -46,9 +49,12 @@ export default class Tunes {
   render(toolData) {
     let wrapper = make('div', this.CSS.wrapper);
 
+    this.buttons = [];
+
     Tunes.tunes.forEach( tune => {
       let el = make('div', [this.CSS.buttonBase, this.CSS.button], {
-        innerHTML: tune.icon
+        innerHTML: tune.icon,
+        title: tune.title
       });
 
       el.addEventListener('click', () => {

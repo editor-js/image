@@ -27,7 +27,7 @@ export default class Ui {
      *    <select-file-button />
      *  </wrapper>
      */
-    this.nodes.caption.dataset.placeholder = 'Caption';
+    this.nodes.caption.dataset.placeholder = this.config.captionPlaceholder;
     this.nodes.imageContainer.appendChild(this.nodes.imagePreloader);
     this.nodes.wrapper.appendChild(this.nodes.imageContainer);
     this.nodes.wrapper.appendChild(this.nodes.caption);
@@ -115,6 +115,11 @@ export default class Ui {
     })
     .catch((error) => {
       console.log('uploading error', error);
+      /**
+       * @todo show notify through the Notify API
+       */
+      this.nodes.imagePreloader.style.backgroundImage = '';
+      this.toggleStatus(Ui.status.EMPTY);
     });
   }
 

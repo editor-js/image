@@ -37,6 +37,6 @@ module.exports = {
     libraryExport: 'default'
   },
   optimization: {
-    minimize: false
+    minimize: true
   }
 };

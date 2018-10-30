@@ -1,9 +1,34 @@
 /**
  * Image Tool for the CodeX Editor
+ * @author CodeX <team@ifmo.su>
+ * @licence MIT
+ * @see {@link https://github.com/codex-editor/image}
+ *
+ * To developers.
+ * To simplify Tool structure, we split it to 4 parts:
+ *  1) index.js — main Tool's interface, public API and methods for working with data
+ *  2) ui.js — module for UI manipulations: render, showing preloader and file-select handlers (including AJAX transport)
+ *  3) tunes.js — working with Block Tunes: render buttons, handle clicks
+ *  4) converter.js — utils for extracting Image Tool Data from pasted content
+ *
+ * For debug purposes there is a testing server
+ * that can save uploaded files and return a Response {@link UploadResponseFormat}
+ *
+ *       $ node tests/server.js
+ *
+ * It will expose 8008 port, so you can pass http://localhost:8008 with the Tools config:
+ *
+ * image: {
+ *   class: ImageTool,
+ *   config: {
+ *     url: 'http://localhost:8008'
+ *   },
+ * },
  */
 
-/** @typedef {object} ImageToolData
- * @description Tool's input and output data format
+/**
+ * @typedef {object} ImageToolData
+ * @description Image Tool's input and output data format
  * @property {string} caption — image caption
  * @property {boolean} withBorder - should image be rendered with border
  * @property {boolean} withBackground - should image be rendered with background
@@ -18,13 +43,13 @@ import Tunes from './tunes';
 import ToolboxIcon from './svg/toolbox.svg';
 import Converter from './coverter';
 
-
 /**
  * @typedef {object} ImageConfig
- * @description
+ * @description Config supported by Tool
  * @property {string} url - upload endpoint
  * @property {string} field - field name for uploaded image
  * @property {string} types - available mime-types
+ * @property {string} captionPlaceholder - placeholder for Caption field
  */
 
 /**
@@ -38,7 +63,7 @@ import Converter from './coverter';
  */
 export default class ImageTool {
   /**
-   * Should this tools be displayed at the Editor's Toolbox
+   * This Tool should be displayed at the Editor's Toolbox
    * @return {boolean}
    */
   static get displayInToolbox() {
@@ -46,7 +71,7 @@ export default class ImageTool {
   }
 
   /**
-   * Get Tool icon's SVG
+   * Tool's icon SVG
    * @return {string}
    */
   static get toolboxIcon() {
@@ -66,7 +91,8 @@ export default class ImageTool {
     this.config = {
       url: config.url || '',
       field: config.field || 'image',
-      types: config.types || 'image/*'
+      types: config.types || 'image/*',
+      captionPlaceholder: config.captionPlaceholder || 'Caption'
     };
 
     this.ui = new Ui({
