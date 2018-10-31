@@ -111,16 +111,28 @@ export default class Ui {
       fieldName: this.config.field
     })
     .then((response) => {
-      this.onUpload(response);
+      if (response.success && response.file){
+        this.onUpload(response);
+      } else {
+        this.uploadingError('incorrect response: ' + JSON.stringify(response));
+      }
     })
     .catch((error) => {
-      console.log('uploading error', error);
-      /**
-       * @todo show notify through the Notify API
-       */
-      this.nodes.imagePreloader.style.backgroundImage = '';
-      this.toggleStatus(Ui.status.EMPTY);
+      this.uploadingError(error);
     });
+  }
+
+  /**
+   * Failed uploading handler
+   * @param {string} message
+   */
+  uploadingError(message){
+    console.log('Image Tool: uploading failed because of', message);
+    /**
+     * @todo show notify through the Notify API
+     */
+    this.nodes.imagePreloader.style.backgroundImage = '';
+    this.toggleStatus(Ui.status.EMPTY);
   }
 
   /**

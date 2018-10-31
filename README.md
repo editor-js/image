@@ -2,10 +2,19 @@
 
 # Image Tool
 
-Provides Image Blocks for the [CodeX Editor](https://ifmo.su/editor).
+Image Block for the [CodeX Editor](https://ifmo.su/editor).
 
-Use for uploading images from user's device.
+![](https://capella.pics/63a03d04-3816-45b2-87b2-d85e556f0066.jpg)
 
+## Features
+
+- Uploading file from the device
+- Supports pasting copied content from the web
+- Supports pasting images by drag-n-drop
+- Allows to add border, background
+- Allows to stretch image to the container's full-width 
+
+*Note* This Tool requires server-side implementation for file uploading. See [backend response format](#server-format) for more details.  
 ## Installation
 
 ### Install via NPM
@@ -33,11 +42,7 @@ You can load specific version of package from [jsDelivr CDN](https://www.jsdeliv
 
 `https://cdn.jsdelivr.net/npm/codex.editor.image@1.0.0`
 
-Then require this script on page with CodeX Editor.
-
-```html
-<script src="..."></script>
-```
+Then require this script on page with CodeX Editor through the `<script src=""></script>` tag.
 
 ## Usage
 
@@ -52,7 +57,7 @@ var editor = CodexEditor({
     image: {
       class: ImageTool,
       config: {
-        url: 'http://localhost:3000/uploadImage',
+        url: 'http://localhost:8008/', // Your backend uploader endpoint 
       }
     }
   }
@@ -65,9 +70,10 @@ var editor = CodexEditor({
 
 | Field | Type     | Description        |
 | ----- | -------- | ------------------ |
-| url   | `string` | uploading endpoint |
-| field | `string` | (default: `image`) name of image field in POST request |
-| types | `string` | (default: `image/*`) list of available mime-types. [see docs](https://github.com/codex-team/ajax#accept-string) |
+| url   | `string` | **Required** Path for file uploading |
+| field | `string` | (default: `image`) Name of uploaded image field in POST request |
+| types | `string` | (default: `image/*`) Mime-types of files that can be [accepted with file selection](https://github.com/codex-team/ajax#accept-string).|
+| captionPlaceholder | `string` | (default: `Caption`) Placeholder for Caption input |
 
 ## Tool's settings
 
@@ -83,7 +89,7 @@ var editor = CodexEditor({
 
 | Field          | Type      | Description                     |
 | -------------- | --------- | ------------------------------- |
-| url            | `string`  | image's url                     |
+| file           | `object`  | Uploaded file data. Any data got from backend uploader. Always contain the `url` property |
 | caption        | `string`  | image's caption                 |
 | withBorder     | `boolean` | add border to image             |
 | withBackground | `boolean` | need to add background          |
@@ -94,7 +100,9 @@ var editor = CodexEditor({
 {
     "type" : "image",
     "data" : {
-        "url" : "https://www.tesla.com/tesla_theme/assets/img/_vehicle_redesign/roadster_and_semi/roadster/hero.jpg",
+        "file": {
+            "url" : "https://www.tesla.com/tesla_theme/assets/img/_vehicle_redesign/roadster_and_semi/roadster/hero.jpg"
+        },
         "caption" : "Roadster // tesla.com",
         "withBorder" : false,
         "withBackground" : false,
@@ -102,3 +110,35 @@ var editor = CodexEditor({
     }
 }
 ```
+
+## Backend response format <a name="server-format"></a>
+
+This Tool works by following scheme:
+
+1. User select file from the device
+2. Tool sends it to **your** backend 
+3. Your backend should save file and return file data with JSON at specified format.
+4. Image tool shows saved image and stores server answer
+
+So, you can implement backend for file saving by your own way. It is a specific and trivial task depending on your
+environment and stack.
+
+Response of your uploader **should** cover following format:
+
+```json
+{
+    "success" : 1,
+    "file": {
+        "url" : "https://www.tesla.com/tesla_theme/assets/img/_vehicle_redesign/roadster_and_semi/roadster/hero.jpg",
+        // ... and any additional fields you want
+    }
+}
+```
+
+**success** - uploading status. 1 for successful, 0 for failed
+
+**file** - uploaded file data. **Should** contain an `url` field with full public path to the uploaded image. 
+Also, can contain any additional fields you want to store. For example, width, height, id etc. 
+All additional fields will be saved at the `file` object of output data.    
+
+ 
