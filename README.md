@@ -9,12 +9,13 @@ Image Block for the [CodeX Editor](https://ifmo.su/editor).
 ## Features
 
 - Uploading file from the device
-- Supports pasting copied content from the web
-- Supports pasting images by drag-n-drop
+- Pasting copied content from the web
+- Pasting images by drag-n-drop
 - Allows to add border, background
 - Allows to stretch image to the container's full-width 
 
-*Note* This Tool requires server-side implementation for file uploading. See [backend response format](#server-format) for more details.  
+**Note** This Tool requires server-side implementation for file uploading. See [backend response format](#server-format) for more details.
+  
 ## Installation
 
 ### Install via NPM
@@ -87,6 +88,8 @@ var editor = CodexEditor({
 
 ## Output data
 
+This Tool returns `data` with following format
+
 | Field          | Type      | Description                     |
 | -------------- | --------- | ------------------------------- |
 | file           | `object`  | Uploaded file data. Any data got from backend uploader. Always contain the `url` property |
@@ -125,7 +128,7 @@ environment and stack.
 
 Response of your uploader **should** cover following format:
 
-```json
+```json5
 {
     "success" : 1,
     "file": {
