@@ -1,7 +1,7 @@
 /**
  * Image Tool for the CodeX Editor
  * @author CodeX <team@ifmo.su>
- * @licence MIT
+ * @license MIT
  * @see {@link https://github.com/codex-editor/image}
  *
  * To developers.
@@ -85,6 +85,7 @@ export default class ImageTool {
    */
   constructor({data, config, api}) {
     this.api = api;
+
     /**
      * Tool's initial config
      */
@@ -228,6 +229,7 @@ export default class ImageTool {
    */
   set image(file) {
     this._data.file = file || {};
+
     if (file && file.url) {
       this.ui.fillImage(file.url);
     }
@@ -266,6 +268,7 @@ export default class ImageTool {
 
     if (tuneName === 'stretched'){
       const blockId = this.api.blocks.getCurrentBlockIndex();
+
       setTimeout(() => {
         this.api.blocks.stretchBlock(blockId, value);
       }, 0) // wait api is ready
