@@ -268,6 +268,7 @@ export default class ImageTool {
 
     if (tuneName === 'stretched'){
       const blockId = this.api.blocks.getCurrentBlockIndex();
+
       setTimeout(() => {
         this.api.blocks.stretchBlock(blockId, value);
       }, 0) // wait api is ready
