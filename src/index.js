@@ -85,6 +85,7 @@ export default class ImageTool {
    */
   constructor({data, config, api}) {
     this.api = api;
+
     /**
      * Tool's initial config
      */
