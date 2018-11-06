@@ -137,7 +137,7 @@ Response of your uploader **should** cover following format:
 
 **success** - uploading status. 1 for successful, 0 for failed
 
-**file** - uploaded file data. **Should** contain an `url` field with full public path to the uploaded image. 
+**file** - uploaded file data. **Must** contain an `url` field with full public path to the uploaded image. 
 Also, can contain any additional fields you want to store. For example, width, height, id etc. 
 All additional fields will be saved at the `file` object of output data.    
 
