@@ -1,7 +1,7 @@
 /**
  * Image Tool for the CodeX Editor
  * @author CodeX <team@ifmo.su>
- * @licence MIT
+ * @license MIT
  * @see {@link https://github.com/codex-editor/image}
  *
  * To developers.
