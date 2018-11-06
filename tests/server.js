@@ -12,12 +12,11 @@ const port = 8008;
 
 const server = http.createServer(
   /**
-   *
+   * Request handler
    * @param {http.IncomingMessage} request
    * @param {http.ServerResponse} response
    */
   function ( request, response ) {
-
     response.setHeader('Access-Control-Allow-Origin', '*');
     response.setHeader('Access-Control-Request-Method', '*');
     response.setHeader('Access-Control-Allow-Methods', 'POST');
@@ -28,12 +27,12 @@ const server = http.createServer(
       return;
     }
 
-
     let responseJson = {
       success: 0
     };
 
     const form = new formidable.IncomingForm();
+
     form.uploadDir = __dirname + '/\.tmp';
     form.keepExtensions = true;
 
@@ -51,7 +50,6 @@ const server = http.createServer(
           name: image.name,
           size: image.size
         };
-
       }
 
       response.writeHead(200, {'Content-Type': 'application/json'});

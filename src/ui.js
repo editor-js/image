@@ -1,6 +1,11 @@
 import buttonIcon from './svg/button-icon.svg';
 import ajax from '@codexteam/ajax';
 
+/**
+ * Class for working with UI:
+ *  - rendering base structure
+ *  - handle files selection and sending
+ */
 export default class Ui {
   constructor({api, config, onUpload}){
     this.api = api;
@@ -142,9 +147,10 @@ export default class Ui {
    */
   beforeSend(fileUploaded){
     const reader = new FileReader();
+
     reader.readAsDataURL(fileUploaded);
 
-    reader.onload = ( e ) => {
+    reader.onload = (e) => {
       this.showPreloader(e.target.result);
     };
   }

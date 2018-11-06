@@ -207,7 +207,8 @@ export default class ImageTool {
     this.ui.fillCaption(this._data.caption);
 
     Tunes.tunes.forEach( ({name: tune}) => {
-      this.setTune(tune, data[tune] !== undefined ? data[tune] : false)
+      const value = data[tune] !== undefined ? data[tune] : false;
+      this.setTune(tune, value)
     });
   }
 
@@ -241,7 +242,7 @@ export default class ImageTool {
    *
    * @param {UploadResponseFormat} response
    */
-  onUpload(response){
+  onUpload(response) {
     this.image = response.file;
   }
 
@@ -251,7 +252,7 @@ export default class ImageTool {
    *
    * @param {string} tuneName - tune that has been clicked
    */
-  tuneToggled(tuneName){
+  tuneToggled(tuneName) {
     // inverse tune state
     this.setTune(tuneName, !this._data[tuneName]);
   }
@@ -270,8 +271,9 @@ export default class ImageTool {
       const blockId = this.api.blocks.getCurrentBlockIndex();
 
       setTimeout(() => {
+        /** Wait until api is ready */
         this.api.blocks.stretchBlock(blockId, value);
-      }, 0) // wait api is ready
+      }, 0);
     }
   }
 }
