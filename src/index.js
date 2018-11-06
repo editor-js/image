@@ -41,7 +41,7 @@ import css from './index.css';
 import Ui from './ui';
 import Tunes from './tunes';
 import ToolboxIcon from './svg/toolbox.svg';
-import Converter from './coverter';
+import Converter from './converter';
 
 /**
  * @typedef {object} ImageConfig
