@@ -5,23 +5,25 @@
  * @see {@link https://github.com/codex-editor/image}
  *
  * To developers.
- * To simplify Tool structure, we split it to 4 parts:
+ * To simplify Tool structure, we split it to 3 parts:
  *  1) index.js — main Tool's interface, public API and methods for working with data
  *  2) ui.js — module for UI manipulations: render, showing preloader and file-select handlers (including AJAX transport)
  *  3) tunes.js — working with Block Tunes: render buttons, handle clicks
- *  4) converter.js — utils for extracting Image Tool Data from pasted content
  *
  * For debug purposes there is a testing server
  * that can save uploaded files and return a Response {@link UploadResponseFormat}
  *
- *       $ node tests/server.js
+ *       $ node dev/server.js
  *
  * It will expose 8008 port, so you can pass http://localhost:8008 with the Tools config:
  *
  * image: {
  *   class: ImageTool,
  *   config: {
- *     url: 'http://localhost:8008'
+ *     endpoints: {
+ *       byFile: 'http://localhost:8008/uploadFile',
+ *       byUrl: 'http://localhost:8008/fetchUrl',
+ *     }
  *   },
  * },
  */
@@ -41,15 +43,18 @@ import css from './index.css';
 import Ui from './ui';
 import Tunes from './tunes';
 import ToolboxIcon from './svg/toolbox.svg';
-import Converter from './converter';
 
 /**
  * @typedef {object} ImageConfig
  * @description Config supported by Tool
- * @property {string} url - upload endpoint
+ * @property {object} endpoints - upload endpoints
+ * @property {string} endpoints.byFile - upload by file
+ * @property {string} endpoints.byUrl - upload by URL
  * @property {string} field - field name for uploaded image
  * @property {string} types - available mime-types
  * @property {string} captionPlaceholder - placeholder for Caption field
+ * @property {object} additionalRequestData - any data to send with requests
+ * @property {string} buttonContent - overrides for Select File button
  */
 
 /**
@@ -90,10 +95,12 @@ export default class ImageTool {
      * Tool's initial config
      */
     this.config = {
-      url: config.url || '',
+      endpoints: config.endpoints || '',
+      additionalRequestData: config.additionalRequestData || {},
       field: config.field || 'image',
       types: config.types || 'image/*',
-      captionPlaceholder: config.captionPlaceholder || 'Caption'
+      captionPlaceholder: config.captionPlaceholder || 'Caption',
+      buttonContent: config.buttonContent || ''
     };
 
     this.ui = new Ui({
@@ -156,28 +163,17 @@ export default class ImageTool {
     this.ui.nodes.fileButton.click();
   }
 
-
   /**
    * Specify paste substitutes
-   * @public
    *
-   * @see {@link ../../../docs/tools.md#paste-handling}
+   * @see {@link https://github.com/codex-team/codex.editor/blob/master/docs/tools.md#paste-handling}
    */
-  static get onPaste() {
+  static get pasteConfig(){
     return {
       /**
        * Paste HTML into Editor
        */
       tags: ['img'],
-      handler: Converter.fromHtml,
-
-      /**
-       * Drag n drop file from into the Editor
-       */
-      files: {
-        mimeTypes: ['image/*']
-      },
-      fileHandler: Converter.fromDroppedFile,
 
       /**
        * Paste URL of image into the Editor
@@ -185,7 +181,38 @@ export default class ImageTool {
       patterns: {
         image: /https?:\/\/\S+\.(gif|jpe?g|tiff|png)$/i
       },
-      patternHandler: Converter.fromPastedUrl,
+
+      /**
+       * Drag n drop file from into the Editor
+       */
+      files: {
+        mimeTypes: ['image/*']
+      },
+    }
+  }
+
+
+  /**
+   * Specify paste substitutes
+   * @public
+   *
+   * @see {@link ../../../docs/tools.md#paste-handling}
+   */
+  onPaste(event) {
+
+    console.log('onPaste!', event.type, event.detail);
+
+    switch (event.type){
+      case 'tag':
+        let image = event.detail.data;
+        this.ui.uploadByUrl(image.src);
+        break;
+      case 'pattern':
+        this.ui.uploadByUrl(event.detail.data);
+        break;
+      case 'file':
+        console.log('file!', event.detail.file);
+        break;
     }
   }
 

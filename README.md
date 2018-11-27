@@ -58,7 +58,10 @@ var editor = CodexEditor({
     image: {
       class: ImageTool,
       config: {
-        url: 'http://localhost:8008/', // Your backend uploader endpoint 
+        endpoints: {
+          byFile: 'http://localhost:8008/uploadFile', // Your backend file uploader endpoint 
+          byUrl: 'http://localhost:8008/fetchUrl', // Your endpoint that provides uploading by Url 
+        }
       }
     }
   }
@@ -69,12 +72,17 @@ var editor = CodexEditor({
 
 ## Config Params 
 
+Image Tool supports these configuration parameters:
+
 | Field | Type     | Description        |
 | ----- | -------- | ------------------ |
-| url   | `string` | **Required** Path for file uploading |
+| endpoints | `{byFile: string, byUrl: string}` | **Required** Endpoints for file uploading. <br> 
+Contains 2 fields: <br> __byFile__ - for file uploading <br> __byUrl__ - for uploading by URL |
 | field | `string` | (default: `image`) Name of uploaded image field in POST request |
 | types | `string` | (default: `image/*`) Mime-types of files that can be [accepted with file selection](https://github.com/codex-team/ajax#accept-string).|
+| additionalRequestData | `object` | Object with any data you want to send with uploading requests |
 | captionPlaceholder | `string` | (default: `Caption`) Placeholder for Caption input |
+| buttonContent | `string` | Allows to override HTML content of «Select file» button |
 
 ## Tool's settings
 
@@ -116,10 +124,18 @@ This Tool returns `data` with following format
 
 ## Backend response format <a name="server-format"></a>
 
-This Tool works by following scheme:
+This Tool works by one of following schemes:
+
+1. Uploading files from the device
+2. Uploading by URL (handle image-like URL's pasting)
+3. Uploading by drag-n-drop file 
+
+### Uploading files from device <a name="from-device"></a>
+
+Scenario:
 
 1. User select file from the device
-2. Tool sends it to **your** backend 
+2. Tool sends it to **your** backend (on `config.endpoint.byFile` route) 
 3. Your backend should save file and return file data with JSON at specified format.
 4. Image tool shows saved image and stores server answer
 
@@ -144,4 +160,15 @@ Response of your uploader **should** cover following format:
 Also, can contain any additional fields you want to store. For example, width, height, id etc. 
 All additional fields will be saved at the `file` object of output data.    
 
+### Uploading by pasted URL
+
+Scenario:
+
+1. User pastes and URL for image file to the Editor
+2. Editor pass pasted string to the Image Tool
+3. Tool sends it to **your** backend (on `config.endpoint.byUrl` route) via 'url' POST-parameter 
+3. Your backend should accept URL, **download and save the original file by passed URL** and return file data with JSON at specified format.
+4. Image tool shows saved image and stores server answer
+
+Response of your uploader should be at the same format as described at «[Uploading files from device](#from-device)» section
  

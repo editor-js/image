@@ -92,7 +92,7 @@ export default class Ui {
   createFileButton(){
     let button = make('div', [this.CSS.button]);
 
-    button.innerHTML = `${buttonIcon} Select an Image`;
+    button.innerHTML = this.config.buttonContent || `${buttonIcon} Select an Image`;
 
     button.addEventListener('click', () => {
       this.selectFile();
@@ -107,24 +107,61 @@ export default class Ui {
    * @fires this.onUpload() - callback passed to the constructor
    */
   selectFile(){
+
+    console.log('selectFile');
     ajax.transport({
-      url: this.config.url,
+      url: this.config.endpoints.byFile,
+      data: this.config.additionalRequestData,
       accept: this.config.types,
       beforeSend: (files) => {
-        this.beforeSend(files[0]);
+        this.beforeSendFile(files[0]);
       },
       fieldName: this.config.field
     })
     .then((response) => {
-      if (response.success && response.file){
-        this.onUpload(response);
-      } else {
-        this.uploadingError('incorrect response: ' + JSON.stringify(response));
-      }
+      this.handleResponse(response);
     })
     .catch((error) => {
       this.uploadingError(error);
     });
+  }
+
+  /**
+   * Handle clicks on the upload file button
+   * @fires ajax.transport()
+   * @fires this.onUpload() - callback passed to the constructor
+   */
+  uploadByUrl(url){
+    /**
+     * Before send
+     */
+    this.showPreloader(url);
+
+    ajax.post({
+      url: this.config.endpoints.byUrl,
+      data: Object.assign({
+        url: url
+      }, this.config.additionalRequestData),
+      type: ajax.contentType.JSON
+    })
+      .then((response) => {
+        this.handleResponse(response);
+      })
+      .catch((error) => {
+        this.uploadingError(error);
+      });
+  }
+
+  /**
+   * Process response from backend
+   * @param {UploadResponseFormat} response
+   */
+  handleResponse(response){
+    if (response.success && response.file){
+      this.onUpload(response);
+    } else {
+      this.uploadingError('incorrect response: ' + JSON.stringify(response));
+    }
   }
 
   /**
@@ -133,9 +170,10 @@ export default class Ui {
    */
   uploadingError(message){
     console.log('Image Tool: uploading failed because of', message);
-    /**
-     * @todo show notify through the Notify API
-     */
+    this.api.notifier.show({
+      message: 'Can not upload an image, try another',
+      style: 'error'
+    });
     this.nodes.imagePreloader.style.backgroundImage = '';
     this.toggleStatus(Ui.status.EMPTY);
   }
@@ -145,7 +183,7 @@ export default class Ui {
    * Uses to sho preview and loader
    * @param {File} fileUploaded
    */
-  beforeSend(fileUploaded){
+  beforeSendFile(fileUploaded){
     const reader = new FileReader();
 
     reader.readAsDataURL(fileUploaded);
