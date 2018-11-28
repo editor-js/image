@@ -7,6 +7,10 @@ import stretchedIcon from './svg/stretched.svg';
  * Working with Block Tunes
  */
 export default class Tunes {
+  /**
+   * @param {object} api - Editor API
+   * @param {function} onChange - tune toggling callback
+   */
   constructor({api, onChange}) {
     this.api = api;
     this.onChange = onChange;
@@ -36,6 +40,10 @@ export default class Tunes {
     ];
   }
 
+  /**
+   * Styles
+   * @return {{wrapper: string, buttonBase: *, button: string, buttonActive: *}}
+   */
   get CSS() {
     return {
       wrapper: '',

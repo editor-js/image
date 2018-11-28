@@ -43,6 +43,11 @@ export default class Ui {
     this.nodes.wrapper.appendChild(this.nodes.caption);
     this.nodes.wrapper.appendChild(this.nodes.fileButton);
   }
+
+  /**
+   * CSS classes
+   * @constructor
+   */
   get CSS() {
     return {
       baseClass: this.api.styles.block,

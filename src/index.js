@@ -40,6 +40,7 @@
  * @property {string} file.url — image URL
  */
 
+// eslint-disable-next-line
 import css from './index.css';
 import Ui from './ui';
 import Tunes from './tunes';
