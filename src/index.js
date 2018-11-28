@@ -193,15 +193,12 @@ export default class ImageTool {
 
 
   /**
-   * Specify paste substitutes
+   * Specify paste handlers
    * @public
    *
-   * @see {@link ../../../docs/tools.md#paste-handling}
+   * @see {@link https://github.com/codex-team/codex.editor/blob/master/docs/tools.md#paste-handling}
    */
   onPaste(event) {
-
-    console.log('onPaste!', event.type, event.detail);
-
     switch (event.type){
       case 'tag':
         let image = event.detail.data;
