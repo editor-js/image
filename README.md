@@ -11,6 +11,7 @@ Image Block for the [CodeX Editor](https://ifmo.su/editor).
 - Uploading file from the device
 - Pasting copied content from the web
 - Pasting images by drag-n-drop
+- Pasting files and screenshots from Clipboard
 - Allows to add border, background
 - Allows to stretch image to the container's full-width 
 
@@ -76,8 +77,7 @@ Image Tool supports these configuration parameters:
 
 | Field | Type     | Description        |
 | ----- | -------- | ------------------ |
-| endpoints | `{byFile: string, byUrl: string}` | **Required** Endpoints for file uploading. <br> 
-Contains 2 fields: <br> __byFile__ - for file uploading <br> __byUrl__ - for uploading by URL |
+| endpoints | `{byFile: string, byUrl: string}` | **Required** Endpoints for file uploading. <br> Contains 2 fields: <br> __byFile__ - for file uploading <br> __byUrl__ - for uploading by URL |
 | field | `string` | (default: `image`) Name of uploaded image field in POST request |
 | types | `string` | (default: `image/*`) Mime-types of files that can be [accepted with file selection](https://github.com/codex-team/ajax#accept-string).|
 | additionalRequestData | `object` | Object with any data you want to send with uploading requests |
@@ -129,6 +129,7 @@ This Tool works by one of following schemes:
 1. Uploading files from the device
 2. Uploading by URL (handle image-like URL's pasting)
 3. Uploading by drag-n-drop file 
+4. Uploading by pasting from Clipboard 
 
 ### Uploading files from device <a name="from-device"></a>
 
@@ -172,3 +173,8 @@ Scenario:
 
 Response of your uploader should be at the same format as described at «[Uploading files from device](#from-device)» section
  
+ 
+### Uploading by drag-n-drop or from Clipboard
+
+Your backend will accept file as FormData object in field name, specified by `config.field` (by default, «`image`»). 
+You should save it and return the same response format as described above.  

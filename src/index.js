@@ -211,7 +211,7 @@ export default class ImageTool {
         this.ui.uploadByUrl(event.detail.data);
         break;
       case 'file':
-        console.log('file!', event.detail.file);
+        this.ui.uploadByFile(event.detail.file);
         break;
     }
   }

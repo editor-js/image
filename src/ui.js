@@ -104,11 +104,8 @@ export default class Ui {
   /**
    * Handle clicks on the upload file button
    * @fires ajax.transport()
-   * @fires this.onUpload() - callback passed to the constructor
    */
   selectFile(){
-
-    console.log('selectFile');
     ajax.transport({
       url: this.config.endpoints.byFile,
       data: this.config.additionalRequestData,
@@ -128,8 +125,7 @@ export default class Ui {
 
   /**
    * Handle clicks on the upload file button
-   * @fires ajax.transport()
-   * @fires this.onUpload() - callback passed to the constructor
+   * @fires ajax.post()
    */
   uploadByUrl(url){
     /**
@@ -153,8 +149,42 @@ export default class Ui {
   }
 
   /**
+   * Handle clicks on the upload file button
+   * @fires ajax.post()
+   * @param {File} file - file pasted by drag-n-drop
+   */
+  uploadByFile(file){
+    /**
+     * Before send
+     */
+    this.showPreloader(file);
+
+    let formData = new FormData();
+    formData.append(this.config.field, file);
+
+    if (this.config.additionalRequestData && Object.keys(this.config.additionalRequestData).length){
+      Object.entries(this.config.additionalRequestData).forEach(([name, value]) => {
+        formData.append(name, value);
+      })
+    }
+
+    ajax.post({
+      url: this.config.endpoints.byFile,
+      data: formData,
+      type: ajax.contentType.JSON
+    })
+      .then((response) => {
+        this.handleResponse(response);
+      })
+      .catch((error) => {
+        this.uploadingError(error);
+      });
+  }
+
+  /**
    * Process response from backend
    * @param {UploadResponseFormat} response
+   * @fires this.onUpload() - callback passed to the constructor
    */
   handleResponse(response){
     if (response.success && response.file){

@@ -151,6 +151,8 @@ class ServerExample {
         if (err){
           reject(err);
         } else {
+          console.log('fields', fields);
+          console.log('files', files);
           resolve({files, fields});
         }
       });
