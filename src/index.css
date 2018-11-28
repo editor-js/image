@@ -22,6 +22,7 @@
       margin: auto;
       position: relative;
       background-color: var(--bg-color);
+      background-position: center center;
 
       &::after {
         content: '';

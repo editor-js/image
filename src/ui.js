@@ -1,16 +1,21 @@
 import buttonIcon from './svg/button-icon.svg';
-import ajax from '@codexteam/ajax';
 
 /**
  * Class for working with UI:
  *  - rendering base structure
- *  - handle files selection and sending
+ *  - show/hide preview
+ *  - apply tune view
  */
 export default class Ui {
-  constructor({api, config, onUpload}){
+  /**
+   * @param {object} api - Editor.js API
+   * @param {ImageConfig} config - user config
+   * @param {function} onSelectFile - callback for clicks on Select file buttor
+   */
+  constructor({api, config, onSelectFile}){
     this.api = api;
     this.config = config;
-    this.onUpload = onUpload;
+    this.onSelectFile = onSelectFile;
     this.nodes = {
       wrapper: make('div', [this.CSS.baseClass, this.CSS.wrapper]),
       imageContainer: make('div', [this.CSS.imageContainer]),
@@ -95,132 +100,10 @@ export default class Ui {
     button.innerHTML = this.config.buttonContent || `${buttonIcon} Select an Image`;
 
     button.addEventListener('click', () => {
-      this.selectFile();
+      this.onSelectFile();
     });
 
     return button;
-  }
-
-  /**
-   * Handle clicks on the upload file button
-   * @fires ajax.transport()
-   */
-  selectFile(){
-    ajax.transport({
-      url: this.config.endpoints.byFile,
-      data: this.config.additionalRequestData,
-      accept: this.config.types,
-      beforeSend: (files) => {
-        this.beforeSendFile(files[0]);
-      },
-      fieldName: this.config.field
-    })
-    .then((response) => {
-      this.handleResponse(response);
-    })
-    .catch((error) => {
-      this.uploadingError(error);
-    });
-  }
-
-  /**
-   * Handle clicks on the upload file button
-   * @fires ajax.post()
-   */
-  uploadByUrl(url){
-    /**
-     * Before send
-     */
-    this.showPreloader(url);
-
-    ajax.post({
-      url: this.config.endpoints.byUrl,
-      data: Object.assign({
-        url: url
-      }, this.config.additionalRequestData),
-      type: ajax.contentType.JSON
-    })
-      .then((response) => {
-        this.handleResponse(response);
-      })
-      .catch((error) => {
-        this.uploadingError(error);
-      });
-  }
-
-  /**
-   * Handle clicks on the upload file button
-   * @fires ajax.post()
-   * @param {File} file - file pasted by drag-n-drop
-   */
-  uploadByFile(file){
-    /**
-     * Before send
-     */
-    this.showPreloader(file);
-
-    let formData = new FormData();
-    formData.append(this.config.field, file);
-
-    if (this.config.additionalRequestData && Object.keys(this.config.additionalRequestData).length){
-      Object.entries(this.config.additionalRequestData).forEach(([name, value]) => {
-        formData.append(name, value);
-      })
-    }
-
-    ajax.post({
-      url: this.config.endpoints.byFile,
-      data: formData,
-      type: ajax.contentType.JSON
-    })
-      .then((response) => {
-        this.handleResponse(response);
-      })
-      .catch((error) => {
-        this.uploadingError(error);
-      });
-  }
-
-  /**
-   * Process response from backend
-   * @param {UploadResponseFormat} response
-   * @fires this.onUpload() - callback passed to the constructor
-   */
-  handleResponse(response){
-    if (response.success && response.file){
-      this.onUpload(response);
-    } else {
-      this.uploadingError('incorrect response: ' + JSON.stringify(response));
-    }
-  }
-
-  /**
-   * Failed uploading handler
-   * @param {string} message
-   */
-  uploadingError(message){
-    console.log('Image Tool: uploading failed because of', message);
-    this.api.notifier.show({
-      message: 'Can not upload an image, try another',
-      style: 'error'
-    });
-    this.nodes.imagePreloader.style.backgroundImage = '';
-    this.toggleStatus(Ui.status.EMPTY);
-  }
-
-  /**
-   * Called before sending, accepts uploaded file
-   * Uses to sho preview and loader
-   * @param {File} fileUploaded
-   */
-  beforeSendFile(fileUploaded){
-    const reader = new FileReader();
-
-    reader.readAsDataURL(fileUploaded);
-
-    reader.onload = (e) => {
-      this.showPreloader(e.target.result);
-    };
   }
 
   /**
@@ -231,6 +114,14 @@ export default class Ui {
     this.nodes.imagePreloader.style.backgroundImage = `url(${src})`;
 
     this.toggleStatus(Ui.status.UPLOADING);
+  }
+
+  /**
+   * Hide uploading preloader
+   */
+  hidePreloader(){
+    this.nodes.imagePreloader.style.backgroundImage = '';
+    this.toggleStatus(Ui.status.EMPTY);
   }
 
   /**

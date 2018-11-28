@@ -5,10 +5,11 @@
  * @see {@link https://github.com/codex-editor/image}
  *
  * To developers.
- * To simplify Tool structure, we split it to 3 parts:
+ * To simplify Tool structure, we split it to 4 parts:
  *  1) index.js — main Tool's interface, public API and methods for working with data
- *  2) ui.js — module for UI manipulations: render, showing preloader and file-select handlers (including AJAX transport)
- *  3) tunes.js — working with Block Tunes: render buttons, handle clicks
+ *  2) uploader.js — module that has methods for sending files via AJAX: from device, by URL or File pasting
+ *  3) ui.js — module for UI manipulations: render, showing preloader, etc
+ *  4) tunes.js — working with Block Tunes: render buttons, handle clicks
  *
  * For debug purposes there is a testing server
  * that can save uploaded files and return a Response {@link UploadResponseFormat}
@@ -43,6 +44,7 @@ import css from './index.css';
 import Ui from './ui';
 import Tunes from './tunes';
 import ToolboxIcon from './svg/toolbox.svg';
+import Uploader from "./uploader";
 
 /**
  * @typedef {object} ImageConfig
@@ -103,12 +105,33 @@ export default class ImageTool {
       buttonContent: config.buttonContent || ''
     };
 
+    /**
+     * Module for file uploading
+     */
+    this.uploader = new Uploader({
+      config: this.config,
+      onUpload: (response) => this.onUpload(response),
+      onError: (error) => this.uploadingFailed(error)
+    });
+
+    /**
+     * Module for working with UI
+     */
     this.ui = new Ui({
       api,
       config: this.config,
-      onUpload: (response) => this.onUpload(response)
+      onSelectFile: () => {
+        this.uploader.uploadSelectedFile({
+          onPreview: (src) => {
+            this.ui.showPreloader(src);
+          }
+        });
+      }
     });
 
+    /**
+     * Module for working with tunes
+     */
     this.tunes = new Tunes({
       api,
       onChange: (tuneName) => this.tuneToggled(tuneName)
@@ -202,13 +225,21 @@ export default class ImageTool {
     switch (event.type){
       case 'tag':
         let image = event.detail.data;
-        this.ui.uploadByUrl(image.src);
+        this.ui.showPreloader(image.src);
+        this.uploader.uploadByUrl(image.src);
         break;
       case 'pattern':
-        this.ui.uploadByUrl(event.detail.data);
+        let url = event.detail.data;
+        this.ui.showPreloader(url);
+        this.uploader.uploadByUrl(url);
         break;
       case 'file':
-        this.ui.uploadByFile(event.detail.file);
+        let file = event.detail.file;
+        this.uploader.uploadByFile(file, {
+          onPreview: (src) => {
+            this.ui.showPreloader(src);
+          }
+        });
         break;
     }
   }
@@ -261,13 +292,33 @@ export default class ImageTool {
   }
 
   /**
-   * Field uploading callback
+   * File uploading callback
    * @private
    *
    * @param {UploadResponseFormat} response
    */
   onUpload(response) {
-    this.image = response.file;
+    if (response.success && response.file){
+      this.image = response.file;
+    } else {
+      this.uploadingFailed('incorrect response: ' + JSON.stringify(response));
+    }
+  }
+
+  /**
+   * Handle uploader errors
+   * @private
+   *
+   * @param {string} errorText
+   */
+  uploadingFailed(errorText){
+    console.log('Image Tool: uploading failed because of', errorText);
+
+    this.api.notifier.show({
+      message: 'Can not upload an image, try another',
+      style: 'error'
+    });
+    this.ui.hidePreloader();
   }
 
   /**
