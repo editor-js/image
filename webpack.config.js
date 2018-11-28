@@ -4,24 +4,19 @@ module.exports = {
       {
         test: /\.js$/,
         exclude: /node_modules/,
-        use: ['babel-loader', {
-          loader: 'eslint-loader',
-          options: {
-            fix: true
-          }
-        }]
+        use: ['babel-loader', 'eslint-loader']
       },
       {
         test: /\.css$/,
         use: [
-          "style-loader",
-          "css-loader",
+          'style-loader',
+          'css-loader',
           {
-            loader: "postcss-loader",
+            loader: 'postcss-loader',
             options: {
               plugins: [
                 require('postcss-nested-ancestors'),
-                require('postcss-nested'),
+                require('postcss-nested')
               ]
             }
           }
@@ -37,7 +32,7 @@ module.exports = {
     path: __dirname + '/dist',
     publicPath: '/',
     filename: 'bundle.js',
-    library: "ImageTool",
+    library: 'ImageTool',
     libraryTarget: 'umd',
     libraryExport: 'default'
   },

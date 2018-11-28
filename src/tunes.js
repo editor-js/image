@@ -7,7 +7,7 @@ import stretchedIcon from './svg/stretched.svg';
  * Working with Block Tunes
  */
 export default class Tunes {
-  constructor({api, onChange}){
+  constructor({api, onChange}) {
     this.api = api;
     this.onChange = onChange;
     this.buttons = [];
@@ -16,7 +16,7 @@ export default class Tunes {
   /**
    * Available Image tunes
    */
-  static get tunes(){
+  static get tunes() {
     return [
       {
         name: 'withBorder',
@@ -32,8 +32,8 @@ export default class Tunes {
         name: 'withBackground',
         icon: bgIcon,
         title: 'With background'
-      },
-    ]
+      }
+    ];
   }
 
   get CSS() {
@@ -41,8 +41,8 @@ export default class Tunes {
       wrapper: '',
       buttonBase: this.api.styles.settingsButton,
       button: 'image-tool__tune',
-      buttonActive: this.api.styles.settingsButtonActive,
-    }
+      buttonActive: this.api.styles.settingsButtonActive
+    };
   }
 
   /**
@@ -55,7 +55,7 @@ export default class Tunes {
 
     this.buttons = [];
 
-    Tunes.tunes.forEach( tune => {
+    Tunes.tunes.forEach(tune => {
       let el = make('div', [this.CSS.buttonBase, this.CSS.button], {
         innerHTML: tune.icon,
         title: tune.title
@@ -80,7 +80,7 @@ export default class Tunes {
    * Clicks to one of the tunes
    * @param {string} tuneName - clicked tune name
    */
-  tuneClicked(tuneName){
+  tuneClicked(tuneName) {
     let button = this.buttons.find(el => el.dataset.tune === tuneName);
 
     button.classList.toggle(this.CSS.buttonActive, !button.classList.contains(this.CSS.buttonActive));

@@ -1,4 +1,4 @@
-import ajax from "@codexteam/ajax";
+import ajax from '@codexteam/ajax';
 
 /**
  * Module for file uploading. Handle 3 scenarios:
@@ -12,7 +12,7 @@ export default class Uploader {
    * @param {function} onUpload - one callback for all uploading (file, url, d-n-d, pasting)
    * @param {function} onError - callback for uploading errors
    */
-  constructor({config, onUpload, onError}){
+  constructor({config, onUpload, onError}) {
     this.config = config;
     this.onUpload = onUpload;
     this.onError = onError;
@@ -23,7 +23,7 @@ export default class Uploader {
    * @fires ajax.transport()
    * @param {function} onPreview - callback fired when preview is ready
    */
-  uploadSelectedFile({onPreview}){
+  uploadSelectedFile({onPreview}) {
     ajax.transport({
       url: this.config.endpoints.byFile,
       data: this.config.additionalRequestData,
@@ -52,14 +52,14 @@ export default class Uploader {
    * @fires ajax.post()
    * @param {string} url - image source url
    */
-  uploadByUrl(url){
+  uploadByUrl(url) {
     ajax.post({
       url: this.config.endpoints.byUrl,
       data: Object.assign({
         url: url
       }, this.config.additionalRequestData),
       type: ajax.contentType.JSON,
-      headers: this.config.additionalRequestHeaders,
+      headers: this.config.additionalRequestHeaders
     })
       .then((response) => {
         this.onUpload(response);
@@ -75,7 +75,7 @@ export default class Uploader {
    * @param {File} file - file pasted by drag-n-drop
    * @param {function} onPreview - file pasted by drag-n-drop
    */
-  uploadByFile(file, {onPreview}){
+  uploadByFile(file, {onPreview}) {
     /**
      * Load file for preview
      * @type {FileReader}
@@ -91,19 +91,20 @@ export default class Uploader {
      * Compose Form Data for sending
      */
     let formData = new FormData();
+
     formData.append(this.config.field, file);
 
-    if (this.config.additionalRequestData && Object.keys(this.config.additionalRequestData).length){
+    if (this.config.additionalRequestData && Object.keys(this.config.additionalRequestData).length) {
       Object.entries(this.config.additionalRequestData).forEach(([name, value]) => {
         formData.append(name, value);
-      })
+      });
     }
 
     ajax.post({
       url: this.config.endpoints.byFile,
       data: formData,
       type: ajax.contentType.JSON,
-      headers: this.config.additionalRequestHeaders,
+      headers: this.config.additionalRequestHeaders
     })
       .then((response) => {
         this.onUpload(response);

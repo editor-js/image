@@ -44,7 +44,7 @@ import css from './index.css';
 import Ui from './ui';
 import Tunes from './tunes';
 import ToolboxIcon from './svg/toolbox.svg';
-import Uploader from "./uploader";
+import Uploader from './uploader';
 
 /**
  * @typedef {object} ImageConfig
@@ -164,6 +164,7 @@ export default class ImageTool {
    */
   save() {
     const caption = this.ui.nodes.caption;
+
     this._data.caption = caption.innerHTML;
 
     return this.data;
@@ -193,12 +194,12 @@ export default class ImageTool {
    *
    * @see {@link https://github.com/codex-team/codex.editor/blob/master/docs/tools.md#paste-handling}
    */
-  static get pasteConfig(){
+  static get pasteConfig() {
     return {
       /**
        * Paste HTML into Editor
        */
-      tags: ['img'],
+      tags: [ 'img' ],
 
       /**
        * Paste URL of image into the Editor
@@ -211,11 +212,10 @@ export default class ImageTool {
        * Drag n drop file from into the Editor
        */
       files: {
-        mimeTypes: ['image/*']
-      },
-    }
+        mimeTypes: [ 'image/*' ]
+      }
+    };
   }
-
 
   /**
    * Specify paste handlers
@@ -224,19 +224,22 @@ export default class ImageTool {
    * @see {@link https://github.com/codex-team/codex.editor/blob/master/docs/tools.md#paste-handling}
    */
   onPaste(event) {
-    switch (event.type){
+    switch (event.type) {
       case 'tag':
         const image = event.detail.data;
+
         this.ui.showPreloader(image.src);
         this.uploader.uploadByUrl(image.src);
         break;
       case 'pattern':
         const url = event.detail.data;
+
         this.ui.showPreloader(url);
         this.uploader.uploadByUrl(url);
         break;
       case 'file':
         const file = event.detail.file;
+
         this.uploader.uploadByFile(file, {
           onPreview: (src) => {
             this.ui.showPreloader(src);
@@ -257,15 +260,16 @@ export default class ImageTool {
    *
    * @param {ImageToolData} data
    */
-  set data(data){
+  set data(data) {
     this.image = data.file;
 
     this._data.caption = data.caption || '';
     this.ui.fillCaption(this._data.caption);
 
-    Tunes.tunes.forEach( ({name: tune}) => {
+    Tunes.tunes.forEach(({name: tune}) => {
       const value = data[tune] !== undefined ? data[tune] : false;
-      this.setTune(tune, value)
+
+      this.setTune(tune, value);
     });
   }
 
@@ -275,7 +279,7 @@ export default class ImageTool {
    *
    * @return {ImageToolData} data
    */
-  get data(){
+  get data() {
     return this._data;
   }
 
@@ -300,7 +304,7 @@ export default class ImageTool {
    * @param {UploadResponseFormat} response
    */
   onUpload(response) {
-    if (response.success && response.file){
+    if (response.success && response.file) {
       this.image = response.file;
     } else {
       this.uploadingFailed('incorrect response: ' + JSON.stringify(response));
@@ -313,7 +317,7 @@ export default class ImageTool {
    *
    * @param {string} errorText
    */
-  uploadingFailed(errorText){
+  uploadingFailed(errorText) {
     console.log('Image Tool: uploading failed because of', errorText);
 
     this.api.notifier.show({
@@ -344,7 +348,7 @@ export default class ImageTool {
 
     this.ui.applyTune(tuneName, value);
 
-    if (tuneName === 'stretched'){
+    if (tuneName === 'stretched') {
       const blockId = this.api.blocks.getCurrentBlockIndex();
 
       setTimeout(() => {

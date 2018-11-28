@@ -12,20 +12,20 @@
  *   }
  *
  */
-const http = require( 'http' );
-const formidable = require( 'formidable' );
+const http = require('http');
+const formidable = require('formidable');
 const { parse } = require('querystring');
 const fs = require('fs');
 const request = require('request');
 const crypto = require('crypto');
 
 class ServerExample {
-  constructor({port, fieldName}){
+  constructor({port, fieldName}) {
     this.uploadDir = __dirname + '/\.tmp';
     this.fieldName = fieldName;
     this.server = http.createServer((req, res) => {
       this.onRequest(req, res);
-    }).listen( port );
+    }).listen(port);
 
     this.server.on('listening', () => {
       console.log('Server is listening ' + port + '...');
@@ -41,12 +41,12 @@ class ServerExample {
    * @param {http.IncomingMessage} request
    * @param {http.ServerResponse} response
    */
-  onRequest(request, response){
+  onRequest(request, response) {
     this.allowCors(response);
 
     const {method, url} = request;
 
-    if (method.toLowerCase() !== 'post'){
+    if (method.toLowerCase() !== 'post') {
       response.end();
       return;
     }
@@ -68,10 +68,10 @@ class ServerExample {
    * @param response
    */
   allowCors(response) {
-    response.setHeader("Access-Control-Allow-Origin", "*");
-    response.setHeader("Access-Control-Allow-Credentials", "true");
-    response.setHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
-    response.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
+    response.setHeader('Access-Control-Allow-Origin', '*');
+    response.setHeader('Access-Control-Allow-Credentials', 'true');
+    response.setHeader('Access-Control-Allow-Methods', 'GET,HEAD,OPTIONS,POST,PUT');
+    response.setHeader('Access-Control-Allow-Headers', 'Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers');
   }
 
   /**
@@ -79,7 +79,7 @@ class ServerExample {
    * @param request
    * @param response
    */
-  uploadFile(request, response){
+  uploadFile(request, response) {
     let responseJson = {
       success: 0
     };
@@ -100,7 +100,7 @@ class ServerExample {
       })
       .finally(() => {
         response.writeHead(200, {'Content-Type': 'application/json'});
-        response.end(JSON.stringify(responseJson))
+        response.end(JSON.stringify(responseJson));
       });
   }
 
@@ -109,21 +109,22 @@ class ServerExample {
    * @param request
    * @param response
    */
-  fetchUrl(request, response){
+  fetchUrl(request, response) {
     let responseJson = {
       success: 0
     };
 
     this.getForm(request)
       .then(({files, fields}) => {
-        let url = fields.url,
-          filename = this.uploadDir + '/' + this.md5(url) + '.png';
+        let url = fields.url;
+
+        let filename = this.uploadDir + '/' + this.md5(url) + '.png';
 
         return this.downloadImage(url, filename)
           .then((path) => {
             responseJson.success = 1;
             responseJson.file = {
-              url: path,
+              url: path
             };
           });
       })
@@ -132,7 +133,7 @@ class ServerExample {
       })
       .finally(() => {
         response.writeHead(200, {'Content-Type': 'application/json'});
-        response.end(JSON.stringify(responseJson))
+        response.end(JSON.stringify(responseJson));
       });
   }
 
@@ -141,15 +142,15 @@ class ServerExample {
    * @param request
    * @return {Promise<{files: object, fields: object}>}
    */
-  getForm(request){
-    return new Promise(((resolve, reject) => {
+  getForm(request) {
+    return new Promise((resolve, reject) => {
       const form = new formidable.IncomingForm();
 
       form.uploadDir = this.uploadDir;
       form.keepExtensions = true;
 
       form.parse(request, (err, fields, files) => {
-        if (err){
+        if (err) {
           reject(err);
         } else {
           console.log('fields', fields);
@@ -157,7 +158,7 @@ class ServerExample {
           resolve({files, fields});
         }
       });
-    }));
+    });
   }
 
   /**
@@ -166,9 +167,9 @@ class ServerExample {
    * @param {string} filename - path for file saving
    * @return {Promise<string>} - filename
    */
-  downloadImage(uri, filename){
+  downloadImage(uri, filename) {
     return new Promise((resolve, reject) => {
-      request.head(uri, function(err, res, body){
+      request.head(uri, function (err, res, body) {
         request(uri).pipe(fs.createWriteStream(filename).on('erorr', reject))
           .on('close', () => {
             resolve(filename);
@@ -182,10 +183,9 @@ class ServerExample {
    * @param string
    * @return {string}
    */
-  md5(string){
-    return crypto.createHash('md5').update(string).digest("hex");
+  md5(string) {
+    return crypto.createHash('md5').update(string).digest('hex');
   }
-
 }
 
 new ServerExample({

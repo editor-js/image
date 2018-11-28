@@ -12,19 +12,19 @@ export default class Ui {
    * @param {ImageConfig} config - user config
    * @param {function} onSelectFile - callback for clicks on Select file buttor
    */
-  constructor({api, config, onSelectFile}){
+  constructor({api, config, onSelectFile}) {
     this.api = api;
     this.config = config;
     this.onSelectFile = onSelectFile;
     this.nodes = {
       wrapper: make('div', [this.CSS.baseClass, this.CSS.wrapper]),
-      imageContainer: make('div', [this.CSS.imageContainer]),
+      imageContainer: make('div', [ this.CSS.imageContainer ]),
       fileButton: this.createFileButton(),
       imageEl: undefined,
       imagePreloader: make('div', this.CSS.imagePreloader),
       caption: make('div', [this.CSS.input, this.CSS.caption], {
         contentEditable: true
-      }),
+      })
     };
 
     /**
@@ -57,8 +57,8 @@ export default class Ui {
       imageContainer: 'image-tool__image',
       imagePreloader: 'image-tool__image-preloader',
       imageEl: 'image-tool__image-picture',
-      caption: 'image-tool__caption',
-    }
+      caption: 'image-tool__caption'
+    };
   };
 
   /**
@@ -68,12 +68,12 @@ export default class Ui {
    * - filled
    * @return {{EMPTY: string, UPLOADING: string, FILLED: string}}
    */
-  static get status(){
+  static get status() {
     return {
       EMPTY: 'empty',
       UPLOADING: 'loading',
-      FILLED: 'filled',
-    }
+      FILLED: 'filled'
+    };
   }
 
   /**
@@ -81,7 +81,7 @@ export default class Ui {
    * @return {HTMLDivElement}
    */
   render(toolData) {
-    if (!toolData.file || Object.keys(toolData.file).length === 0){
+    if (!toolData.file || Object.keys(toolData.file).length === 0) {
       this.toggleStatus(Ui.status.EMPTY);
     } else {
       this.toggleStatus(Ui.status.UPLOADING);
@@ -94,8 +94,8 @@ export default class Ui {
    * Creates upload-file button
    * @return {Element}
    */
-  createFileButton(){
-    let button = make('div', [this.CSS.button]);
+  createFileButton() {
+    let button = make('div', [ this.CSS.button ]);
 
     button.innerHTML = this.config.buttonContent || `${buttonIcon} Select an Image`;
 
@@ -110,7 +110,7 @@ export default class Ui {
    * Shows uploading preloader
    * @param {string} src - preview source
    */
-  showPreloader(src){
+  showPreloader(src) {
     this.nodes.imagePreloader.style.backgroundImage = `url(${src})`;
 
     this.toggleStatus(Ui.status.UPLOADING);
@@ -119,7 +119,7 @@ export default class Ui {
   /**
    * Hide uploading preloader
    */
-  hidePreloader(){
+  hidePreloader() {
     this.nodes.imagePreloader.style.backgroundImage = '';
     this.toggleStatus(Ui.status.EMPTY);
   }
@@ -128,7 +128,7 @@ export default class Ui {
    * Shows an image
    * @param {string} url
    */
-  fillImage(url){
+  fillImage(url) {
     this.nodes.imageEl = make('img', this.CSS.imageEl, {
       src: url
     });
@@ -141,15 +141,15 @@ export default class Ui {
       if (this.nodes.imagePreloader) {
         this.nodes.imagePreloader.style.backgroundImage = '';
       }
-    })
+    });
   }
 
   /**
    * Shows caption input
    * @param {string} text - caption text
    */
-  fillCaption(text){
-    if (this.nodes.caption){
+  fillCaption(text) {
+    if (this.nodes.caption) {
       this.nodes.caption.innerHTML = text;
     }
   }
@@ -158,9 +158,9 @@ export default class Ui {
    * Changes UI status
    * @param {string} status - see {@link Ui.status} constants
    */
-  toggleStatus(status){
-    for (const statusType in Ui.status){
-      if (Ui.status.hasOwnProperty(statusType)){
+  toggleStatus(status) {
+    for (const statusType in Ui.status) {
+      if (Ui.status.hasOwnProperty(statusType)) {
         this.nodes.wrapper.classList.toggle(`${this.CSS.wrapper}--${Ui.status[statusType]}`, status === Ui.status[statusType]);
       }
     }
@@ -171,7 +171,7 @@ export default class Ui {
    * @param {string} tuneName - one of available tunes {@link Tunes.tunes}
    * @param {boolean} status - true for enable, false for disable
    */
-  applyTune(tuneName, status){
+  applyTune(tuneName, status) {
     this.nodes.wrapper.classList.toggle(`${this.CSS.wrapper}--${tuneName}`, status);
   }
 }
@@ -184,12 +184,12 @@ export default class Ui {
  * @param  {Object} attributes        - any attributes
  * @return {Element}
  */
-export const make = function make (tagName, classNames = null, attributes = {}) {
+export const make = function make(tagName, classNames = null, attributes = {}) {
   let el = document.createElement(tagName);
 
-  if ( Array.isArray(classNames) ) {
+  if (Array.isArray(classNames)) {
     el.classList.add(...classNames);
-  } else if( classNames ) {
+  } else if (classNames) {
     el.classList.add(classNames);
   }
 
