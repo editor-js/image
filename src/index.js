@@ -226,17 +226,17 @@ export default class ImageTool {
   onPaste(event) {
     switch (event.type){
       case 'tag':
-        let image = event.detail.data;
+        const image = event.detail.data;
         this.ui.showPreloader(image.src);
         this.uploader.uploadByUrl(image.src);
         break;
       case 'pattern':
-        let url = event.detail.data;
+        const url = event.detail.data;
         this.ui.showPreloader(url);
         this.uploader.uploadByUrl(url);
         break;
       case 'file':
-        let file = event.detail.file;
+        const file = event.detail.file;
         this.uploader.uploadByFile(file, {
           onPreview: (src) => {
             this.ui.showPreloader(src);

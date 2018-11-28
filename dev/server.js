@@ -2,7 +2,8 @@
  * Sample HTTP server for accept uploaded images
  * [!] Use it only for debugging purposes
  *
- * How to use:
+ * How to use [requires Node.js 10.0.0+ and npm install]:
+ *
  * 1. $ node dev/server.js
  * 2. set 'endpoints' at the Image Tools 'config' in example.html
  *   endpoints : {
