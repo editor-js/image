@@ -7,21 +7,24 @@
  * To developers.
  * To simplify Tool structure, we split it to 4 parts:
  *  1) index.js — main Tool's interface, public API and methods for working with data
- *  2) ui.js — module for UI manipulations: render, showing preloader and file-select handlers (including AJAX transport)
- *  3) tunes.js — working with Block Tunes: render buttons, handle clicks
- *  4) converter.js — utils for extracting Image Tool Data from pasted content
+ *  2) uploader.js — module that has methods for sending files via AJAX: from device, by URL or File pasting
+ *  3) ui.js — module for UI manipulations: render, showing preloader, etc
+ *  4) tunes.js — working with Block Tunes: render buttons, handle clicks
  *
  * For debug purposes there is a testing server
  * that can save uploaded files and return a Response {@link UploadResponseFormat}
  *
- *       $ node tests/server.js
+ *       $ node dev/server.js
  *
  * It will expose 8008 port, so you can pass http://localhost:8008 with the Tools config:
  *
  * image: {
  *   class: ImageTool,
  *   config: {
- *     url: 'http://localhost:8008'
+ *     endpoints: {
+ *       byFile: 'http://localhost:8008/uploadFile',
+ *       byUrl: 'http://localhost:8008/fetchUrl',
+ *     }
  *   },
  * },
  */
@@ -37,19 +40,25 @@
  * @property {string} file.url — image URL
  */
 
+// eslint-disable-next-line
 import css from './index.css';
 import Ui from './ui';
 import Tunes from './tunes';
 import ToolboxIcon from './svg/toolbox.svg';
-import Converter from './converter';
+import Uploader from './uploader';
 
 /**
  * @typedef {object} ImageConfig
  * @description Config supported by Tool
- * @property {string} url - upload endpoint
+ * @property {object} endpoints - upload endpoints
+ * @property {string} endpoints.byFile - upload by file
+ * @property {string} endpoints.byUrl - upload by URL
  * @property {string} field - field name for uploaded image
  * @property {string} types - available mime-types
  * @property {string} captionPlaceholder - placeholder for Caption field
+ * @property {object} additionalRequestData - any data to send with requests
+ * @property {object} additionalRequestHeaders - allows to pass custom headers with Request
+ * @property {string} buttonContent - overrides for Select File button
  */
 
 /**
@@ -90,18 +99,42 @@ export default class ImageTool {
      * Tool's initial config
      */
     this.config = {
-      url: config.url || '',
+      endpoints: config.endpoints || '',
+      additionalRequestData: config.additionalRequestData || {},
+      additionalRequestHeaders: config.additionalRequestHeaders || {},
       field: config.field || 'image',
       types: config.types || 'image/*',
-      captionPlaceholder: config.captionPlaceholder || 'Caption'
+      captionPlaceholder: config.captionPlaceholder || 'Caption',
+      buttonContent: config.buttonContent || ''
     };
 
+    /**
+     * Module for file uploading
+     */
+    this.uploader = new Uploader({
+      config: this.config,
+      onUpload: (response) => this.onUpload(response),
+      onError: (error) => this.uploadingFailed(error)
+    });
+
+    /**
+     * Module for working with UI
+     */
     this.ui = new Ui({
       api,
       config: this.config,
-      onUpload: (response) => this.onUpload(response)
+      onSelectFile: () => {
+        this.uploader.uploadSelectedFile({
+          onPreview: (src) => {
+            this.ui.showPreloader(src);
+          }
+        });
+      }
     });
 
+    /**
+     * Module for working with tunes
+     */
     this.tunes = new Tunes({
       api,
       onChange: (tuneName) => this.tuneToggled(tuneName)
@@ -132,6 +165,7 @@ export default class ImageTool {
    */
   save() {
     const caption = this.ui.nodes.caption;
+
     this._data.caption = caption.innerHTML;
 
     return this.data;
@@ -156,28 +190,17 @@ export default class ImageTool {
     this.ui.nodes.fileButton.click();
   }
 
-
   /**
    * Specify paste substitutes
-   * @public
    *
-   * @see {@link ../../../docs/tools.md#paste-handling}
+   * @see {@link https://github.com/codex-team/codex.editor/blob/master/docs/tools.md#paste-handling}
    */
-  static get onPaste() {
+  static get pasteConfig() {
     return {
       /**
        * Paste HTML into Editor
        */
-      tags: ['img'],
-      handler: Converter.fromHtml,
-
-      /**
-       * Drag n drop file from into the Editor
-       */
-      files: {
-        mimeTypes: ['image/*']
-      },
-      fileHandler: Converter.fromDroppedFile,
+      tags: [ 'img' ],
 
       /**
        * Paste URL of image into the Editor
@@ -185,7 +208,45 @@ export default class ImageTool {
       patterns: {
         image: /https?:\/\/\S+\.(gif|jpe?g|tiff|png)$/i
       },
-      patternHandler: Converter.fromPastedUrl,
+
+      /**
+       * Drag n drop file from into the Editor
+       */
+      files: {
+        mimeTypes: [ 'image/*' ]
+      }
+    };
+  }
+
+  /**
+   * Specify paste handlers
+   * @public
+   *
+   * @see {@link https://github.com/codex-team/codex.editor/blob/master/docs/tools.md#paste-handling}
+   */
+  onPaste(event) {
+    switch (event.type) {
+      case 'tag':
+        const image = event.detail.data;
+
+        this.ui.showPreloader(image.src);
+        this.uploader.uploadByUrl(image.src);
+        break;
+      case 'pattern':
+        const url = event.detail.data;
+
+        this.ui.showPreloader(url);
+        this.uploader.uploadByUrl(url);
+        break;
+      case 'file':
+        const file = event.detail.file;
+
+        this.uploader.uploadByFile(file, {
+          onPreview: (src) => {
+            this.ui.showPreloader(src);
+          }
+        });
+        break;
     }
   }
 
@@ -200,15 +261,16 @@ export default class ImageTool {
    *
    * @param {ImageToolData} data
    */
-  set data(data){
+  set data(data) {
     this.image = data.file;
 
     this._data.caption = data.caption || '';
     this.ui.fillCaption(this._data.caption);
 
-    Tunes.tunes.forEach( ({name: tune}) => {
+    Tunes.tunes.forEach(({name: tune}) => {
       const value = data[tune] !== undefined ? data[tune] : false;
-      this.setTune(tune, value)
+
+      this.setTune(tune, value);
     });
   }
 
@@ -218,7 +280,7 @@ export default class ImageTool {
    *
    * @return {ImageToolData} data
    */
-  get data(){
+  get data() {
     return this._data;
   }
 
@@ -237,13 +299,33 @@ export default class ImageTool {
   }
 
   /**
-   * Field uploading callback
+   * File uploading callback
    * @private
    *
    * @param {UploadResponseFormat} response
    */
   onUpload(response) {
-    this.image = response.file;
+    if (response.success && response.file) {
+      this.image = response.file;
+    } else {
+      this.uploadingFailed('incorrect response: ' + JSON.stringify(response));
+    }
+  }
+
+  /**
+   * Handle uploader errors
+   * @private
+   *
+   * @param {string} errorText
+   */
+  uploadingFailed(errorText) {
+    console.log('Image Tool: uploading failed because of', errorText);
+
+    this.api.notifier.show({
+      message: 'Can not upload an image, try another',
+      style: 'error'
+    });
+    this.ui.hidePreloader();
   }
 
   /**
@@ -267,7 +349,7 @@ export default class ImageTool {
 
     this.ui.applyTune(tuneName, value);
 
-    if (tuneName === 'stretched'){
+    if (tuneName === 'stretched') {
       const blockId = this.api.blocks.getCurrentBlockIndex();
 
       setTimeout(() => {

@@ -1,22 +1,24 @@
+const path = require('path');
+
 module.exports = {
   module: {
     rules: [
       {
         test: /\.js$/,
         exclude: /node_modules/,
-        use: ['babel-loader']
+        use: ['babel-loader', 'eslint-loader']
       },
       {
         test: /\.css$/,
         use: [
-          "style-loader",
-          "css-loader",
+          'style-loader',
+          'css-loader',
           {
-            loader: "postcss-loader",
+            loader: 'postcss-loader',
             options: {
               plugins: [
                 require('postcss-nested-ancestors'),
-                require('postcss-nested'),
+                require('postcss-nested')
               ]
             }
           }
@@ -29,10 +31,10 @@ module.exports = {
     ]
   },
   output: {
-    path: __dirname + '/dist',
+    path: path.join(__dirname, '/dist'),
     publicPath: '/',
     filename: 'bundle.js',
-    library: "ImageTool",
+    library: 'ImageTool',
     libraryTarget: 'umd',
     libraryExport: 'default'
   },
