@@ -72,19 +72,17 @@ import Uploader from './uploader';
  */
 export default class ImageTool {
   /**
-   * This Tool should be displayed at the Editor's Toolbox
-   * @return {boolean}
-   */
-  static get displayInToolbox() {
-    return true;
-  }
-
-  /**
-   * Tool's icon SVG
-   * @return {string}
+   * Get Tool toolbox settings
+   * icon - Tool icon's SVG
+   * title - title to show in toolbox
+   *
+   * @return {{icon: string, title: string}}
    */
   static get toolboxIcon() {
-    return ToolboxIcon;
+    return {
+      icon: ToolboxIcon,
+      title: 'Image'
+    };
   }
 
   /**
