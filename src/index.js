@@ -78,7 +78,7 @@ export default class ImageTool {
    *
    * @return {{icon: string, title: string}}
    */
-  static get toolboxIcon() {
+  static get toolbox() {
     return {
       icon: ToolboxIcon,
       title: 'Image'
