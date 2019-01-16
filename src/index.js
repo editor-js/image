@@ -222,28 +222,33 @@ export default class ImageTool {
    *
    * @see {@link https://github.com/codex-team/codex.editor/blob/master/docs/tools.md#paste-handling}
    */
-  onPaste(event) {
+  async onPaste(event) {
     switch (event.type) {
       case 'tag':
         const image = event.detail.data;
 
-        this.ui.showPreloader(image.src);
-        this.uploader.uploadByUrl(image.src);
+        /** Images from PDF */
+        if (/^blob:/.test(image.src)) {
+          const response = await fetch(image.src);
+          const file = await response.blob();
+
+          this.uploadFile(file);
+          break;
+        }
+
+        this.uploadUrl(image.src);
         break;
+
       case 'pattern':
         const url = event.detail.data;
 
-        this.ui.showPreloader(url);
-        this.uploader.uploadByUrl(url);
+        this.uploadUrl(url);
         break;
+
       case 'file':
         const file = event.detail.file;
 
-        this.uploader.uploadByFile(file, {
-          onPreview: (src) => {
-            this.ui.showPreloader(src);
-          }
-        });
+        this.uploadFile(file);
         break;
     }
   }
@@ -355,5 +360,28 @@ export default class ImageTool {
         this.api.blocks.stretchBlock(blockId, value);
       }, 0);
     }
+  }
+
+  /**
+   * Show preloader and upload image file
+   *
+   * @param {File} file
+   */
+  uploadFile(file) {
+    this.uploader.uploadByFile(file, {
+      onPreview: (src) => {
+        this.ui.showPreloader(src);
+      }
+    });
+  }
+
+  /**
+   * Show preloader and upload image by target url
+   *
+   * @param {string} url
+   */
+  uploadUrl(url) {
+    this.ui.showPreloader(url);
+    this.uploader.uploadByUrl(url);
   }
 }
