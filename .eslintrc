@@ -1,5 +1,8 @@
 {
   "extends": [
     "codex"
-  ]
+  ],
+  "globals": {
+    "fetch": true
+  }
 }
