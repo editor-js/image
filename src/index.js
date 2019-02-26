@@ -1,8 +1,8 @@
 /**
- * Image Tool for the CodeX Editor
+ * Image Tool for the Editor.js
  * @author CodeX <team@ifmo.su>
  * @license MIT
- * @see {@link https://github.com/codex-editor/image}
+ * @see {@link https://github.com/editorjs/image}
  *
  * To developers.
  * To simplify Tool structure, we split it to 4 parts:
@@ -88,7 +88,7 @@ export default class ImageTool {
   /**
    * @param {ImageToolData} data - previously saved data
    * @param {ImageConfig} config - user config for Tool
-   * @param {object} api - CodeX Editor API
+   * @param {object} api - Editor.js API
    */
   constructor({data, config, api}) {
     this.api = api;
@@ -191,7 +191,7 @@ export default class ImageTool {
   /**
    * Specify paste substitutes
    *
-   * @see {@link https://github.com/codex-team/codex.editor/blob/master/docs/tools.md#paste-handling}
+   * @see {@link https://github.com/codex-team/editor.js/blob/master/docs/tools.md#paste-handling}
    */
   static get pasteConfig() {
     return {
@@ -220,7 +220,7 @@ export default class ImageTool {
    * Specify paste handlers
    * @public
    *
-   * @see {@link https://github.com/codex-team/codex.editor/blob/master/docs/tools.md#paste-handling}
+   * @see {@link https://github.com/codex-team/editor.js/blob/master/docs/tools.md#paste-handling}
    */
   onPaste(event) {
     switch (event.type) {
