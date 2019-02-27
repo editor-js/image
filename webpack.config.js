@@ -6,7 +6,15 @@ module.exports = {
       {
         test: /\.js$/,
         exclude: /node_modules/,
-        use: ['babel-loader', 'eslint-loader']
+        use: [
+          {
+            loader: 'babel-loader',
+            query: {
+              presets: [ '@babel/preset-env' ],
+            },
+          },
+          'eslint-loader'
+        ]
       },
       {
         test: /\.css$/,
@@ -37,8 +45,5 @@ module.exports = {
     library: 'ImageTool',
     libraryTarget: 'umd',
     libraryExport: 'default'
-  },
-  optimization: {
-    minimize: true
   }
 };

@@ -1,4 +1,4 @@
-import {make} from './ui';
+import { make } from './ui';
 import bgIcon from './svg/background.svg';
 import borderIcon from './svg/border.svg';
 import stretchedIcon from './svg/stretched.svg';
@@ -11,7 +11,7 @@ export default class Tunes {
    * @param {object} api - Editor API
    * @param {function} onChange - tune toggling callback
    */
-  constructor({api, onChange}) {
+  constructor({ api, onChange }) {
     this.api = api;
     this.onChange = onChange;
     this.buttons = [];

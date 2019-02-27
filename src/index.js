@@ -90,7 +90,7 @@ export default class ImageTool {
    * @param {ImageConfig} config - user config for Tool
    * @param {object} api - Editor.js API
    */
-  constructor({data, config, api}) {
+  constructor({ data, config, api }) {
     this.api = api;
 
     /**
@@ -270,7 +270,7 @@ export default class ImageTool {
     this._data.caption = data.caption || '';
     this.ui.fillCaption(this._data.caption);
 
-    Tunes.tunes.forEach(({name: tune}) => {
+    Tunes.tunes.forEach(({ name: tune }) => {
       const value = data[tune] !== undefined ? data[tune] : false;
 
       this.setTune(tune, value);
