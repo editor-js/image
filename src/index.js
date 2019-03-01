@@ -2,7 +2,7 @@
  * Image Tool for the Editor.js
  * @author CodeX <team@ifmo.su>
  * @license MIT
- * @see {@link https://github.com/editorjs/image}
+ * @see {@link https://github.com/editor-js/image}
  *
  * To developers.
  * To simplify Tool structure, we split it to 4 parts:
