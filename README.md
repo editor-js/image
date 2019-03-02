@@ -1,8 +1,8 @@
-![](https://badgen.net/badge/CodeX%20Editor/v2.0/blue)
+![](https://badgen.net/badge/Editor.js/v2.0/blue)
 
 # Image Tool
 
-Image Block for the [CodeX Editor](https://ifmo.su/editor).
+Image Block for the [Editor.js](https://editorjs.io).
 
 ![](https://capella.pics/63a03d04-3816-45b2-87b2-d85e556f0066.jpg)
 
@@ -24,13 +24,13 @@ Image Block for the [CodeX Editor](https://ifmo.su/editor).
 Get the package
 
 ```shell
-npm i --save-dev codex.editor.image
+npm i --save-dev @editorjs/image
 ```
 
 Include module at your application
 
 ```javascript
-const ImageTool = require('codex.editor.image');
+const ImageTool = require('@editorjs/image');
 ```
 
 ### Download to your project's source dir
@@ -40,18 +40,18 @@ const ImageTool = require('codex.editor.image');
 
 ### Load from CDN
 
-You can load specific version of package from [jsDelivr CDN](https://www.jsdelivr.com/package/npm/codex.editor.image).
+You can load specific version of package from [jsDelivr CDN](https://www.jsdelivr.com/package/npm/@editorjs/image).
 
-`https://cdn.jsdelivr.net/npm/codex.editor.image@1.0.0`
+`https://cdn.jsdelivr.net/npm/@editorjs/image@1.0.0`
 
-Then require this script on page with CodeX Editor through the `<script src=""></script>` tag.
+Then require this script on page with Editor.js through the `<script src=""></script>` tag.
 
 ## Usage
 
-Add a new Tool to the `tools` property of the CodeX Editor initial config.
+Add a new Tool to the `tools` property of the Editor.js initial config.
 
 ```javascript
-var editor = CodexEditor({
+var editor = EditorJS({
   ...
 
   tools: {

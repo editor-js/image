@@ -12,7 +12,7 @@ export default class Uploader {
    * @param {function} onUpload - one callback for all uploading (file, url, d-n-d, pasting)
    * @param {function} onError - callback for uploading errors
    */
-  constructor({config, onUpload, onError}) {
+  constructor({ config, onUpload, onError }) {
     this.config = config;
     this.onUpload = onUpload;
     this.onError = onError;
@@ -23,7 +23,7 @@ export default class Uploader {
    * @fires ajax.transport()
    * @param {function} onPreview - callback fired when preview is ready
    */
-  uploadSelectedFile({onPreview}) {
+  uploadSelectedFile({ onPreview }) {
     ajax.transport({
       url: this.config.endpoints.byFile,
       data: this.config.additionalRequestData,
@@ -75,7 +75,7 @@ export default class Uploader {
    * @param {File} file - file pasted by drag-n-drop
    * @param {function} onPreview - file pasted by drag-n-drop
    */
-  uploadByFile(file, {onPreview}) {
+  uploadByFile(file, { onPreview }) {
     /**
      * Load file for preview
      * @type {FileReader}

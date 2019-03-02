@@ -12,7 +12,7 @@ export default class Ui {
    * @param {ImageConfig} config - user config
    * @param {function} onSelectFile - callback for clicks on Select file buttor
    */
-  constructor({api, config, onSelectFile}) {
+  constructor({ api, config, onSelectFile }) {
     this.api = api;
     this.config = config;
     this.onSelectFile = onSelectFile;
