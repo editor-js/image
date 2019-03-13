@@ -308,10 +308,12 @@ export default class ImageTool {
    * @param {UploadResponseFormat} response
    */
   onUpload(response) {
-    if (response.success && response.file) {
-      this.image = response.file;
+    const body = response.body;
+
+    if (body.success && body.file) {
+      this.image = body.file;
     } else {
-      this.uploadingFailed('incorrect response: ' + JSON.stringify(response));
+      this.uploadingFailed('incorrect response: ' + JSON.stringify(body));
     }
   }
 
