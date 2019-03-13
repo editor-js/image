@@ -609,10 +609,10 @@
     lodash "^4.17.11"
     to-fast-properties "^2.0.0"
 
-"@codexteam/ajax@^3.2.1":
-  version "3.2.1"
-  resolved "https://registry.yarnpkg.com/@codexteam/ajax/-/ajax-3.2.1.tgz#7b22dc1c2e84e57e8c18f21232d3bee8ec7c31bb"
-  integrity sha512-hGJTTeHQTaP8/IQsb8WotNt+OyPEf1WTRd2kfsV/kHq8bZdLFTT17lj8RjcnQugurlL7F+hTbkzjoZ/uETa7OA==
+"@codexteam/ajax@^4.0.1":
+  version "4.0.1"
+  resolved "https://registry.yarnpkg.com/@codexteam/ajax/-/ajax-4.0.1.tgz#1b4d59c493841e2a29dc25514cee2fade5a9efba"
+  integrity sha512-qiKOmq3/FpCt/5AlsxS04ueBPZ0JxgY+gYaTGqKEA4yIFnOR+XpNfYFCZbkRB2fpPm++sRLVhskawkHDn39cbA==
 
 "@webassemblyjs/ast@1.8.3":
   version "1.8.3"

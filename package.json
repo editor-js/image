@@ -1,6 +1,6 @@
 {
   "name": "@editorjs/image",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "keywords": [
     "codex editor",
     "tool",
@@ -25,7 +25,7 @@
     "@babel/plugin-transform-runtime": "^7.2.0",
     "@babel/preset-env": "^7.3.4",
     "@babel/runtime": "^7.2.0",
-    "@codexteam/ajax": "^3.2.1",
+    "@codexteam/ajax": "^4.0.1",
     "babel-loader": "^8.0.5",
     "css-loader": "^1.0.0",
     "eslint": "^5.9.0",
