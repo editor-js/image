@@ -134,19 +134,64 @@ export default class Ui {
    * @param {string} url
    */
   fillImage(url) {
-    this.nodes.imageEl = make('img', this.CSS.imageEl, {
-      src: url
-    });
+    /**
+     * Check for a source extension to compose element correctly: video tag for mp4, img — for others
+     */
+    const tag = /\.mp4$/.test(url) ? 'VIDEO' : 'IMG';
 
-    this.nodes.imageContainer.appendChild(this.nodes.imageEl);
-    this.nodes.imageEl.addEventListener('load', () => {
+    let attributes = {
+      src: url
+    };
+
+    /**
+     * We use eventName variable because IMG and VIDEO tags have different event to be called on source load
+     * - IMG: load
+     * - VIDEO: loadeddata
+     * @type {string}
+     */
+    let eventName = 'load';
+
+    /**
+     * Update attributes and eventName if source is a mp4 video
+     */
+    if (tag === 'VIDEO') {
+      /**
+       * Add attributes for playing muted mp4 as a gif
+       * @type {boolean}
+       */
+      attributes.autoplay = true;
+      attributes.loop = true;
+      attributes.muted = true;
+      attributes.playsinline = true;
+
+      /**
+       * Change event to be listened
+       * @type {string}
+       */
+      eventName = 'loadeddata';
+    }
+
+    /**
+     * Compose tag with defined attributes
+     * @type {Element}
+     */
+    this.nodes.imageEl = make(tag, this.CSS.imageEl, attributes);
+
+    /**
+     * Add load event listener
+     */
+    this.nodes.imageEl.addEventListener(eventName, () => {
       this.toggleStatus(Ui.status.FILLED);
 
-      // preloader does not exists on first rendering with presaved data
+      /**
+       * Preloader does not exists on first rendering with presaved data
+       */
       if (this.nodes.imagePreloader) {
         this.nodes.imagePreloader.style.backgroundImage = '';
       }
     });
+
+    this.nodes.imageContainer.appendChild(this.nodes.imageEl);
   }
 
   /**
