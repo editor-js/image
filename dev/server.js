@@ -23,6 +23,7 @@ const path = require('path');
 
 class ServerExample {
   constructor({ port, fieldName }) {
+    this.port = port;
     this.uploadDir = path.join(__dirname, '.tmp');
     this.fieldName = fieldName;
     this.server = http.createServer((req, res) => {
@@ -47,6 +48,11 @@ class ServerExample {
     this.allowCors(response);
 
     const { method, url } = request;
+
+    if (method.toLowerCase() === 'get') {
+      this.serveFile(request, response);
+      return;
+    }
 
     if (method.toLowerCase() !== 'post') {
       response.end();
@@ -92,7 +98,7 @@ class ServerExample {
 
         responseJson.success = 1;
         responseJson.file = {
-          url: image.path,
+          url: this.renderURLFromPath(image.path),
           name: image.name,
           size: image.size
         };
@@ -126,7 +132,7 @@ class ServerExample {
           .then((path) => {
             responseJson.success = 1;
             responseJson.file = {
-              url: path
+              url: this.renderURLFromPath(path)
             };
           });
       })
@@ -137,6 +143,24 @@ class ServerExample {
         response.writeHead(200, { 'Content-Type': 'application/json' });
         response.end(JSON.stringify(responseJson));
       });
+  }
+
+  /**
+   *
+   * @param {Request} request
+   * @param {Response} response
+   */
+  serveFile(request, response) {
+    const pathToFile = path.join(__dirname, request.url);
+    const fileStream = fs.createReadStream(
+      pathToFile
+    );
+
+    fileStream.pipe(response);
+    fileStream.on('error', () => {
+      response.statusCode = 404;
+      response.end();
+    });
   }
 
   /**
@@ -187,6 +211,14 @@ class ServerExample {
    */
   md5(string) {
     return crypto.createHash('md5').update(string).digest('hex');
+  }
+
+  /**
+   * return a url to image
+   * @param {string} pathToFile
+   */
+  renderURLFromPath(pathToFile) {
+    return `http://localhost:${this.port}/${path.join('.tmp/', path.basename(pathToFile))}`;
   }
 }
 
