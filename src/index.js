@@ -76,6 +76,7 @@ export class Uploader {
  * @description Config supported by Tool
  * @property {string} captionPlaceholder - placeholder for Caption field
  * @property {string} buttonContent - overrides for Select File button
+ * @property {string} types - available mime-types
  * @property {Uploader} uploader - api transport for upload images
  */
 
