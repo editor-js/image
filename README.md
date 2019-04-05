@@ -89,6 +89,7 @@ Image Tool supports these configuration parameters:
 | buttonContent | `string` | Allows to override HTML content of «Select file» button |
 
 Default Uploader class supports these configuration parameters:
+
 | Field | Type     | Description        |
 | ----- | -------- | ------------------ |
 | endpoints | `{byFile: string, byUrl: string}` | **Required** Endpoints for file uploading. <br> Contains 2 fields: <br> __byFile__ - for file uploading <br> __byUrl__ - for uploading by URL |
