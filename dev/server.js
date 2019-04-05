@@ -17,14 +17,14 @@ const http = require('http');
 const formidable = require('formidable');
 const { parse } = require('querystring');
 const fs = require('fs');
-const request = require('request');
+const get = require('request');
 const crypto = require('crypto');
-const path = require('path');
+const { join, basename } = require('path');
 
 class ServerExample {
   constructor({ port, fieldName }) {
     this.port = port;
-    this.uploadDir = path.join(__dirname, '.tmp');
+    this.uploadDir = join(__dirname, '.tmp');
     this.fieldName = fieldName;
     this.server = http.createServer((req, res) => {
       this.onRequest(req, res);
@@ -151,7 +151,7 @@ class ServerExample {
    * @param {Response} response
    */
   serveFile(request, response) {
-    const pathToFile = path.join(__dirname, request.url);
+    const pathToFile = join(__dirname, request.url);
     const fileStream = fs.createReadStream(
       pathToFile
     );
@@ -195,8 +195,9 @@ class ServerExample {
    */
   downloadImage(uri, filename) {
     return new Promise((resolve, reject) => {
-      request.head(uri, function (err, res, body) {
-        request(uri).pipe(fs.createWriteStream(filename).on('erorr', reject))
+      get.head(uri, function (err, res, body) {
+        if (err) reject(err);
+        get(uri).pipe(fs.createWriteStream(filename).on('erorr', reject))
           .on('close', () => {
             resolve(filename);
           });
@@ -218,7 +219,7 @@ class ServerExample {
    * @param {string} pathToFile
    */
   renderURLFromPath(pathToFile) {
-    return `http://localhost:${this.port}/${path.join('.tmp/', path.basename(pathToFile))}`;
+    return `http://localhost:${this.port}/${join('.tmp/', basename(pathToFile))}`;
   }
 }
 
