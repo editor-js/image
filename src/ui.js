@@ -1,6 +1,11 @@
 import buttonIcon from './svg/button-icon.svg';
 
 /**
+ * @type {HTMLInputElement}
+ */
+let fileInput = null;
+
+/**
  * Class for working with UI:
  *  - rendering base structure
  *  - show/hide preview
@@ -105,10 +110,71 @@ export default class Ui {
     button.innerHTML = this.config.buttonContent || `${buttonIcon} Select an Image`;
 
     button.addEventListener('click', () => {
-      this.onSelectFile();
+      this.openFileDialog()
+        .then(this.onSelectFile);
     });
 
     return button;
+  }
+
+  /**
+   * open file dialog
+   * @returns {Promise<File}
+   */
+  openFileDialog() {
+    return new Promise((resolve) => {
+      /**
+       * Create a new INPUT element or reuse old INPUT
+       */
+      fileInput = fileInput || document.createElement('INPUT');
+
+      /**
+       * collect all inputs for better clean up
+       */
+      /**
+       * Set a 'FILE' type for this input element
+       * @type {string}
+       */
+      fileInput.type = 'file';
+
+      if (this.config.types) {
+        fileInput.setAttribute('accept', this.config.types);
+      }
+
+      /**
+       * Do not show element
+       */
+      fileInput.style.display = 'none';
+
+      /**
+       * Append element to the body
+       * Fix using module on mobile devices
+       */
+      document.body.appendChild(fileInput);
+
+      /**
+       * Add onchange listener for «choose file» pop-up
+       */
+      fileInput.addEventListener('change', event => {
+        /**
+         * Get files from input field
+         */
+        const [ file ] = event.target.files;
+        /**
+         * Return ready to be uploaded FormData object
+         */
+
+        resolve(file);
+
+        fileInput.parentElement.removeChild(fileInput);
+        fileInput = null;
+      }, false);
+
+      /**
+       * Fire click event on «input file» field
+       */
+      fileInput.click();
+    });
   }
 
   /**
@@ -223,6 +289,16 @@ export default class Ui {
    */
   applyTune(tuneName, status) {
     this.nodes.wrapper.classList.toggle(`${this.CSS.wrapper}--${tuneName}`, status);
+  }
+
+  /**
+   * cleanup input
+   */
+  destroy() {
+    if (fileInput) {
+      fileInput.parentElement.removeChild(fileInput);
+      fileInput = null;
+    }
   }
 }
 

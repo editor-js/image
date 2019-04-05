@@ -1,3 +1,4 @@
+/* eslint-disable require-jsdoc */
 /**
  * Sample HTTP server for accept uploaded images
  * [!] Use it only for debugging purposes
@@ -18,10 +19,11 @@ const { parse } = require('querystring');
 const fs = require('fs');
 const request = require('request');
 const crypto = require('crypto');
+const path = require('path');
 
 class ServerExample {
-  constructor({port, fieldName}) {
-    this.uploadDir = __dirname + '/\.tmp';
+  constructor({ port, fieldName }) {
+    this.uploadDir = path.join(__dirname, '.tmp');
     this.fieldName = fieldName;
     this.server = http.createServer((req, res) => {
       this.onRequest(req, res);
@@ -44,7 +46,7 @@ class ServerExample {
   onRequest(request, response) {
     this.allowCors(response);
 
-    const {method, url} = request;
+    const { method, url } = request;
 
     if (method.toLowerCase() !== 'post') {
       response.end();
@@ -85,7 +87,7 @@ class ServerExample {
     };
 
     this.getForm(request)
-      .then(({files}) => {
+      .then(({ files }) => {
         let image = files[this.fieldName] || {};
 
         responseJson.success = 1;
@@ -99,7 +101,7 @@ class ServerExample {
         console.log('Uploading error', error);
       })
       .finally(() => {
-        response.writeHead(200, {'Content-Type': 'application/json'});
+        response.writeHead(200, { 'Content-Type': 'application/json' });
         response.end(JSON.stringify(responseJson));
       });
   }
@@ -115,7 +117,7 @@ class ServerExample {
     };
 
     this.getForm(request)
-      .then(({files, fields}) => {
+      .then(({ files, fields }) => {
         let url = fields.url;
 
         let filename = this.uploadDir + '/' + this.md5(url) + '.png';
@@ -132,7 +134,7 @@ class ServerExample {
         console.log('Uploading error', error);
       })
       .finally(() => {
-        response.writeHead(200, {'Content-Type': 'application/json'});
+        response.writeHead(200, { 'Content-Type': 'application/json' });
         response.end(JSON.stringify(responseJson));
       });
   }
@@ -155,7 +157,7 @@ class ServerExample {
         } else {
           console.log('fields', fields);
           console.log('files', files);
-          resolve({files, fields});
+          resolve({ files, fields });
         }
       });
     });

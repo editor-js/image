@@ -1,5 +1,8 @@
 const path = require('path');
 
+/**
+ * @type {import('webpack').Configuration}
+ */
 module.exports = {
   module: {
     rules: [
@@ -10,8 +13,8 @@ module.exports = {
           {
             loader: 'babel-loader',
             query: {
-              presets: [ '@babel/preset-env' ],
-            },
+              presets: [ '@babel/preset-env' ]
+            }
           },
           'eslint-loader'
         ]
@@ -38,10 +41,15 @@ module.exports = {
       }
     ]
   },
+  entry: {
+    imagetool: path.join(__dirname, './src/index.js'),
+    uploader: path.join(__dirname, './src/uploader.js')
+  },
+  devtool: 'inline-source-map',
   output: {
     path: path.join(__dirname, '/dist'),
     publicPath: '/',
-    filename: 'bundle.js',
+    filename: '[name].js',
     library: 'ImageTool',
     libraryTarget: 'umd',
     libraryExport: 'default'

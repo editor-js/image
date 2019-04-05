@@ -40,25 +40,43 @@
  * @property {string} file.url — image URL
  */
 
-// eslint-disable-next-line
-import css from './index.css';
+import './index.css';
 import Ui from './ui';
 import Tunes from './tunes';
 import ToolboxIcon from './svg/toolbox.svg';
-import Uploader from './uploader';
+
+/**
+ * Interface for classes that represent a uploader
+ * @interface Uploader
+ */
+export class Uploader {
+  /**
+   * Handle clicks on the upload file button
+   * @param {string} url - image source url
+   * @param {Object} context - context object with helpers and other properties
+   * @param {function(string)} context.setPreview - callback for set preview image
+   * @returns {Promise<UploadResponseFormat>}
+   */
+  uploadByUrl(url, { setPreview }) {
+  }
+
+  /**
+   * Handle clicks on the upload file button
+   * @param {File} file - file pasted by drag-n-drop
+   * @param {Object} context - context object with helpers and other properties
+   * @param {function(string)} context.setPreview - callback for set preview image
+   * @returns {Promise<UploadResponseFormat>}
+   */
+  uploadByFile(file, { setPreview }) {
+  }
+}
 
 /**
  * @typedef {object} ImageConfig
  * @description Config supported by Tool
- * @property {object} endpoints - upload endpoints
- * @property {string} endpoints.byFile - upload by file
- * @property {string} endpoints.byUrl - upload by URL
- * @property {string} field - field name for uploaded image
- * @property {string} types - available mime-types
  * @property {string} captionPlaceholder - placeholder for Caption field
- * @property {object} additionalRequestData - any data to send with requests
- * @property {object} additionalRequestHeaders - allows to pass custom headers with Request
  * @property {string} buttonContent - overrides for Select File button
+ * @property {Uploader} uploader - api transport for upload images
  */
 
 /**
@@ -91,16 +109,19 @@ export default class ImageTool {
    * @param {object} api - Editor.js API
    */
   constructor({ data, config, api }) {
+    /**
+     * @param {string} src - url on preview image while uploading file
+     */
+    this.setPreview = (src) => {
+      this.ui.showPreloader(src);
+    };
+
     this.api = api;
 
     /**
      * Tool's initial config
      */
     this.config = {
-      endpoints: config.endpoints || '',
-      additionalRequestData: config.additionalRequestData || {},
-      additionalRequestHeaders: config.additionalRequestHeaders || {},
-      field: config.field || 'image',
       types: config.types || 'image/*',
       captionPlaceholder: config.captionPlaceholder || 'Caption',
       buttonContent: config.buttonContent || ''
@@ -108,12 +129,9 @@ export default class ImageTool {
 
     /**
      * Module for file uploading
+     * @type {Uploader}
      */
-    this.uploader = new Uploader({
-      config: this.config,
-      onUpload: (response) => this.onUpload(response),
-      onError: (error) => this.uploadingFailed(error)
-    });
+    this.uploader = config.uploader;
 
     /**
      * Module for working with UI
@@ -121,12 +139,12 @@ export default class ImageTool {
     this.ui = new Ui({
       api,
       config: this.config,
-      onSelectFile: () => {
-        this.uploader.uploadSelectedFile({
-          onPreview: (src) => {
-            this.ui.showPreloader(src);
-          }
-        });
+      onSelectFile: (file) => {
+        this.handleUpload(
+          this.uploader.uploadByFile(file, {
+            setPreview: this.setPreview
+          })
+        );
       }
     });
 
@@ -167,6 +185,13 @@ export default class ImageTool {
     this._data.caption = caption.innerHTML;
 
     return this.data;
+  }
+
+  /**
+   * cleanup after ui
+   */
+  destroy() {
+    this.ui.destroy();
   }
 
   /**
@@ -370,11 +395,11 @@ export default class ImageTool {
    * @param {File} file
    */
   uploadFile(file) {
-    this.uploader.uploadByFile(file, {
-      onPreview: (src) => {
-        this.ui.showPreloader(src);
-      }
-    });
+    this.handleUpload(
+      this.uploader.uploadByFile(file, {
+        setPreview: this.setPreview
+      })
+    );
   }
 
   /**
@@ -383,7 +408,24 @@ export default class ImageTool {
    * @param {string} url
    */
   uploadUrl(url) {
-    this.ui.showPreloader(url);
-    this.uploader.uploadByUrl(url);
+    this.handleUpload(
+      this.uploader.uploadByUrl(url, {
+        setPreview: this.setPreview
+      })
+    );
+  }
+
+  /**
+   * Helper for handle promise
+   * @param {Promise} promise
+   */
+  handleUpload(promise) {
+    promise
+      .then((response) => {
+        this.onUpload(response);
+      })
+      .catch((error) => {
+        this.uploadingFailed(error);
+      });
   }
 }

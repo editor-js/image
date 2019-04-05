@@ -1,5 +1,28 @@
 import ajax from '@codexteam/ajax';
 
+const mergeConfig = ({
+  endpoints = {},
+  additionalRequestData = {},
+  additionalRequestHeaders = {},
+  field = 'image'
+}) => ({
+  endpoints,
+  additionalRequestData,
+  additionalRequestHeaders,
+  field
+});
+
+/**
+ * @typedef {object} UploaderConfig
+ * @description Config supported by Uploader
+ * @property {object} endpoints - upload endpoints
+ * @property {string} endpoints.byFile - upload by file
+ * @property {string} endpoints.byUrl - upload by URL
+ * @property {string} field - field name for uploaded image
+ * @property {object} additionalRequestData - any data to send with requests
+ * @property {object} additionalRequestHeaders - allows to pass custom headers with Request
+ */
+
 /**
  * Module for file uploading. Handle 3 scenarios:
  *  1. Select file from device and upload
@@ -8,74 +31,39 @@ import ajax from '@codexteam/ajax';
  */
 export default class Uploader {
   /**
-   * @param {ImageConfig} config
-   * @param {function} onUpload - one callback for all uploading (file, url, d-n-d, pasting)
-   * @param {function} onError - callback for uploading errors
+   * @param {UploaderConfig} config
    */
-  constructor({ config, onUpload, onError }) {
-    this.config = config;
-    this.onUpload = onUpload;
-    this.onError = onError;
-  }
-
-  /**
-   * Handle clicks on the upload file button
-   * @fires ajax.transport()
-   * @param {function} onPreview - callback fired when preview is ready
-   */
-  uploadSelectedFile({ onPreview }) {
-    ajax.transport({
-      url: this.config.endpoints.byFile,
-      data: this.config.additionalRequestData,
-      accept: this.config.types,
-      headers: this.config.additionalRequestHeaders,
-      beforeSend: (files) => {
-        const reader = new FileReader();
-
-        reader.readAsDataURL(files[0]);
-        reader.onload = (e) => {
-          onPreview(e.target.result);
-        };
-      },
-      fieldName: this.config.field
-    })
-      .then((response) => {
-        this.onUpload(response);
-      })
-      .catch((error) => {
-        this.onError(error);
-      });
+  constructor(config) {
+    this.config = mergeConfig(config);
   }
 
   /**
    * Handle clicks on the upload file button
    * @fires ajax.post()
    * @param {string} url - image source url
+   * @param {function(string)} setPreview - callback for set preview image
+   * @returns {Promise<UploadResponseFormat>}
    */
-  uploadByUrl(url) {
-    ajax.post({
+  uploadByUrl(url, { setPreview }) {
+    setPreview(url);
+    return ajax.post({
       url: this.config.endpoints.byUrl,
       data: Object.assign({
         url: url
       }, this.config.additionalRequestData),
       type: ajax.contentType.JSON,
       headers: this.config.additionalRequestHeaders
-    })
-      .then((response) => {
-        this.onUpload(response);
-      })
-      .catch((error) => {
-        this.onError(error);
-      });
+    });
   }
 
   /**
-   * Handle clicks on the upload file button
+   * Handle clicks on the upload file button or by paste and drag and drop
    * @fires ajax.post()
    * @param {File} file - file pasted by drag-n-drop
-   * @param {function} onPreview - file pasted by drag-n-drop
+   * @param {function(string)} setPreview - callback for set preview image
+   * @returns {Promise<UploadResponseFormat>}
    */
-  uploadByFile(file, { onPreview }) {
+  uploadByFile(file, { setPreview }) {
     /**
      * Load file for preview
      * @type {FileReader}
@@ -84,7 +72,7 @@ export default class Uploader {
 
     reader.readAsDataURL(file);
     reader.onload = (e) => {
-      onPreview(e.target.result);
+      setPreview(e.target.result);
     };
 
     /**
@@ -94,23 +82,17 @@ export default class Uploader {
 
     formData.append(this.config.field, file);
 
-    if (this.config.additionalRequestData && Object.keys(this.config.additionalRequestData).length) {
+    if (Object.keys(this.config.additionalRequestData).length) {
       Object.entries(this.config.additionalRequestData).forEach(([name, value]) => {
         formData.append(name, value);
       });
     }
 
-    ajax.post({
+    return ajax.post({
       url: this.config.endpoints.byFile,
       data: formData,
       type: ajax.contentType.JSON,
       headers: this.config.additionalRequestHeaders
-    })
-      .then((response) => {
-        this.onUpload(response);
-      })
-      .catch((error) => {
-        this.onError(error);
-      });
+    });
   }
 }
