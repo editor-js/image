@@ -110,13 +110,6 @@ export default class ImageTool {
    * @param {object} api - Editor.js API
    */
   constructor({ data, config, api }) {
-    /**
-     * @param {string} src - url on preview image while uploading file
-     */
-    this.setPreview = (src) => {
-      this.ui.showPreloader(src);
-    };
-
     this.api = api;
 
     /**
@@ -333,7 +326,7 @@ export default class ImageTool {
    *
    * @param {UploadResponseFormat} response
    */
-  onUpload(response) {
+  onUpload = (response) => {
     const body = response.body;
 
     if (body.success && body.file) {
@@ -349,7 +342,7 @@ export default class ImageTool {
    *
    * @param {string} errorText
    */
-  uploadingFailed(errorText) {
+  uploadingFailed = (errorText) => {
     console.log('Image Tool: uploading failed because of', errorText);
 
     this.api.notifier.show({
@@ -422,11 +415,14 @@ export default class ImageTool {
    */
   handleUpload(promise) {
     promise
-      .then((response) => {
-        this.onUpload(response);
-      })
-      .catch((error) => {
-        this.uploadingFailed(error);
-      });
+      .then(this.onUpload)
+      .catch(this.uploadingFailed);
   }
+
+  /**
+   * @param {string} src - url on preview image while uploading file
+   */
+  setPreview = (src) => {
+    this.ui.showPreloader(src);
+  };
 }

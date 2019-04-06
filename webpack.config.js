@@ -40,7 +40,6 @@ module.exports = {
     imagetool: path.join(__dirname, './src/index.js'),
     uploader: path.join(__dirname, './src/uploader.js')
   },
-  devtool: 'inline-source-map',
   output: {
     path: path.join(__dirname, '/dist'),
     publicPath: '/',
