@@ -11,7 +11,7 @@
   "description": "Image Tool for Editor.js",
   "license": "MIT",
   "repository": "https://github.com/editor-js/image",
-  "main": "./dist/imagetool.js",
+  "main": "./dist/ImageTool.js",
   "scripts": {
     "build": "webpack --mode production",
     "build:dev": "webpack --mode development --watch"

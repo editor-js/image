@@ -37,14 +37,14 @@ module.exports = {
     ]
   },
   entry: {
-    imagetool: path.join(__dirname, './src/index.js'),
-    uploader: path.join(__dirname, './src/uploader.js')
+    ImageTool: path.join(__dirname, './src/index.js'),
+    ImageToolUploader: path.join(__dirname, './src/uploader.js')
   },
   output: {
     path: path.join(__dirname, '/dist'),
     publicPath: '/',
     filename: '[name].js',
-    library: 'ImageTool',
+    library: '[name]',
     libraryTarget: 'umd',
     libraryExport: 'default'
   }

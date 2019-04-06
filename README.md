@@ -36,14 +36,15 @@ import ImageTool from '@editorjs/image'
 ### Download to your project's source dir
 
 1. Upload folder `dist` from repository
-2. Add `dist/imagetool.js` file to your page.
-3. Add `dist/uploader.js` file to your page (optional).
+2. Add `dist/ImageTool.js` file to your page.
+3. Add `dist/ImageToolUploader.js` file to your page (optional).
 
 ### Load from CDN
 
 You can load specific version of package from [jsDelivr CDN](https://www.jsdelivr.com/package/npm/@editorjs/image).
 
 `https://cdn.jsdelivr.net/npm/@editorjs/image@latest`
+`https://cdn.jsdelivr.net/npm/@editorjs/image/dist/ImageToolUploader.js` (optional)
 
 Then require this script on page with Editor.js through the `<script src=""></script>` tag.
 
@@ -53,7 +54,11 @@ Add a new Tool to the `tools` property of the Editor.js initial config.
 
 ```javascript
 import ImageTool from '@editorjs/image'
-import Uploader from '@editorjs/image/dist/uploader'
+import Uploader from '@editorjs/image/dist/ImageToolUploader'
+
+// or if you inject ImageTool via script
+const ImageTool = window.ImageTool
+const Uploader = window.ImageToolUploader
 
 var editor = EditorJS({
   ...
