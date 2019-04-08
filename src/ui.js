@@ -10,7 +10,7 @@ export default class Ui {
   /**
    * @param {object} api - Editor.js API
    * @param {ImageConfig} config - user config
-   * @param {function} onSelectFile - callback for clicks on Select file buttor
+   * @param {function} onSelectFile - callback for clicks on Select file button
    */
   constructor({ api, config, onSelectFile }) {
     this.api = api;
