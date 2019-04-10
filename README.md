@@ -207,6 +207,27 @@ You should save it and return the same response format as described above.
  * @property {string} file.url - [Required] image source URL
  */
 
+// example of api client
+class Api {
+  /**
+   * @param {string} url
+   * @return {Promise<UploadResponseFormat>}
+   */
+  uploadFileByURL(url) {
+    //magic
+  }
+
+  /**
+   * @param {File} file
+   * @return {Promise<UploadResponseFormat>}
+   */
+  uploadByFile(file) {
+    //magic
+  }
+}
+
+const api = new Api();
+
 class CustomUploader {
   /**
    * Handle url string from paste
