@@ -166,7 +166,7 @@ export default class Ui {
 
         resolve(file);
 
-        fileInput.parentElement.removeChild(fileInput);
+        fileInput.remove();
         fileInput = null;
       }, false);
 
@@ -296,7 +296,7 @@ export default class Ui {
    */
   destroy() {
     if (fileInput) {
-      fileInput.parentElement.removeChild(fileInput);
+      fileInput.remove();
       fileInput = null;
     }
   }
