@@ -100,7 +100,7 @@ export default class ImageTool {
      * Module for file uploading
      * @type {Uploader}
      */
-    this.uploader = this.config.uploader || new Uploader(this.config);
+    this.uploader = this.config.uploader || new Uploader(config);
 
     /**
      * Module for working with UI
