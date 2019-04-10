@@ -37,13 +37,12 @@ module.exports = {
     ]
   },
   entry: {
-    ImageTool: path.join(__dirname, './src/index.js'),
-    ImageToolUploader: path.join(__dirname, './src/uploader.js')
+    ImageTool: path.join(__dirname, './src/index.js')
   },
   output: {
     path: path.join(__dirname, '/dist'),
     publicPath: '/',
-    filename: '[name].js',
+    filename: 'bundle.js',
     library: '[name]',
     libraryTarget: 'umd',
     libraryExport: 'default'

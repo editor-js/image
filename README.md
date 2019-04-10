@@ -36,15 +36,13 @@ import ImageTool from '@editorjs/image'
 ### Download to your project's source dir
 
 1. Upload folder `dist` from repository
-2. Add `dist/ImageTool.js` file to your page.
-3. Add `dist/ImageToolUploader.js` file to your page (optional).
+2. Add `dist/build.js` file to your page.
 
 ### Load from CDN
 
 You can load specific version of package from [jsDelivr CDN](https://www.jsdelivr.com/package/npm/@editorjs/image).
 
-`https://cdn.jsdelivr.net/npm/@editorjs/image@latest`
-`https://cdn.jsdelivr.net/npm/@editorjs/image/dist/ImageToolUploader.js` (optional)
+`https://cdn.jsdelivr.net/npm/@editorjs/image@2.3.0`
 
 Then require this script on page with Editor.js through the `<script src=""></script>` tag.
 
@@ -54,11 +52,9 @@ Add a new Tool to the `tools` property of the Editor.js initial config.
 
 ```javascript
 import ImageTool from '@editorjs/image'
-import Uploader from '@editorjs/image/dist/ImageToolUploader'
 
 // or if you inject ImageTool via script
 const ImageTool = window.ImageTool
-const Uploader = window.ImageToolUploader
 
 var editor = EditorJS({
   ...
@@ -68,12 +64,11 @@ var editor = EditorJS({
     image: {
       class: ImageTool,
       config: {
-        uploader: new Uploader({
-          endpoints: {
-            byFile: 'http://localhost:8008/uploadFile', // Your backend file uploader endpoint
-            byUrl: 'http://localhost:8008/fetchUrl', // Your endpoint that provides uploading by Url
-          }
-        })
+        endpoints: {
+          byFile: 'http://localhost:8008/uploadFile', // Your backend file uploader endpoint
+          byUrl: 'http://localhost:8008/fetchUrl', // Your endpoint that provides uploading by Url
+        }, // config for default uploader
+        uploader: new CustomUploader({}) // if exists, using in prefer
       }
     }
   }
@@ -93,7 +88,7 @@ Image Tool supports these configuration parameters:
 | types | `string` | (default: `image/*`) Mime-types of files that can be [accepted with file selection](https://github.com/codex-team/ajax#accept-string).|
 | buttonContent | `string` | Allows to override HTML content of «Select file» button |
 
-Default Uploader class supports these configuration parameters:
+Default Uploader supports these configuration parameters:
 
 | Field | Type     | Description        |
 | ----- | -------- | ------------------ |
@@ -202,7 +197,6 @@ You should save it and return the same response format as described above.
 
 ## Writing your own implementation of the Uploader class
 ```js
-
 /**
  * @typedef {object} UploadResponseFormat
  * @description This format expected from backend on file uploading
@@ -233,6 +227,32 @@ class CustomUploader {
    * @param {function(string)} context.setPreview - callback for set preview image
    * @returns {Promise<UploadResponseFormat>}
    */
+  uploadByFile(file, { setPreview }) {
+    /**
+     * Load file for preview
+     * @type {FileReader}
+    */
+    const reader = new FileReader();
+
+    reader.readAsDataURL(file);
+    reader.onload = (e) => {
+      setPreview(e.target.result);
+    };
+
+    return api.uploadFile(file); // Promise return object in format { success: 1, file: { url: '' }}
+  }
+}
+```
+
+Implementation on classes is optional, you can just drop an object with the methods uploadByFile, uploadByUrl
+
+```js
+{
+  uploadByUrl(url, { setPreview }) {
+    setPreview(url);
+    return api.uploadFileByURL(url); // Promise return object in format { success: 1, file: { url: '' }}
+  }
+
   uploadByFile(file, { setPreview }) {
     /**
      * Load file for preview

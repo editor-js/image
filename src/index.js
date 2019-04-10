@@ -44,32 +44,7 @@ import './index.css';
 import Ui from './ui';
 import Tunes from './tunes';
 import ToolboxIcon from './svg/toolbox.svg';
-
-/**
- * Interface for classes that represent a uploader
- * @interface Uploader
- */
-export class Uploader {
-  /**
-   * Handle clicks on the upload file button
-   * @param {string} url - image source url
-   * @param {Object} context - context object with helpers and other properties
-   * @param {function(string)} context.setPreview - callback for set preview image
-   * @returns {Promise<UploadResponseFormat>}
-   */
-  uploadByUrl(url, { setPreview }) {
-  }
-
-  /**
-   * Handle clicks on the upload file button
-   * @param {File} file - file pasted by drag-n-drop
-   * @param {Object} context - context object with helpers and other properties
-   * @param {function(string)} context.setPreview - callback for set preview image
-   * @returns {Promise<UploadResponseFormat>}
-   */
-  uploadByFile(file, { setPreview }) {
-  }
-}
+import Uploader from './uploader';
 
 /**
  * @typedef {object} ImageConfig
@@ -125,7 +100,7 @@ export default class ImageTool {
      * Module for file uploading
      * @type {Uploader}
      */
-    this.uploader = config.uploader;
+    this.uploader = this.config.uploader || new Uploader(this.config);
 
     /**
      * Module for working with UI
