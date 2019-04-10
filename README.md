@@ -83,7 +83,7 @@ Image Tool supports these configuration parameters:
 
 | Field | Type     | Description        |
 | ----- | -------- | ------------------ |
-| uploader | `interface Uploader` | Any javascript class that implements the Uploader interface. Together with the Image Tool we provide the default Uploader.
+| uploader | `interface Uploader` | Any javascript class or object that implements the Uploader interface. Together with the Image Tool we provide the default Uploader.
 | captionPlaceholder | `string` | (default: `Caption`) Placeholder for Caption input |
 | types | `string` | (default: `image/*`) Mime-types of files that can be [accepted with file selection](https://github.com/codex-team/ajax#accept-string).|
 | buttonContent | `string` | Allows to override HTML content of «Select file» button |
