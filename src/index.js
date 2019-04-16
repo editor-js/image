@@ -59,6 +59,9 @@ import Uploader from './uploader';
  * @property {object} additionalRequestData - any data to send with requests
  * @property {object} additionalRequestHeaders - allows to pass custom headers with Request
  * @property {string} buttonContent - overrides for Select File button
+ * @property {object} [uploader] - optional custom uploader
+ * @property {function(File): Promise.<UploadResponseFormat>} [uploader.uploadByFile] - method that upload image by File
+ * @property {function(string): Promise.<UploadResponseFormat>} [uploader.uploadByUrl] - method that upload image by URL
  */
 
 /**
@@ -103,7 +106,8 @@ export default class ImageTool {
       field: config.field || 'image',
       types: config.types || 'image/*',
       captionPlaceholder: config.captionPlaceholder || 'Caption',
-      buttonContent: config.buttonContent || ''
+      buttonContent: config.buttonContent || '',
+      uploader: config.uploader || undefined
     };
 
     /**
@@ -308,12 +312,10 @@ export default class ImageTool {
    * @param {UploadResponseFormat} response
    */
   onUpload(response) {
-    const body = response.body;
-
-    if (body.success && body.file) {
-      this.image = body.file;
+    if (response.success && response.file) {
+      this.image = response.file;
     } else {
-      this.uploadingFailed('incorrect response: ' + JSON.stringify(body));
+      this.uploadingFailed('incorrect response: ' + JSON.stringify(response));
     }
   }
 
