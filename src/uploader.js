@@ -37,8 +37,7 @@ export default class Uploader {
      * Custom uploading
      */
     if (this.config.uploader && typeof this.config.uploader.uploadByFile === 'function') {
-      // ajax.selectFile().then((files) => {
-      selectFiles().then((files) => {
+      ajax.selectFiles().then((files) => {
         preparePreview(files[0]);
 
         let upload = this.config.uploader.uploadByFile(files[0]);
@@ -175,62 +174,4 @@ export default class Uploader {
  */
 function isPromise(object) {
   return Promise.resolve(object) === object;
-}
-
-/**
- * Temporary solution
- * @todo replace it with ajax.selectFiles() method
- * @returns {Promise.<File>}
- */
-function selectFiles() {
-  return new Promise((resolve) => {
-    /**
-     * Create a new INPUT element or reuse old INPUT
-     */
-    let fileInput = document.createElement('INPUT');
-
-    /**
-     * collect all inputs for better clean up
-     */
-    /**
-     * Set a 'FILE' type for this input element
-     * @type {string}
-     */
-    fileInput.type = 'file';
-    fileInput.setAttribute('accept', 'image/*');
-
-    /**
-     * Do not show element
-     */
-    fileInput.style.display = 'none';
-
-    /**
-     * Append element to the body
-     * Fix using module on mobile devices
-     */
-    document.body.appendChild(fileInput);
-
-    /**
-     * Add onchange listener for «choose file» pop-up
-     */
-    fileInput.addEventListener('change', event => {
-      /**
-       * Get files from input field
-       */
-      const [ file ] = event.target.files;
-      /**
-       * Return ready to be uploaded FormData object
-       */
-
-      resolve(file);
-
-      fileInput.remove();
-      fileInput = null;
-    }, false);
-
-    /**
-     * Fire click event on «input file» field
-     */
-    fileInput.click();
-  });
 }
