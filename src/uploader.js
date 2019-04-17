@@ -24,7 +24,7 @@ export default class Uploader {
    * @param {function} onPreview - callback fired when preview is ready
    */
   uploadSelectedFile({ onPreview }) {
-    let preparePreview = function (file) {
+    const preparePreview = function (file) {
       const reader = new FileReader();
 
       reader.readAsDataURL(file);
@@ -141,7 +141,7 @@ export default class Uploader {
       /**
        * Default uploading
        */
-      let formData = new FormData();
+      const formData = new FormData();
 
       formData.append(this.config.field, file);
 
