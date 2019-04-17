@@ -35,25 +35,27 @@ export default class Uploader {
 
     /**
      * Custom uploading
+     * or default uploading
      */
+    let upload;
+
+    // custom uploading
     if (this.config.uploader && typeof this.config.uploader.uploadByFile === 'function') {
-      ajax.selectFiles().then((files) => {
+      upload = ajax.selectFiles().then((files) => {
         preparePreview(files[0]);
 
-        let upload = this.config.uploader.uploadByFile(files[0]);
+        const customUpload = this.config.uploader.uploadByFile(files[0]);
 
-        if (!isPromise(upload)) {
+        if (!isPromise(customUpload)) {
           console.warn('Custom uploader method uploadByFile should return a Promise');
         }
 
-        upload.then((response) => {
-          this.onUpload(response);
-        }).catch((error) => {
-          this.onError(error);
-        });
+        return customUpload;
       });
+
+    // default uploading
     } else {
-      ajax.transport({
+      upload = ajax.transport({
         url: this.config.endpoints.byFile,
         data: this.config.additionalRequestData,
         accept: this.config.types,
@@ -62,12 +64,14 @@ export default class Uploader {
           preparePreview(files[0]);
         },
         fieldName: this.config.field
-      }).then((response) => {
-        this.onUpload(response.body);
-      }).catch((error) => {
-        this.onError(error);
-      });
+      }).then((response) => response.body);
     }
+
+    upload.then((response) => {
+      this.onUpload(response);
+    }).catch((error) => {
+      this.onError(error);
+    });
   }
 
   /**
