@@ -114,6 +114,22 @@
       }
     }
   }
+
+  &--floatToLeft {
+    ^&__image {
+      &-picture {
+        float: left;
+      }
+    }
+  }
+
+  &--floatToRight {
+    ^&__image {
+      &-picture {
+        float: right;
+      }
+    }
+  }
 }
 
 @keyframes image-preloader-spin {
