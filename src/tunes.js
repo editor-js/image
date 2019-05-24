@@ -2,6 +2,8 @@ import { make } from './ui';
 import bgIcon from './svg/background.svg';
 import borderIcon from './svg/border.svg';
 import stretchedIcon from './svg/stretched.svg';
+import floatToLeftIcon from './svg/arrow-left.svg';
+import floatToRightIcon from './svg/arrow-right.svg';
 
 /**
  * Working with Block Tunes
@@ -36,8 +38,25 @@ export default class Tunes {
         name: 'withBackground',
         icon: bgIcon,
         title: 'With background'
+      },
+      {
+        name: 'floatToLeft',
+        icon: floatToLeftIcon,
+        title: 'Float image to left'
+      },
+      {
+        name: 'floatToRight',
+        icon: floatToRightIcon,
+        title: 'Float image to right'
       }
     ];
+  }
+
+  /**
+   * Can be only one tune
+   */
+  static get mutuallyExclusiveTunes() {
+    return ['floatToLeft', 'stretched', 'floatToRight'];
   }
 
   /**
@@ -71,6 +90,7 @@ export default class Tunes {
 
       el.addEventListener('click', () => {
         this.tuneClicked(tune.name);
+        this.checkForDeactivateAnotherTunes(tune.name);
       });
 
       el.dataset.tune = tune.name;
@@ -85,14 +105,31 @@ export default class Tunes {
   }
 
   /**
+     * For float and stretch we should reset active state if someone was selected
+     * @param tuneName
+     */
+  checkForDeactivateAnotherTunes(tuneName) {
+    const findedIndex = Tunes.mutuallyExclusiveTunes.indexOf(tuneName);
+
+    if (findedIndex >= 0) {
+      Tunes.mutuallyExclusiveTunes.forEach((item, index) => {
+        if (findedIndex !== index) {
+          this.tuneClicked(item, false);
+        }
+      });
+    }
+  }
+
+  /**
    * Clicks to one of the tunes
    * @param {string} tuneName - clicked tune name
+   * @param {boolean} state - necessary state
    */
-  tuneClicked(tuneName) {
+  tuneClicked(tuneName, state) {
     let button = this.buttons.find(el => el.dataset.tune === tuneName);
 
-    button.classList.toggle(this.CSS.buttonActive, !button.classList.contains(this.CSS.buttonActive));
+    button.classList.toggle(this.CSS.buttonActive, state !== undefined ? state : !button.classList.contains(this.CSS.buttonActive));
 
-    this.onChange(tuneName);
+    this.onChange(tuneName, state);
   }
 }
