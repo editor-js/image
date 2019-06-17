@@ -157,7 +157,6 @@ export default class Uploader {
       upload = ajax.post({
         url: this.config.endpoints.byFile,
         data: formData,
-        type: ajax.contentType.FORM,
         headers: Object.assign({}, this.config.additionalRequestHeaders)
       }).then(response => response.body);
     }
