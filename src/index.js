@@ -275,7 +275,7 @@ export default class ImageTool {
     this.ui.fillCaption(this._data.caption);
 
     Tunes.tunes.forEach(({ name: tune }) => {
-      const value = data[tune] !== undefined ? data[tune] : false;
+      const value = typeof data[tune] !== 'undefined' ? data[tune] === true || data[tune] === 'true' : false;
 
       this.setTune(tune, value);
     });
