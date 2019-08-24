@@ -357,12 +357,15 @@ export default class ImageTool {
     this.ui.applyTune(tuneName, value);
 
     if (tuneName === 'stretched') {
-      const blockId = this.api.blocks.getCurrentBlockIndex();
-
-      setTimeout(() => {
-        /** Wait until api is ready */
+      /**
+       * Wait until the API is ready
+       */
+      Promise.resolve().then(() => {
+        const blockId = this.api.blocks.getCurrentBlockIndex();
         this.api.blocks.stretchBlock(blockId, value);
-      }, 0);
+      }).catch(err => {
+        console.error(err);
+      });
     }
   }
 
