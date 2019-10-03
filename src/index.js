@@ -362,6 +362,7 @@ export default class ImageTool {
        */
       Promise.resolve().then(() => {
         const blockId = this.api.blocks.getCurrentBlockIndex();
+
         this.api.blocks.stretchBlock(blockId, value);
       }).catch(err => {
         console.error(err);
