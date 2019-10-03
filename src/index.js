@@ -275,7 +275,7 @@ export default class ImageTool {
     this.ui.fillCaption(this._data.caption);
 
     Tunes.tunes.forEach(({ name: tune }) => {
-      const value = data[tune] !== undefined ? data[tune] : false;
+      const value = typeof data[tune] !== 'undefined' ? data[tune] === true || data[tune] === 'true' : false;
 
       this.setTune(tune, value);
     });
@@ -357,12 +357,16 @@ export default class ImageTool {
     this.ui.applyTune(tuneName, value);
 
     if (tuneName === 'stretched') {
-      const blockId = this.api.blocks.getCurrentBlockIndex();
+      /**
+       * Wait until the API is ready
+       */
+      Promise.resolve().then(() => {
+        const blockId = this.api.blocks.getCurrentBlockIndex();
 
-      setTimeout(() => {
-        /** Wait until api is ready */
         this.api.blocks.stretchBlock(blockId, value);
-      }, 0);
+      }).catch(err => {
+        console.error(err);
+      });
     }
   }
 
