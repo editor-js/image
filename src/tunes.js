@@ -9,10 +9,12 @@ import stretchedIcon from './svg/stretched.svg';
 export default class Tunes {
   /**
    * @param {object} api - Editor API
+   * @param {array} actions - Userdefined tunes
    * @param {function} onChange - tune toggling callback
    */
-  constructor({ api, onChange }) {
+  constructor({ api, actions, onChange }) {
     this.api = api;
+    this.actions = actions;
     this.onChange = onChange;
     this.buttons = [];
   }
@@ -63,14 +65,15 @@ export default class Tunes {
 
     this.buttons = [];
 
-    Tunes.tunes.forEach(tune => {
+    const tunes = Tunes.tunes.concat(this.actions);
+    tunes.forEach((tune) => {
       let el = make('div', [this.CSS.buttonBase, this.CSS.button], {
         innerHTML: tune.icon,
         title: tune.title
       });
 
       el.addEventListener('click', () => {
-        this.tuneClicked(tune.name);
+        this.tuneClicked(tune.name, tune.action);
       });
 
       el.dataset.tune = tune.name;
@@ -87,8 +90,15 @@ export default class Tunes {
   /**
    * Clicks to one of the tunes
    * @param {string} tuneName - clicked tune name
+   * @param {function} customFunction - function to execute on click
    */
-  tuneClicked(tuneName) {
+  tuneClicked(tuneName, customFunction) {
+    if (typeof customFunction === 'function') {
+        if (!customFunction(tuneName)) {
+            return false;
+        }
+    }
+    
     let button = this.buttons.find(el => el.dataset.tune === tuneName);
 
     button.classList.toggle(this.CSS.buttonActive, !button.classList.contains(this.CSS.buttonActive));
