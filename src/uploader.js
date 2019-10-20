@@ -41,7 +41,7 @@ export default class Uploader {
 
     // custom uploading
     if (this.config.uploader && typeof this.config.uploader.uploadByFile === 'function') {
-      upload = ajax.selectFiles().then((files) => {
+      upload = ajax.selectFiles({ accept: this.config.types }).then((files) => {
         preparePreview(files[0]);
 
         const customUpload = this.config.uploader.uploadByFile(files[0]);
