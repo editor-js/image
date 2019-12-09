@@ -327,9 +327,15 @@ export default class ImageTool {
    */
   uploadingFailed(errorText) {
     console.log('Image Tool: uploading failed because of', errorText);
-
+    
+    let errorMessage = 'Can not upload an image, try another.';
+    let errorJson = JSON.parse(errorText);
+    if (errorJson.hasOwnProperty('message')) {
+      errorMessage = errorJson.message;  
+    }
+    
     this.api.notifier.show({
-      message: 'Can not upload an image, try another',
+      message: errorMessage,
       style: 'error'
     });
     this.ui.hidePreloader();
