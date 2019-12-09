@@ -54,6 +54,7 @@ import Uploader from './uploader';
  * @property {string} endpoints.byFile - upload by file
  * @property {string} endpoints.byUrl - upload by URL
  * @property {string} field - field name for uploaded image
+ * @property {string} pattern - pattern for pasted image url
  * @property {string} types - available mime-types
  * @property {string} captionPlaceholder - placeholder for Caption field
  * @property {object} additionalRequestData - any data to send with requests
@@ -101,6 +102,7 @@ export default class ImageTool {
      */
     this.config = {
       endpoints: config.endpoints || '',
+      pattern: config.pattern || /https?:\/\/\S+\.(gif|jpe?g|tiff|png)$/i,
       additionalRequestData: config.additionalRequestData || {},
       additionalRequestHeaders: config.additionalRequestHeaders || {},
       field: config.field || 'image',
@@ -208,7 +210,7 @@ export default class ImageTool {
        * Paste URL of image into the Editor
        */
       patterns: {
-        image: /https?:\/\/\S+$/i
+        image: this.config.pattern
       },
 
       /**
