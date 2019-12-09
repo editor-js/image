@@ -208,7 +208,7 @@ export default class ImageTool {
        * Paste URL of image into the Editor
        */
       patterns: {
-        image: /https?:\/\/\S+\.(gif|jpe?g|tiff|png)$/i
+        image: /https?:\/\/\S+$/i
       },
 
       /**
