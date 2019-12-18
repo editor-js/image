@@ -230,7 +230,7 @@ export default class ImageTool {
    */
   async onPaste(event) {
     switch (event.type) {
-      case 'tag':
+      case 'tag': {
         const image = event.detail.data;
 
         /** Images from PDF */
@@ -244,18 +244,19 @@ export default class ImageTool {
 
         this.uploadUrl(image.src);
         break;
-
-      case 'pattern':
+      }
+      case 'pattern': {
         const url = event.detail.data;
 
         this.uploadUrl(url);
         break;
-
-      case 'file':
+      }
+      case 'file': {
         const file = event.detail.file;
 
         this.uploadFile(file);
         break;
+      }
     }
   }
 
