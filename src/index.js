@@ -38,6 +38,7 @@
  * @property {boolean} stretched - should image be stretched to full width of container
  * @property {object} file — Image file data returned from backend
  * @property {string} file.url — image URL
+ * @property {string} credit - image credit
  */
 
 // eslint-disable-next-line
@@ -56,6 +57,7 @@ import Uploader from './uploader';
  * @property {string} field - field name for uploaded image
  * @property {string} types - available mime-types
  * @property {string} captionPlaceholder - placeholder for Caption field
+ * @property {string} creditPlaceholder - placeholder for Credit field
  * @property {object} additionalRequestData - any data to send with requests
  * @property {object} additionalRequestHeaders - allows to pass custom headers with Request
  * @property {string} buttonContent - overrides for Select File button
@@ -106,6 +108,7 @@ export default class ImageTool {
       field: config.field || 'image',
       types: config.types || 'image/*',
       captionPlaceholder: config.captionPlaceholder || 'Caption',
+      creditPlaceholder: config.creditPlaceholder || 'Credit',
       buttonContent: config.buttonContent || '',
       uploader: config.uploader || undefined
     };
@@ -167,8 +170,10 @@ export default class ImageTool {
    */
   save() {
     const caption = this.ui.nodes.caption;
+    const credit = this.ui.nodes.credit;
 
     this._data.caption = caption.innerHTML;
+    this._data.credit = credit.innerHTML;
 
     return this.data;
   }
@@ -228,7 +233,7 @@ export default class ImageTool {
    */
   async onPaste(event) {
     switch (event.type) {
-      case 'tag':
+      case 'tag': {
         const image = event.detail.data;
 
         /** Images from PDF */
@@ -242,18 +247,19 @@ export default class ImageTool {
 
         this.uploadUrl(image.src);
         break;
-
-      case 'pattern':
+      }
+      case 'pattern': {
         const url = event.detail.data;
 
         this.uploadUrl(url);
         break;
-
-      case 'file':
+      }
+      case 'file': {
         const file = event.detail.file;
 
         this.uploadFile(file);
         break;
+      }
     }
   }
 
@@ -273,6 +279,9 @@ export default class ImageTool {
 
     this._data.caption = data.caption || '';
     this.ui.fillCaption(this._data.caption);
+
+    this._data.credit = data.credit || '';
+    this.ui.fillCredit(this._data.credit);
 
     Tunes.tunes.forEach(({ name: tune }) => {
       const value = typeof data[tune] !== 'undefined' ? data[tune] === true || data[tune] === 'true' : false;
