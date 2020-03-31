@@ -59,12 +59,12 @@ export default class Tunes {
    * @return {Element}
    */
   render(toolData) {
-    let wrapper = make('div', this.CSS.wrapper);
+    const wrapper = make('div', this.CSS.wrapper);
 
     this.buttons = [];
 
     Tunes.tunes.forEach(tune => {
-      let el = make('div', [this.CSS.buttonBase, this.CSS.button], {
+      const el = make('div', [this.CSS.buttonBase, this.CSS.button], {
         innerHTML: tune.icon,
         title: tune.title
       });
@@ -89,7 +89,7 @@ export default class Tunes {
    * @param {string} tuneName - clicked tune name
    */
   tuneClicked(tuneName) {
-    let button = this.buttons.find(el => el.dataset.tune === tuneName);
+    const button = this.buttons.find(el => el.dataset.tune === tuneName);
 
     button.classList.toggle(this.CSS.buttonActive, !button.classList.contains(this.CSS.buttonActive));
 

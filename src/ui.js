@@ -24,6 +24,9 @@ export default class Ui {
       imagePreloader: make('div', this.CSS.imagePreloader),
       caption: make('div', [this.CSS.input, this.CSS.caption], {
         contentEditable: true
+      }),
+      credit: make('div', [this.CSS.input, this.CSS.credit], {
+        contentEditable: true
       })
     };
 
@@ -34,13 +37,16 @@ export default class Ui {
      *      <image-preloader />
      *    </image-container>
      *    <caption />
+     *    <credit />
      *    <select-file-button />
      *  </wrapper>
      */
     this.nodes.caption.dataset.placeholder = this.config.captionPlaceholder;
+    this.nodes.credit.dataset.placeholder = this.config.creditPlaceholder;
     this.nodes.imageContainer.appendChild(this.nodes.imagePreloader);
     this.nodes.wrapper.appendChild(this.nodes.imageContainer);
     this.nodes.wrapper.appendChild(this.nodes.caption);
+    this.nodes.wrapper.appendChild(this.nodes.credit);
     this.nodes.wrapper.appendChild(this.nodes.fileButton);
   }
 
@@ -62,7 +68,8 @@ export default class Ui {
       imageContainer: 'image-tool__image',
       imagePreloader: 'image-tool__image-preloader',
       imageEl: 'image-tool__image-picture',
-      caption: 'image-tool__caption'
+      caption: 'image-tool__caption',
+      credit: 'image-tool__credit'
     };
   };
 
@@ -100,7 +107,7 @@ export default class Ui {
    * @return {Element}
    */
   createFileButton() {
-    let button = make('div', [ this.CSS.button ]);
+    const button = make('div', [ this.CSS.button ]);
 
     button.innerHTML = this.config.buttonContent || `${buttonIcon} Select an Image`;
 
@@ -139,7 +146,7 @@ export default class Ui {
      */
     const tag = /\.mp4$/.test(url) ? 'VIDEO' : 'IMG';
 
-    let attributes = {
+    const attributes = {
       src: url
     };
 
@@ -205,12 +212,22 @@ export default class Ui {
   }
 
   /**
+   * Shows credit input
+   * @param {string} text - credit text
+   */
+  fillCredit(text) {
+    if (this.nodes.credit) {
+      this.nodes.credit.innerHTML = text;
+    }
+  }
+
+  /**
    * Changes UI status
    * @param {string} status - see {@link Ui.status} constants
    */
   toggleStatus(status) {
     for (const statusType in Ui.status) {
-      if (Ui.status.hasOwnProperty(statusType)) {
+      if (Object.prototype.hasOwnProperty.call(Ui.status, statusType)) {
         this.nodes.wrapper.classList.toggle(`${this.CSS.wrapper}--${Ui.status[statusType]}`, status === Ui.status[statusType]);
       }
     }
@@ -235,7 +252,7 @@ export default class Ui {
  * @return {Element}
  */
 export const make = function make(tagName, classNames = null, attributes = {}) {
-  let el = document.createElement(tagName);
+  const el = document.createElement(tagName);
 
   if (Array.isArray(classNames)) {
     el.classList.add(...classNames);
@@ -243,7 +260,7 @@ export const make = function make(tagName, classNames = null, attributes = {}) {
     el.classList.add(classNames);
   }
 
-  for (let attrName in attributes) {
+  for (var attrName in attributes) {
     el[attrName] = attributes[attrName];
   }
 
