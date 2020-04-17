@@ -15,7 +15,11 @@ Image Block for the [Editor.js](https://editorjs.io).
 - Allows to add border, background
 - Allows to stretch image to the container's full-width
 
-**Note** This Tool requires server-side implementation for file uploading. See [backend response format](#server-format) for more details.
+**Notes** 
+
+This Tool requires server-side implementation for file uploading. See [backend response format](#server-format) for more details.
+
+This Tool is also capable of uploading & displaying video files using the <video> element. To enable this, use the Config Params : 'type' to support the upload of video Mime-types.
 
 ## Installation
 
