@@ -48,7 +48,7 @@ export default class Ui {
   /**
    * CSS classes
    *
-   * @class
+   * @returns {object}
    */
   get CSS() {
     return {
