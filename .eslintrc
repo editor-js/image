@@ -3,6 +3,8 @@
     "codex"
   ],
   "globals": {
-    "fetch": true
+    "fetch": true,
+    "ImageConfig": true,
+    "ImageToolData": true
   }
 }

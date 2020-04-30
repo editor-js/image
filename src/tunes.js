@@ -8,8 +8,9 @@ import stretchedIcon from './svg/stretched.svg';
  */
 export default class Tunes {
   /**
-   * @param {object} api - Editor API
-   * @param {function} onChange - tune toggling callback
+   * @param {object} tune - image tool Tunes managers
+   * @param {object} tune.api - Editor API
+   * @param {Function} tune.onChange - tune toggling callback
    */
   constructor({ api, onChange }) {
     this.api = api;
@@ -19,54 +20,58 @@ export default class Tunes {
 
   /**
    * Available Image tunes
+   *
+   * @returns {{name: string, icon: string, title: string}[]}
    */
   static get tunes() {
     return [
       {
         name: 'withBorder',
         icon: borderIcon,
-        title: 'With border'
+        title: 'With border',
       },
       {
         name: 'stretched',
         icon: stretchedIcon,
-        title: 'Stretch image'
+        title: 'Stretch image',
       },
       {
         name: 'withBackground',
         icon: bgIcon,
-        title: 'With background'
-      }
+        title: 'With background',
+      },
     ];
   }
 
   /**
    * Styles
-   * @return {{wrapper: string, buttonBase: *, button: string, buttonActive: *}}
+   *
+   * @returns {{wrapper: string, buttonBase: *, button: string, buttonActive: *}}
    */
   get CSS() {
     return {
       wrapper: '',
       buttonBase: this.api.styles.settingsButton,
       button: 'image-tool__tune',
-      buttonActive: this.api.styles.settingsButtonActive
+      buttonActive: this.api.styles.settingsButtonActive,
     };
   }
 
   /**
    * Makes buttons with tunes: add background, add border, stretch image
-   * @param {ImageToolData} toolData
-   * @return {Element}
+   *
+   * @param {ImageToolData} toolData - generate Elements of tunes
+   * @returns {Element}
    */
   render(toolData) {
-    let wrapper = make('div', this.CSS.wrapper);
+    const wrapper = make('div', this.CSS.wrapper);
 
     this.buttons = [];
 
     Tunes.tunes.forEach(tune => {
-      let el = make('div', [this.CSS.buttonBase, this.CSS.button], {
+      const el = make('div', [this.CSS.buttonBase, this.CSS.button], {
         innerHTML: tune.icon,
-        title: tune.title
+        title: tune.title,
       });
 
       el.addEventListener('click', () => {
@@ -86,10 +91,12 @@ export default class Tunes {
 
   /**
    * Clicks to one of the tunes
+   *
    * @param {string} tuneName - clicked tune name
+   * @returns {void}
    */
   tuneClicked(tuneName) {
-    let button = this.buttons.find(el => el.dataset.tune === tuneName);
+    const button = this.buttons.find(el => el.dataset.tune === tuneName);
 
     button.classList.toggle(this.CSS.buttonActive, !button.classList.contains(this.CSS.buttonActive));
 
