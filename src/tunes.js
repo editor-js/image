@@ -23,22 +23,22 @@ export default class Tunes {
    *
    * @returns {{name: string, icon: string, title: string}[]}
    */
-  static get tunes() {
+  get tunes() {
     return [
       {
         name: 'withBorder',
         icon: borderIcon,
-        title: 'With border',
+        title: this.api.i18n.t('With border'),
       },
       {
         name: 'stretched',
         icon: stretchedIcon,
-        title: 'Stretch image',
+        title: this.api.i18n.t('Stretch image'),
       },
       {
         name: 'withBackground',
         icon: bgIcon,
-        title: 'With background',
+        title: this.api.i18n.t('With background'),
       },
     ];
   }

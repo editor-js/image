@@ -107,7 +107,7 @@ export default class ImageTool {
       additionalRequestHeaders: config.additionalRequestHeaders || {},
       field: config.field || 'image',
       types: config.types || 'image/*',
-      captionPlaceholder: config.captionPlaceholder || 'Caption',
+      captionPlaceholder: config.captionPlaceholder || this.api.i18n.t('Caption'),
       buttonContent: config.buttonContent || '',
       uploader: config.uploader || undefined,
     };
@@ -286,7 +286,7 @@ export default class ImageTool {
     this._data.caption = data.caption || '';
     this.ui.fillCaption(this._data.caption);
 
-    Tunes.tunes.forEach(({ name: tune }) => {
+    this.tunes.tunes.forEach(({ name: tune }) => {
       const value = typeof data[tune] !== 'undefined' ? data[tune] === true || data[tune] === 'true' : false;
 
       this.setTune(tune, value);
@@ -346,7 +346,7 @@ export default class ImageTool {
     console.log('Image Tool: uploading failed because of', errorText);
 
     this.api.notifier.show({
-      message: 'Can not upload an image, try another',
+      message: this.api.i18n.t('Can not upload an image, try another'),
       style: 'error',
     });
     this.ui.hidePreloader();
