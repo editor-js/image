@@ -23,22 +23,22 @@ export default class Tunes {
    *
    * @returns {{name: string, icon: string, title: string}[]}
    */
-  get tunes() {
+  static get tunes() {
     return [
       {
         name: 'withBorder',
         icon: borderIcon,
-        title: this.api.i18n.t('With border'),
+        title: 'With border',
       },
       {
         name: 'stretched',
         icon: stretchedIcon,
-        title: this.api.i18n.t('Stretch image'),
+        title: 'Stretch image',
       },
       {
         name: 'withBackground',
         icon: bgIcon,
-        title: this.api.i18n.t('With background'),
+        title: 'With background',
       },
     ];
   }
@@ -68,10 +68,11 @@ export default class Tunes {
 
     this.buttons = [];
 
-    this.tunes.forEach(tune => {
+    Tunes.tunes.forEach(tune => {
+      const title = this.api.i18n.t(tune.title);
       const el = make('div', [this.CSS.buttonBase, this.CSS.button], {
         innerHTML: tune.icon,
-        title: tune.title,
+        title,
       });
 
       el.addEventListener('click', () => {
@@ -83,7 +84,7 @@ export default class Tunes {
 
       this.buttons.push(el);
 
-      this.api.tooltip.onHover(el, tune.title, {
+      this.api.tooltip.onHover(el, title, {
         placement: 'top',
       });
 
