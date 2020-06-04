@@ -1,6 +1,7 @@
 /**
  * Image Tool for the Editor.js
- * @author CodeX <team@ifmo.su>
+ *
+ * @author CodeX <team@codex.so>
  * @license MIT
  * @see {@link https://github.com/editor-js/image}
  *
@@ -79,19 +80,20 @@ export default class ImageTool {
    * icon - Tool icon's SVG
    * title - title to show in toolbox
    *
-   * @return {{icon: string, title: string}}
+   * @returns {{icon: string, title: string}}
    */
   static get toolbox() {
     return {
       icon: ToolboxIcon,
-      title: 'Image'
+      title: 'Image',
     };
   }
 
   /**
-   * @param {ImageToolData} data - previously saved data
-   * @param {ImageConfig} config - user config for Tool
-   * @param {object} api - Editor.js API
+   * @param {object} tool - tool properties got from editor.js
+   * @param {ImageToolData} tool.data - previously saved data
+   * @param {ImageConfig} tool.config - user config for Tool
+   * @param {object} tool.api - Editor.js API
    */
   constructor({ data, config, api }) {
     this.api = api;
@@ -105,9 +107,9 @@ export default class ImageTool {
       additionalRequestHeaders: config.additionalRequestHeaders || {},
       field: config.field || 'image',
       types: config.types || 'image/*',
-      captionPlaceholder: config.captionPlaceholder || 'Caption',
+      captionPlaceholder: this.api.i18n.t(config.captionPlaceholder || 'Caption'),
       buttonContent: config.buttonContent || '',
-      uploader: config.uploader || undefined
+      uploader: config.uploader || undefined,
     };
 
     /**
@@ -116,7 +118,7 @@ export default class ImageTool {
     this.uploader = new Uploader({
       config: this.config,
       onUpload: (response) => this.onUpload(response),
-      onError: (error) => this.uploadingFailed(error)
+      onError: (error) => this.uploadingFailed(error),
     });
 
     /**
@@ -129,9 +131,9 @@ export default class ImageTool {
         this.uploader.uploadSelectedFile({
           onPreview: (src) => {
             this.ui.showPreloader(src);
-          }
+          },
         });
-      }
+      },
     });
 
     /**
@@ -139,7 +141,7 @@ export default class ImageTool {
      */
     this.tunes = new Tunes({
       api,
-      onChange: (tuneName) => this.tuneToggled(tuneName)
+      onChange: (tuneName) => this.tuneToggled(tuneName),
     });
 
     /**
@@ -151,9 +153,10 @@ export default class ImageTool {
 
   /**
    * Renders Block content
+   *
    * @public
    *
-   * @return {HTMLDivElement}
+   * @returns {HTMLDivElement}
    */
   render() {
     return this.ui.render(this.data);
@@ -161,9 +164,10 @@ export default class ImageTool {
 
   /**
    * Return Block data
+   *
    * @public
    *
-   * @return {ImageToolData}
+   * @returns {ImageToolData}
    */
   save() {
     const caption = this.ui.nodes.caption;
@@ -175,9 +179,10 @@ export default class ImageTool {
 
   /**
    * Makes buttons with tunes: add background, add border, stretch image
+   *
    * @public
    *
-   * @return {Element}
+   * @returns {Element}
    */
   renderSettings() {
     return this.tunes.render(this.data);
@@ -186,6 +191,7 @@ export default class ImageTool {
   /**
    * Fires after clicks on the Toolbox Image Icon
    * Initiates click on the Select File button
+   *
    * @public
    */
   appendCallback() {
@@ -196,6 +202,7 @@ export default class ImageTool {
    * Specify paste substitutes
    *
    * @see {@link https://github.com/codex-team/editor.js/blob/master/docs/tools.md#paste-handling}
+   * @returns {{tags: string[], patterns: object<string, RegExp>, files: {extensions: string[], mimeTypes: string[]}}}
    */
   static get pasteConfig() {
     return {
@@ -208,27 +215,30 @@ export default class ImageTool {
        * Paste URL of image into the Editor
        */
       patterns: {
-        image: /https?:\/\/\S+\.(gif|jpe?g|tiff|png)$/i
+        image: /https?:\/\/\S+\.(gif|jpe?g|tiff|png)$/i,
       },
 
       /**
        * Drag n drop file from into the Editor
        */
       files: {
-        mimeTypes: [ 'image/*' ]
-      }
+        mimeTypes: [ 'image/*' ],
+      },
     };
   }
 
   /**
    * Specify paste handlers
-   * @public
    *
+   * @public
    * @see {@link https://github.com/codex-team/editor.js/blob/master/docs/tools.md#paste-handling}
+   * @param {CustomEvent} event - editor.js custom paste event
+   *                              {@link https://github.com/codex-team/editor.js/blob/master/types/tools/paste-events.d.ts}
+   * @returns {void}
    */
   async onPaste(event) {
     switch (event.type) {
-      case 'tag':
+      case 'tag': {
         const image = event.detail.data;
 
         /** Images from PDF */
@@ -242,18 +252,19 @@ export default class ImageTool {
 
         this.uploadUrl(image.src);
         break;
-
-      case 'pattern':
+      }
+      case 'pattern': {
         const url = event.detail.data;
 
         this.uploadUrl(url);
         break;
-
-      case 'file':
+      }
+      case 'file': {
         const file = event.detail.file;
 
         this.uploadFile(file);
         break;
+      }
     }
   }
 
@@ -264,9 +275,10 @@ export default class ImageTool {
 
   /**
    * Stores all Tool's data
+   *
    * @private
    *
-   * @param {ImageToolData} data
+   * @param {ImageToolData} data - data in Image Tool format
    */
   set data(data) {
     this.image = data.file;
@@ -283,9 +295,10 @@ export default class ImageTool {
 
   /**
    * Return Tool data
+   *
    * @private
    *
-   * @return {ImageToolData} data
+   * @returns {ImageToolData}
    */
   get data() {
     return this._data;
@@ -293,6 +306,7 @@ export default class ImageTool {
 
   /**
    * Set new image file
+   *
    * @private
    *
    * @param {object} file - uploaded file data
@@ -307,9 +321,11 @@ export default class ImageTool {
 
   /**
    * File uploading callback
+   *
    * @private
    *
-   * @param {UploadResponseFormat} response
+   * @param {UploadResponseFormat} response - uploading server response
+   * @returns {void}
    */
   onUpload(response) {
     if (response.success && response.file) {
@@ -321,25 +337,28 @@ export default class ImageTool {
 
   /**
    * Handle uploader errors
-   * @private
    *
-   * @param {string} errorText
+   * @private
+   * @param {string} errorText - uploading error text
+   * @returns {void}
    */
   uploadingFailed(errorText) {
     console.log('Image Tool: uploading failed because of', errorText);
 
     this.api.notifier.show({
-      message: 'Can not upload an image, try another',
-      style: 'error'
+      message: this.api.i18n.t('Can not upload an image, try another'),
+      style: 'error',
     });
     this.ui.hidePreloader();
   }
 
   /**
    * Callback fired when Block Tune is activated
+   *
    * @private
    *
    * @param {string} tuneName - tune that has been clicked
+   * @returns {void}
    */
   tuneToggled(tuneName) {
     // inverse tune state
@@ -348,8 +367,10 @@ export default class ImageTool {
 
   /**
    * Set one tune
+   *
    * @param {string} tuneName - {@link Tunes.tunes}
    * @param {boolean} value - tune state
+   * @returns {void}
    */
   setTune(tuneName, value) {
     this._data[tuneName] = value;
@@ -364,29 +385,32 @@ export default class ImageTool {
         const blockId = this.api.blocks.getCurrentBlockIndex();
 
         this.api.blocks.stretchBlock(blockId, value);
-      }).catch(err => {
-        console.error(err);
-      });
+      })
+        .catch(err => {
+          console.error(err);
+        });
     }
   }
 
   /**
    * Show preloader and upload image file
    *
-   * @param {File} file
+   * @param {File} file - file that is currently uploading (from paste)
+   * @returns {void}
    */
   uploadFile(file) {
     this.uploader.uploadByFile(file, {
       onPreview: (src) => {
         this.ui.showPreloader(src);
-      }
+      },
     });
   }
 
   /**
    * Show preloader and upload image by target url
    *
-   * @param {string} url
+   * @param {string} url - url pasted
+   * @returns {void}
    */
   uploadUrl(url) {
     this.ui.showPreloader(url);

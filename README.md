@@ -12,14 +12,15 @@ Image Block for the [Editor.js](https://editorjs.io).
 - Pasting copied content from the web
 - Pasting images by drag-n-drop
 - Pasting files and screenshots from Clipboard
-- Allows to add border, background
-- Allows to stretch image to the container's full-width
+- Allows adding a border, and a background
+- Allows stretching an image to the container's full-width
 
-**Notes** 
+**Notes**
 
-This Tool requires server-side implementation for file uploading. See [backend response format](#server-format) for more details.
+This Tool requires server-side implementation for the file uploading. See [backend response format](#server-format) for more details.
 
-This Tool is also capable of uploading & displaying video files using the <video> element. To enable this, use the Config Params : 'type' to support the upload of video Mime-types.
+This Tool is also capable of uploading & displaying video files using the <video> element. To enable this, specify video mime-types via the 'types' config param.
+
 
 ## Installation
 
@@ -37,7 +38,7 @@ Include module at your application
 import ImageTool from '@editorjs/image';
 ```
 
-### Other methods 
+### Other methods
 
 #### Manual downloading and connecting
 
@@ -46,7 +47,7 @@ import ImageTool from '@editorjs/image';
 
 #### Loading from CDN
 
-You can load specific version of package from [jsDelivr CDN](https://www.jsdelivr.com/package/npm/@editorjs/image).
+You can load a specific version of package from [jsDelivr CDN](https://www.jsdelivr.com/package/npm/@editorjs/image).
 
 `https://cdn.jsdelivr.net/npm/@editorjs/image@2.3.0`
 
@@ -61,7 +62,7 @@ import ImageTool from '@editorjs/image';
 
 // or if you inject ImageTool via standalone script
 const ImageTool = window.ImageTool;
- 
+
 var editor = EditorJS({
   ...
 
@@ -97,7 +98,7 @@ Image Tool supports these configuration parameters:
 | buttonContent | `string` | Allows to override HTML content of «Select file» button |
 | uploader | `{{uploadByFile: function, uploadByUrl: function}}` | Optional custom uploading methods. See details below. |
 
-Note that if you don't implement your custom uploader methods, the `endpoints` param is required. 
+Note that if you don't implement your custom uploader methods, the `endpoints` param is required.
 
 ## Tool's settings
 
@@ -196,15 +197,15 @@ You should save it and return the same response format as described above.
 
 ## Providing custom uploading methods
 
-As mentioned at the Config Params section, you have an ability to provide own custom uploading methods. 
-It is a quite simple: implement `uploadByFile` and `uploadByUrl` methods and pass them via `uploader` config param. 
-Both methods must return a Promise that resolves with response in format that described at the [backend response format](#server-format) section.
+As mentioned at the Config Params section, you have an ability to provide own custom uploading methods.
+It is a quite simple: implement `uploadByFile` and `uploadByUrl` methods and pass them via `uploader` config param.
+Both methods must return a Promise that resolves with response in a format that described at the [backend response format](#server-format) section.
 
 
 | Method         | Arguments | Return value | Description |
 | -------------- | --------- | -------------| ------------|
-| uploadByFile   | `File`    | `{Promise.<{success, file: {url}}>}` | Upload file to the server and return an uploaded image data | 
-| uploadByUrl    | `string`  | `{Promise.<{success, file: {url}}>}` | Send URL-string to the server, that should load image by this URL and return an uploaded image data | 
+| uploadByFile   | `File`    | `{Promise.<{success, file: {url}}>}` | Upload file to the server and return an uploaded image data |
+| uploadByUrl    | `string`  | `{Promise.<{success, file: {url}}>}` | Send URL-string to the server, that should load image by this URL and return an uploaded image data |
 
 Example:
 
@@ -220,7 +221,7 @@ var editor = EditorJS({
       class: ImageTool,
       config: {
         /**
-         * Custom uploader 
+         * Custom uploader
          */
         uploader: {
           /**
@@ -240,7 +241,7 @@ var editor = EditorJS({
               };
             });
           },
-          
+
           /**
            * Send URL-string to the server. Backend should load image by this URL and return an uploaded image data
            * @param {string} url - pasted image URL
