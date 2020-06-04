@@ -107,7 +107,7 @@ export default class ImageTool {
       additionalRequestHeaders: config.additionalRequestHeaders || {},
       field: config.field || 'image',
       types: config.types || 'image/*',
-      captionPlaceholder: config.captionPlaceholder || this.api.i18n.t('Caption'),
+      captionPlaceholder: this.api.i18n.t(config.captionPlaceholder || 'Caption'),
       buttonContent: config.buttonContent || '',
       uploader: config.uploader || undefined,
     };

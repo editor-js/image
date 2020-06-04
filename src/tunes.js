@@ -68,7 +68,7 @@ export default class Tunes {
 
     this.buttons = [];
 
-    Tunes.tunes.forEach(tune => {
+    this.tunes.forEach(tune => {
       const el = make('div', [this.CSS.buttonBase, this.CSS.button], {
         innerHTML: tune.icon,
         title: tune.title,
@@ -82,6 +82,10 @@ export default class Tunes {
       el.classList.toggle(this.CSS.buttonActive, toolData[tune.name]);
 
       this.buttons.push(el);
+
+      this.api.tooltip.onHover(el, tune.title, {
+        placement: 'top',
+      });
 
       wrapper.appendChild(el);
     });
