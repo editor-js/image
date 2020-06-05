@@ -95,8 +95,9 @@ export default class ImageTool {
    * @param {ImageConfig} tool.config - user config for Tool
    * @param {object} tool.api - Editor.js API
    */
-  constructor({ data, config, api }) {
+  constructor({ data, config, api, readOnly }) {
     this.api = api;
+    this.readOnly = readOnly;
 
     /**
      * Tool's initial config
@@ -134,6 +135,7 @@ export default class ImageTool {
           },
         });
       },
+      readOnly,
     });
 
     /**
