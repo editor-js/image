@@ -60,6 +60,7 @@ import Uploader from './uploader';
  * @property {object} additionalRequestData - any data to send with requests
  * @property {object} additionalRequestHeaders - allows to pass custom headers with Request
  * @property {string} buttonContent - overrides for Select File button
+ * @property {function(imageTool: ImageTool): any} onSelectFile - if passed, invoked on clicking "select an image"
  * @property {object} [uploader] - optional custom uploader
  * @property {function(File): Promise.<UploadResponseFormat>} [uploader.uploadByFile] - method that upload image by File
  * @property {function(string): Promise.<UploadResponseFormat>} [uploader.uploadByUrl] - method that upload image by URL
@@ -110,6 +111,7 @@ export default class ImageTool {
       captionPlaceholder: this.api.i18n.t(config.captionPlaceholder || 'Caption'),
       buttonContent: config.buttonContent || '',
       uploader: config.uploader || undefined,
+      onSelectFile: config.onSelectFile,
     };
 
     /**
@@ -128,11 +130,15 @@ export default class ImageTool {
       api,
       config: this.config,
       onSelectFile: () => {
-        this.uploader.uploadSelectedFile({
-          onPreview: (src) => {
-            this.ui.showPreloader(src);
-          },
-        });
+        if (this.config.onSelectFile) {
+          this.config.onSelectFile(this);
+        } else {
+          this.uploader.uploadSelectedFile({
+            onPreview: (src) => {
+              this.ui.showPreloader(src);
+            },
+          });
+        }
       },
     });
 
