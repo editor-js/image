@@ -1,7 +1,7 @@
 .image-tool {
-  --bg-color: #CDD1E0;
-  --front-color: #388AE5;
-  --border-color: #E8E8EB;
+  --bg-color: #cdd1e0;
+  --front-color: #388ae5;
+  --border-color: #e8e8eb;
 
   &__image {
     border-radius: 3px;
@@ -25,7 +25,7 @@
       background-position: center center;
 
       &::after {
-        content: '';
+        content: "";
         position: absolute;
         z-index: 3;
         width: 60px;
@@ -44,25 +44,24 @@
   }
 
   &__caption {
-    &[contentEditable=true][data-placeholder]::before{
-      position: absolute;
+    &[contentEditable="true"][data-placeholder]::before {
+      position: absolute !important;
       content: attr(data-placeholder);
       color: #707684;
       font-weight: normal;
-      opacity: 0;
+      display: none;
     }
 
-    &[contentEditable=true][data-placeholder]:empty {
-
+    &[contentEditable="true"][data-placeholder]:empty {
       &::before {
-        opacity: 1;
+        display: block;
       }
 
       &:focus::before {
-         opacity: 0;
+        display: none;
       }
     }
-   }
+  }
 
   &--empty {
     ^&__image {
