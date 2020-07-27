@@ -63,6 +63,7 @@ import Uploader from './uploader';
  * @property {object} [uploader] - optional custom uploader
  * @property {function(File): Promise.<UploadResponseFormat>} [uploader.uploadByFile] - method that upload image by File
  * @property {function(string): Promise.<UploadResponseFormat>} [uploader.uploadByUrl] - method that upload image by URL
+ * @property {Array} [defaultElements] - optional, show only specific default elements
  */
 
 /**
@@ -110,6 +111,7 @@ export default class ImageTool {
       captionPlaceholder: this.api.i18n.t(config.captionPlaceholder || 'Caption'),
       buttonContent: config.buttonContent || '',
       uploader: config.uploader || undefined,
+      defaultElements: config.defaultElements || ['caption', 'withBorder', 'stretched', 'withBackground'],
     };
 
     /**
@@ -141,6 +143,7 @@ export default class ImageTool {
      */
     this.tunes = new Tunes({
       api,
+      config: this.config,
       onChange: (tuneName) => this.tuneToggled(tuneName),
     });
 
@@ -286,7 +289,7 @@ export default class ImageTool {
     this._data.caption = data.caption || '';
     this.ui.fillCaption(this._data.caption);
 
-    Tunes.tunes.forEach(({ name: tune }) => {
+    this.tunes.tunes.forEach(({ name: tune }) => {
       const value = typeof data[tune] !== 'undefined' ? data[tune] === true || data[tune] === 'true' : false;
 
       this.setTune(tune, value);

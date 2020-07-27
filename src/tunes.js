@@ -12,8 +12,9 @@ export default class Tunes {
    * @param {object} tune.api - Editor API
    * @param {Function} tune.onChange - tune toggling callback
    */
-  constructor({ api, onChange }) {
+  constructor({ api, config, onChange }) {
     this.api = api;
+    this.config = config;
     this.onChange = onChange;
     this.buttons = [];
   }
@@ -23,8 +24,8 @@ export default class Tunes {
    *
    * @returns {{name: string, icon: string, title: string}[]}
    */
-  static get tunes() {
-    return [
+  get tunes() {
+    const defaultList = [
       {
         name: 'withBorder',
         icon: borderIcon,
@@ -41,6 +42,8 @@ export default class Tunes {
         title: 'With background',
       },
     ];
+
+    return defaultList.filter((it) => this.config.defaultElements.includes(it.name));
   }
 
   /**
@@ -68,7 +71,7 @@ export default class Tunes {
 
     this.buttons = [];
 
-    Tunes.tunes.forEach(tune => {
+    this.tunes.forEach(tune => {
       const title = this.api.i18n.t(tune.title);
       const el = make('div', [this.CSS.buttonBase, this.CSS.button], {
         innerHTML: tune.icon,

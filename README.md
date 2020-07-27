@@ -97,6 +97,7 @@ Image Tool supports these configuration parameters:
 | captionPlaceholder | `string` | (default: `Caption`) Placeholder for Caption input |
 | buttonContent | `string` | Allows to override HTML content of «Select file» button |
 | uploader | `{{uploadByFile: function, uploadByUrl: function}}` | Optional custom uploading methods. See details below. |
+| defaultElements | `array` | List of default elements to enable. Empty is all elements, eg: ['caption', 'withBorder', 'stretched', 'withBackground']. See details below. |
 
 Note that if you don't implement your custom uploader methods, the `endpoints` param is required.
 
@@ -104,11 +105,11 @@ Note that if you don't implement your custom uploader methods, the `endpoints` p
 
 ![](https://capella.pics/c74cdeec-3405-48ac-a960-f784188cf9b4.jpg)
 
-1. Add border
+1. Add border `withBorder`
 
-2. Stretch to full-width
+2. Stretch to full-width `stretched`
 
-3. Add background
+3. Add background `withBackground`
 
 ## Output data
 
