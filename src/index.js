@@ -199,6 +199,9 @@ export default class ImageTool {
   }
 
   /**
+  * How to Deal with pattern variable such that we can provide feature to change pattern for pasteConfig()
+  */
+  /**
    * Specify paste substitutes
    *
    * @see {@link https://github.com/codex-team/editor.js/blob/master/docs/tools.md#paste-handling}
