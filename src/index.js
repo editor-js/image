@@ -189,7 +189,9 @@ export default class ImageTool {
    * @returns {void}
    */
   removed() {
-    this.config.onRemove(this.data);
+    if (this.config.onRemove && typeof this.config.onRemove === 'function') {
+      this.config.onRemove(this.data);
+    }
   }
 
   /**
