@@ -10,6 +10,7 @@ export default class Tunes {
   /**
    * @param {object} tune - image tool Tunes managers
    * @param {object} tune.api - Editor API
+   * @param {object} tune.actions - list of user defined tunes
    * @param {Function} tune.onChange - tune toggling callback
    */
   constructor({ api, actions, onChange }) {
