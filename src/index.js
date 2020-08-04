@@ -110,6 +110,7 @@ export default class ImageTool {
       captionPlaceholder: this.api.i18n.t(config.captionPlaceholder || 'Caption'),
       buttonContent: config.buttonContent || '',
       uploader: config.uploader || undefined,
+      actions: config.actions || [],
     };
 
     /**
@@ -141,6 +142,7 @@ export default class ImageTool {
      */
     this.tunes = new Tunes({
       api,
+      actions: this.config.actions,
       onChange: (tuneName) => this.tuneToggled(tuneName),
     });
 

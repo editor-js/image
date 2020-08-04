@@ -97,6 +97,7 @@ Image Tool supports these configuration parameters:
 | captionPlaceholder | `string` | (default: `Caption`) Placeholder for Caption input |
 | buttonContent | `string` | Allows to override HTML content of «Select file» button |
 | uploader | `{{uploadByFile: function, uploadByUrl: function}}` | Optional custom uploading methods. See details below. |
+| actions | `array` | Array with custom actions to show in the tool's settings menu. See details below. |
 
 Note that if you don't implement your custom uploader methods, the `endpoints` param is required.
 
@@ -109,6 +110,23 @@ Note that if you don't implement your custom uploader methods, the `endpoints` p
 2. Stretch to full-width
 
 3. Add background
+
+Add extra setting-buttons by adding them to the `actions`-array in the configuration:
+```js
+actions: [
+    {
+        name: 'new_button',
+        icon: '<svg>...</svg>',
+        title: 'New Button',
+        action: (name) => {
+            alert(`${name} button clicked`);
+            return false;
+        }
+    }
+]
+```
+By adding `return true` or `return false` at the end of your custom actions, you can determine wether the icon in the tool's settings is toggled or not. This is helpfull for actions that do not toggle between states, but execute a different action.
+If toggling is enabled, an `image-tool--[button name]` class will be appended and removed from the container.
 
 ## Output data
 

@@ -10,10 +10,12 @@ export default class Tunes {
   /**
    * @param {object} tune - image tool Tunes managers
    * @param {object} tune.api - Editor API
+   * @param {object} tune.actions - list of user defined tunes
    * @param {Function} tune.onChange - tune toggling callback
    */
-  constructor({ api, onChange }) {
+  constructor({ api, actions, onChange }) {
     this.api = api;
+    this.actions = actions;
     this.onChange = onChange;
     this.buttons = [];
   }
@@ -68,7 +70,9 @@ export default class Tunes {
 
     this.buttons = [];
 
-    Tunes.tunes.forEach(tune => {
+    const tunes = Tunes.tunes.concat(this.actions);
+
+    tunes.forEach(tune => {
       const title = this.api.i18n.t(tune.title);
       const el = make('div', [this.CSS.buttonBase, this.CSS.button], {
         innerHTML: tune.icon,
@@ -76,7 +80,7 @@ export default class Tunes {
       });
 
       el.addEventListener('click', () => {
-        this.tuneClicked(tune.name);
+        this.tuneClicked(tune.name, tune.action);
       });
 
       el.dataset.tune = tune.name;
@@ -98,9 +102,15 @@ export default class Tunes {
    * Clicks to one of the tunes
    *
    * @param {string} tuneName - clicked tune name
-   * @returns {void}
+   * @param {Function} customFunction - function to execute on click
    */
-  tuneClicked(tuneName) {
+  tuneClicked(tuneName, customFunction) {
+    if (typeof customFunction === 'function') {
+      if (!customFunction(tuneName)) {
+        return false;
+      }
+    }
+
     const button = this.buttons.find(el => el.dataset.tune === tuneName);
 
     button.classList.toggle(this.CSS.buttonActive, !button.classList.contains(this.CSS.buttonActive));
