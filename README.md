@@ -112,6 +112,7 @@ Note that if you don't implement your custom uploader methods, the `endpoints` p
 3. Add background
 
 Add extra setting-buttons by adding them to the `actions`-array in the configuration:
+
 ```js
 actions: [
     {
@@ -125,8 +126,10 @@ actions: [
     }
 ]
 ```
+
 By adding `return true` or `return false` at the end of your custom actions, you can determine wether the icon in the tool's settings is toggled or not. This is helpfull for actions that do not toggle between states, but execute a different action.
-If toggling is enabled, an `image-tool--[button name]` class will be appended and removed from the container.
+If toggling is enabled, an `image-tool--[action name]` class will be appended and removed from the container.
+`[action name]` and value (default: `false`) will be appended to output data.
 
 ## Output data
 
@@ -139,7 +142,7 @@ This Tool returns `data` with following format
 | withBorder     | `boolean` | add border to image             |
 | withBackground | `boolean` | need to add background          |
 | stretched      | `boolean` | stretch image to screen's width |
-
+| [action name]  | `boolean` | your custom action's value      |
 
 ```json
 {
@@ -151,7 +154,8 @@ This Tool returns `data` with following format
         "caption" : "Roadster // tesla.com",
         "withBorder" : false,
         "withBackground" : false,
-        "stretched" : true
+        "stretched" : true,
+        "new_button" : false
     }
 }
 ```
