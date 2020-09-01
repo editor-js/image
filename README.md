@@ -98,6 +98,7 @@ Image Tool supports these configuration parameters:
 | buttonContent | `string` | Allows to override HTML content of «Select file» button |
 | uploader | `{{uploadByFile: function, uploadByUrl: function}}` | Optional custom uploading methods. See details below. |
 | actions | `array` | Array with custom actions to show in the tool's settings menu. See details below. |
+| onRemove | `function(data: OutputData)` | Optional method fired on remove block event. |
 
 Note that if you don't implement your custom uploader methods, the `endpoints` param is required.
 
@@ -282,6 +283,49 @@ var editor = EditorJS({
     }
   }
 
+  ...
+});
+```
+
+## Handle Block Delete
+As mentioned at the Config Params section, you can receive an event trigger on block delete.
+Simply implement `onRemove` method and pass it to config param. The function receives block data as argument in format
+described at the [output data](#output-data) section.
+
+Scenario:
+
+1. User deletes an image block from editor using tools menu.
+2. Tool calls `config.onRemove` function with block data as argument.
+
+Example:
+
+```javascript
+import ImageTool from '@editorjs/image';
+
+// or if you inject ImageTool via standalone script
+const ImageTool = window.ImageTool;
+ 
+var editor = EditorJS({
+  ...
+
+  tools: {
+    ...
+    image: {
+      class: ImageTool,
+      config: {
+        /**
+         * Invoked on block delete lifecycle event.
+         * @param {object} data - deleted block's output data
+         * @return {undefined}
+         */
+        onRemove: data => {
+          // log received block data
+          console.log(data) 
+        }
+        // other config params
+      }
+    }
+  }
   ...
 });
 ```

@@ -60,6 +60,7 @@ import Uploader from './uploader';
  * @property {object} additionalRequestData - any data to send with requests
  * @property {object} additionalRequestHeaders - allows to pass custom headers with Request
  * @property {string} buttonContent - overrides for Select File button
+ * @property {function(object)} [onRemove] - optional on delete trigger
  * @property {object} [uploader] - optional custom uploader
  * @property {function(File): Promise.<UploadResponseFormat>} [uploader.uploadByFile] - method that upload image by File
  * @property {function(string): Promise.<UploadResponseFormat>} [uploader.uploadByUrl] - method that upload image by URL
@@ -111,6 +112,7 @@ export default class ImageTool {
       buttonContent: config.buttonContent || '',
       uploader: config.uploader || undefined,
       actions: config.actions || [],
+      onRemove: config.onRemove || undefined
     };
 
     /**
@@ -177,6 +179,19 @@ export default class ImageTool {
     this._data.caption = caption.innerHTML;
 
     return this.data;
+  }
+
+  /**
+   * Fire config.onRemove with block data when block is deleted.
+   *
+   * @public
+   *
+   * @returns {void}
+   */
+  removed() {
+    if (this.config.onRemove && typeof this.config.onRemove === 'function') {
+      this.config.onRemove(this.data);
+    }
   }
 
   /**
