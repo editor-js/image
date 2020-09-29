@@ -12,11 +12,13 @@ export default class Ui {
    * @param {object} ui.api - Editor.js API
    * @param {ImageConfig} ui.config - user config
    * @param {Function} ui.onSelectFile - callback for clicks on Select file button
+   * @param {boolean} ui.readOnly - read-only mode flag
    */
-  constructor({ api, config, onSelectFile }) {
+  constructor({ api, config, onSelectFile, readOnly }) {
     this.api = api;
     this.config = config;
     this.onSelectFile = onSelectFile;
+    this.readOnly = readOnly;
     this.nodes = {
       wrapper: make('div', [this.CSS.baseClass, this.CSS.wrapper]),
       imageContainer: make('div', [ this.CSS.imageContainer ]),
@@ -24,7 +26,7 @@ export default class Ui {
       imageEl: undefined,
       imagePreloader: make('div', this.CSS.imagePreloader),
       caption: make('div', [this.CSS.input, this.CSS.caption], {
-        contentEditable: true,
+        contentEditable: !this.readOnly,
       }),
     };
 
