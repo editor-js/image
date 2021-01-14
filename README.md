@@ -98,7 +98,7 @@ Image Tool supports these configuration parameters:
 | buttonContent | `string` | Allows to override HTML content of «Select file» button |
 | uploader | `{{uploadByFile: function, uploadByUrl: function}}` | Optional custom uploading methods. See details below. |
 | actions | `array` | Array with custom actions to show in the tool's settings menu. See details below. |
-
+| defaultElements | `array` | List of default elements to enable. Empty is all elements, eg: ['caption', 'withBorder', 'stretched', 'withBackground']. See details below. |
 Note that if you don't implement your custom uploader methods, the `endpoints` param is required.
 
 ## Tool's settings
