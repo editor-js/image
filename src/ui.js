@@ -28,6 +28,14 @@ export default class Ui {
       caption: make('div', [this.CSS.input, this.CSS.caption], {
         contentEditable: !this.readOnly,
       }),
+      legend: make('input', [this.CSS.input, this.CSS.legend], {
+        contentEditable: !this.readOnly,
+        required: true,
+      }),
+      title: make('input', [this.CSS.input, this.CSS.title], {
+        contentEditable: !this.readOnly,
+        required: true,
+      }),
     };
 
     /**
@@ -40,11 +48,28 @@ export default class Ui {
      *    <select-file-button />
      *  </wrapper>
      */
-    this.nodes.caption.dataset.placeholder = this.config.captionPlaceholder;
+    // this.nodes.caption.dataset.placeholder = this.config.captionPlaceholder;
+    this.nodes.legend.placeholder = this.config.legendPlaceholder;
+    this.nodes.title.placeholder = this.config.titlePlaceholder;
     this.nodes.imageContainer.appendChild(this.nodes.imagePreloader);
     this.nodes.wrapper.appendChild(this.nodes.imageContainer);
-    this.nodes.wrapper.appendChild(this.nodes.caption);
+    // this.nodes.wrapper.appendChild(this.nodes.caption);
+    this.nodes.wrapper.appendChild(this.nodes.title);
+    this.nodes.wrapper.appendChild(this.nodes.legend);
     this.nodes.wrapper.appendChild(this.nodes.fileButton);
+
+    this.nodes.legend.hidden = false;
+    this.nodes.title.hidden = false;
+
+    this.nodes.imageContainer.addEventListener('click', () => {
+      if (window.getComputedStyle(this.nodes.legend).display === 'none' && window.getComputedStyle(this.nodes.title).display === 'none') {
+        this.nodes.legend.hidden = false;
+        this.nodes.title.hidden = false;
+      } else {
+        this.nodes.legend.hidden = true;
+        this.nodes.title.hidden = true;
+      }
+    });
   }
 
   /**
@@ -67,6 +92,8 @@ export default class Ui {
       imagePreloader: 'image-tool__image-preloader',
       imageEl: 'image-tool__image-picture',
       caption: 'image-tool__caption',
+      legend: 'image-tool__legend',
+      title: 'image-tool__title',
     };
   };
 
@@ -221,6 +248,18 @@ export default class Ui {
   fillCaption(text) {
     if (this.nodes.caption) {
       this.nodes.caption.innerHTML = text;
+    }
+  }
+
+  fillLegend(text) {
+    if (this.nodes.legend) {
+      this.nodes.legend.value = text;
+    }
+  }
+
+  fillTitle(text) {
+    if (this.nodes.title) {
+      this.nodes.title.value = text;
     }
   }
 

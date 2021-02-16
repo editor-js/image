@@ -2,6 +2,7 @@
   "extends": [
     "codex"
   ],
+  "parser": "babel-eslint",
   "globals": {
     "fetch": true,
     "ImageConfig": true,

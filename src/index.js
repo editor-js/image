@@ -57,6 +57,8 @@ import Uploader from './uploader';
  * @property {string} field - field name for uploaded image
  * @property {string} types - available mime-types
  * @property {string} captionPlaceholder - placeholder for Caption field
+ * @property {string} legendPlaceholder - placeholder for Legend field
+ * @property {string} titlePlaceholder - placeholder for Legend field
  * @property {object} additionalRequestData - any data to send with requests
  * @property {object} additionalRequestHeaders - allows to pass custom headers with Request
  * @property {string} buttonContent - overrides for Select File button
@@ -119,6 +121,8 @@ export default class ImageTool {
       field: config.field || 'image',
       types: config.types || 'image/*',
       captionPlaceholder: this.api.i18n.t(config.captionPlaceholder || 'Caption'),
+      titlePlaceholder: this.api.i18n.t(config.titlePlaceholder || 'Titre'),
+      legendPlaceholder: this.api.i18n.t(config.legendPlaceholder || 'Légende'),
       buttonContent: config.buttonContent || '',
       uploader: config.uploader || undefined,
       actions: config.actions || [],
@@ -184,9 +188,13 @@ export default class ImageTool {
    * @returns {ImageToolData}
    */
   save() {
-    const caption = this.ui.nodes.caption;
+    // const caption = this.ui.nodes.caption;
+    const legend = this.ui.nodes.legend;
+    const title = this.ui.nodes.title;
 
-    this._data.caption = caption.innerHTML;
+    // this._data.caption = caption.innerHTML;
+    this._data.legend = legend.value;
+    this._data.title = title.value;
 
     return this.data;
   }
@@ -297,8 +305,13 @@ export default class ImageTool {
   set data(data) {
     this.image = data.file;
 
-    this._data.caption = data.caption || '';
-    this.ui.fillCaption(this._data.caption);
+    // this._data.caption = data.caption || '';
+    this._data.title = data.title || '';
+    this._data.legend = data.legend || '';
+
+    // this.ui.fillCaption(this._data.caption);
+    this.ui.fillTitle(this._data.title);
+    this.ui.fillLegend(this._data.legend);
 
     Tunes.tunes.forEach(({ name: tune }) => {
       const value = typeof data[tune] !== 'undefined' ? data[tune] === true || data[tune] === 'true' : false;
