@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Test image tool</title>
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/editorjs@latest"></script>
+    <script src="./../dist/bundle.js"></script>
+
+    <script>
+        var editor;
+
+        window.addEventListener('DOMContentLoaded', function () {
+
+            editor = new EditorJS({
+                /**
+                 * Id of Element that should contain the Editor
+                 */
+                holder: 'editor',
+                placeholder: 'Let`s write an awesome story!',
+                tools: {
+                    image: {
+                        class: ImageTool,
+                        config: {
+                            captionPlaceholder: 'Caption',
+                            endpoints: {
+                                byFile: 'http://localhost:8008/upload/file',
+                                byUrl: 'http://localhost:8008/upload/url'
+                            },
+                            withCropper: true,
+                            cropperConfigs: {
+                                aspectRatio: 2/3
+                            }
+                        },
+                    }
+                }
+            });
+        });
+
+    </script>
+
+</head>
+<body>
+
+<div id="editor"></div>
+
+</body>
+</html>

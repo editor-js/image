@@ -1,4 +1,6 @@
 import buttonIcon from './svg/button-icon.svg';
+import Cropper from 'cropperjs';
+import ajax from '@codexteam/ajax';
 
 /**
  * Class for working with UI:
@@ -19,6 +21,7 @@ export default class Ui {
     this.config = config;
     this.onSelectFile = onSelectFile;
     this.readOnly = readOnly;
+    this.cropper = null;
     this.nodes = {
       wrapper: make('div', [this.CSS.baseClass, this.CSS.wrapper]),
       imageContainer: make('div', [ this.CSS.imageContainer ]),
@@ -28,6 +31,10 @@ export default class Ui {
       caption: make('div', [this.CSS.input, this.CSS.caption], {
         contentEditable: !this.readOnly,
       }),
+      cropper: make('div', [this.CSS.cropper]),
+      cropperContainer: make('div', [this.CSS.cropperContainer]),
+      cropperCanvas : make('canvas', [this.CSS.cropperCanvas]),
+      cropperCanvasButton: this.createCroppedButton()
     };
 
     /**
@@ -38,6 +45,10 @@ export default class Ui {
      *    </image-container>
      *    <caption />
      *    <select-file-button />
+     *    <cropper-container>
+     *      <cropper-canvas />
+     *      <cropper-confirmation-button />
+     *    </cropper-container>*
      *  </wrapper>
      */
     this.nodes.caption.dataset.placeholder = this.config.captionPlaceholder;
@@ -45,6 +56,12 @@ export default class Ui {
     this.nodes.wrapper.appendChild(this.nodes.imageContainer);
     this.nodes.wrapper.appendChild(this.nodes.caption);
     this.nodes.wrapper.appendChild(this.nodes.fileButton);
+
+    this.nodes.cropperContainer.appendChild(this.nodes.cropperCanvas)
+    this.nodes.cropper.appendChild(this.nodes.cropperContainer);
+    this.nodes.cropper.appendChild(this.nodes.cropperCanvasButton);
+    this.nodes.wrapper.appendChild(this.nodes.cropper);
+
   }
 
   /**
@@ -67,20 +84,26 @@ export default class Ui {
       imagePreloader: 'image-tool__image-preloader',
       imageEl: 'image-tool__image-picture',
       caption: 'image-tool__caption',
+      cropper: 'image-tool__cropper',
+      cropperContainer: 'image-tool__cropper-container',
+      cropperCanvas: 'image-tool__cropper-canvas',
+      cropperConfirmButton: 'image-tool__cropper-canvas-btn',
     };
   };
 
   /**
    * Ui statuses:
    * - empty
+   * - cropping
    * - uploading
    * - filled
    *
-   * @returns {{EMPTY: string, UPLOADING: string, FILLED: string}}
+   * @returns {{EMPTY: string, CROPPING: string, UPLOADING: string, FILLED: string}}
    */
   static get status() {
     return {
       EMPTY: 'empty',
+      CROPPING: 'cropping',
       UPLOADING: 'loading',
       FILLED: 'filled',
     };
@@ -113,10 +136,80 @@ export default class Ui {
     button.innerHTML = this.config.buttonContent || `${buttonIcon} ${this.api.i18n.t('Select an Image')}`;
 
     button.addEventListener('click', () => {
-      this.onSelectFile();
+      if (this.config.withCropper) {
+        ajax.selectFiles({accept: this.config.types})
+            .then((files) => {
+              this.showCropper(files[0]);
+            });
+      } else {
+        this.onSelectFile();
+      }
     });
 
     return button;
+  }
+
+  /**
+   * Create send cropped file button
+   *
+   * @return {Element}
+   */
+  createCroppedButton() {
+    const button = make('button', [this.CSS.cropperConfirmButton])
+
+    button.innerHTML = this.config.buttonCropped || `${buttonIcon} ${this.api.i18n.t('Upload photo')}`;
+
+    button.addEventListener('click', () => {
+      const canvas = this.getCroppedCanvas();
+      if (canvas) {
+        canvas.toBlob((blob) => {
+          this.onSelectFile(new File([blob], "fileName.jpg", { type: "image/jpeg" }));
+        });
+      }
+    });
+
+    return button;
+  }
+
+
+  /**
+   *
+   * @return {null|HTMLCanvasElement}
+   */
+  getCroppedCanvas() {
+    return this.cropper ? this.cropper.getCroppedCanvas() : null;
+  }
+
+  /**
+   * Render cropper
+   *
+   * @param {File} file
+   * @return {Element}
+   */
+  showCropper(file) {
+    const canvas = this.nodes.cropperCanvas;
+
+    const ctx = canvas.getContext('2d');
+    const reader = new FileReader();
+    const img = new Image();
+
+    img.onload = () => {
+      ctx.canvas.width = img.width;
+      ctx.canvas.height = img.height;
+      // draw image
+      ctx.drawImage(img, 0, 0, ctx.canvas.width, ctx.canvas.height);
+      this.cropper = new Cropper(canvas,this.config.cropperConfigs);
+    };
+
+    reader.onloadend = function () {
+      img.src = reader.result;
+    }
+    // this is to read the file
+    reader.readAsDataURL(file);
+
+    this.toggleStatus(Ui.status.CROPPING);
+
+    return canvas;
   }
 
   /**
