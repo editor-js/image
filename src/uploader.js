@@ -24,9 +24,9 @@ export default class Uploader {
    * Fires ajax.transport()
    *
    * @param {Function} onPreview - callback fired when preview is ready
-   * @param {?File} file - if the user is using cropping
+   * @param {object} [croppedFile] - if the user is using cropping
    */
-  uploadSelectedFile({ onPreview }, file) {
+  uploadSelectedFile({ onPreview }, croppedFile) {
     const preparePreview = function (file) {
       const reader = new FileReader();
 
@@ -44,7 +44,6 @@ export default class Uploader {
 
     // custom uploading
     if (this.config.uploader && typeof this.config.uploader.uploadByFile === 'function') {
-
       const customHandler = (files) => {
         preparePreview(files[0]);
 
@@ -55,34 +54,32 @@ export default class Uploader {
         }
 
         return customUpload;
-      }
+      };
 
-      if (file) {
-        return customHandler([file]);
+      if (croppedFile) {
+        return customHandler([ croppedFile ]);
       } else {
-        upload = ajax.selectFiles({accept: this.config.types}).then((files) => {
+        upload = ajax.selectFiles({ accept: this.config.types }).then((files) => {
           return customHandler(files);
         });
       }
 
       // default uploading
     } else {
-      if (file) {
-
+      if (croppedFile) {
         const form = new FormData();
-        form.append(this.config.field, file, 'image.jpg');
+
+        form.append(this.config.field, croppedFile, 'image.jpg');
 
         upload = ajax.post({
           url: this.config.endpoints.byFile,
           data: form,
           headers: this.config.additionalRequestHeaders,
           beforeSend: () => {
-            preparePreview(file);
-          }
+            preparePreview(croppedFile);
+          },
         }).then((response) => response.body);
-
       } else {
-
         upload = ajax.transport({
           url: this.config.endpoints.byFile,
           data: this.config.additionalRequestData,
@@ -93,7 +90,6 @@ export default class Uploader {
           },
           fieldName: this.config.field,
         }).then((response) => response.body);
-
       }
     }
 
