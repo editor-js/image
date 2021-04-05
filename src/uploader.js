@@ -183,5 +183,5 @@ export default class Uploader {
  * @returns {boolean}
  */
 function isPromise(object) {
-  return Promise.resolve(object) === object;
+  return typeof object.then === "function";
 }
