@@ -136,7 +136,14 @@ export default class Ui {
    */
   createFileButton() {
     const button = make('div', [ this.CSS.button ]);
+    const info = make('div')
 
+    info.innerHTML =
+        '<ul style="list-style-type: none">' +
+          '<li>La taille minimum requise est de 500x500 pixels</li>' +
+          '<li>Le fichier doit peser moins de 500 KO</li>' +
+          '<li>Extension autorisées: png gif jpg jpeg</li>' +
+        '</ul>';
     button.innerHTML = this.config.buttonContent || `${buttonIcon} ${this.api.i18n.t('Select an Image')}`;
 
     button.addEventListener('click', () => {
