@@ -34,6 +34,7 @@
  * @typedef {object} ImageToolData
  * @description Image Tool's input and output data format
  * @property {string} caption — image caption
+ * @property {string} linkUrl — image url destination
  * @property {boolean} withBorder - should image be rendered with border
  * @property {boolean} withBackground - should image be rendered with background
  * @property {boolean} stretched - should image be stretched to full width of container
@@ -57,6 +58,7 @@ import Uploader from './uploader';
  * @property {string} field - field name for uploaded image
  * @property {string} types - available mime-types
  * @property {string} captionPlaceholder - placeholder for Caption field
+ * @property {string} linkUrlPlaceholder - placeholder for LinkUrl field
  * @property {object} additionalRequestData - any data to send with requests
  * @property {object} additionalRequestHeaders - allows to pass custom headers with Request
  * @property {string} buttonContent - overrides for Select File button
@@ -118,7 +120,10 @@ export default class ImageTool {
       additionalRequestHeaders: config.additionalRequestHeaders || {},
       field: config.field || 'image',
       types: config.types || 'image/*',
-      captionPlaceholder: this.api.i18n.t(config.captionPlaceholder || 'Caption'),
+      captionPlaceholder: this.api.i18n.t(
+        config.captionPlaceholder || 'Caption'
+      ),
+      linkUrlPlaceholder: 'Link Url',
       buttonContent: config.buttonContent || '',
       uploader: config.uploader || undefined,
       actions: config.actions || [],
@@ -185,8 +190,10 @@ export default class ImageTool {
    */
   save() {
     const caption = this.ui.nodes.caption;
+    const linkUrl = this.ui.nodes.linkUrl;
 
     this._data.caption = caption.innerHTML;
+    this._data.linkUrl = linkUrl.innerHTML;
 
     return this.data;
   }
@@ -223,7 +230,7 @@ export default class ImageTool {
       /**
        * Paste HTML into Editor
        */
-      tags: [ 'img' ],
+      tags: ['img'],
 
       /**
        * Paste URL of image into the Editor
@@ -236,7 +243,7 @@ export default class ImageTool {
        * Drag n drop file from into the Editor
        */
       files: {
-        mimeTypes: [ 'image/*' ],
+        mimeTypes: ['image/*'],
       },
     };
   }
@@ -300,8 +307,14 @@ export default class ImageTool {
     this._data.caption = data.caption || '';
     this.ui.fillCaption(this._data.caption);
 
+    this._data.linkUrl = data.linkUrl || '';
+    this.ui.fillLinkUrl(this._data.linkUrl);
+
     Tunes.tunes.forEach(({ name: tune }) => {
-      const value = typeof data[tune] !== 'undefined' ? data[tune] === true || data[tune] === 'true' : false;
+      const value =
+        typeof data[tune] !== 'undefined'
+          ? data[tune] === true || data[tune] === 'true'
+          : false;
 
       this.setTune(tune, value);
     });
@@ -395,12 +408,13 @@ export default class ImageTool {
       /**
        * Wait until the API is ready
        */
-      Promise.resolve().then(() => {
-        const blockId = this.api.blocks.getCurrentBlockIndex();
+      Promise.resolve()
+        .then(() => {
+          const blockId = this.api.blocks.getCurrentBlockIndex();
 
-        this.api.blocks.stretchBlock(blockId, value);
-      })
-        .catch(err => {
+          this.api.blocks.stretchBlock(blockId, value);
+        })
+        .catch((err) => {
           console.error(err);
         });
     }

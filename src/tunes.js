@@ -2,6 +2,7 @@ import { make } from './ui';
 import bgIcon from './svg/background.svg';
 import borderIcon from './svg/border.svg';
 import stretchedIcon from './svg/stretched.svg';
+// import linkIcon from './svg/link.svg';
 
 /**
  * Working with Block Tunes
@@ -72,7 +73,7 @@ export default class Tunes {
 
     const tunes = Tunes.tunes.concat(this.actions);
 
-    tunes.forEach(tune => {
+    tunes.forEach((tune) => {
       const title = this.api.i18n.t(tune.title);
       const el = make('div', [this.CSS.buttonBase, this.CSS.button], {
         innerHTML: tune.icon,
@@ -111,9 +112,12 @@ export default class Tunes {
       }
     }
 
-    const button = this.buttons.find(el => el.dataset.tune === tuneName);
+    const button = this.buttons.find((el) => el.dataset.tune === tuneName);
 
-    button.classList.toggle(this.CSS.buttonActive, !button.classList.contains(this.CSS.buttonActive));
+    button.classList.toggle(
+      this.CSS.buttonActive,
+      !button.classList.contains(this.CSS.buttonActive)
+    );
 
     this.onChange(tuneName);
   }

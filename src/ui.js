@@ -21,11 +21,14 @@ export default class Ui {
     this.readOnly = readOnly;
     this.nodes = {
       wrapper: make('div', [this.CSS.baseClass, this.CSS.wrapper]),
-      imageContainer: make('div', [ this.CSS.imageContainer ]),
+      imageContainer: make('div', [this.CSS.imageContainer]),
       fileButton: this.createFileButton(),
       imageEl: undefined,
       imagePreloader: make('div', this.CSS.imagePreloader),
       caption: make('div', [this.CSS.input, this.CSS.caption], {
+        contentEditable: !this.readOnly,
+      }),
+      linkUrl: make('div', [this.CSS.input, this.CSS.linkUrl], {
         contentEditable: !this.readOnly,
       }),
     };
@@ -41,9 +44,11 @@ export default class Ui {
      *  </wrapper>
      */
     this.nodes.caption.dataset.placeholder = this.config.captionPlaceholder;
+    this.nodes.linkUrl.dataset.placeholder = this.config.linkUrlPlaceholder;
     this.nodes.imageContainer.appendChild(this.nodes.imagePreloader);
     this.nodes.wrapper.appendChild(this.nodes.imageContainer);
     this.nodes.wrapper.appendChild(this.nodes.caption);
+    this.nodes.wrapper.appendChild(this.nodes.linkUrl);
     this.nodes.wrapper.appendChild(this.nodes.fileButton);
   }
 
@@ -67,8 +72,9 @@ export default class Ui {
       imagePreloader: 'image-tool__image-preloader',
       imageEl: 'image-tool__image-picture',
       caption: 'image-tool__caption',
+      linkUrl: 'image-tool__link-url',
     };
-  };
+  }
 
   /**
    * Ui statuses:
@@ -108,9 +114,11 @@ export default class Ui {
    * @returns {Element}
    */
   createFileButton() {
-    const button = make('div', [ this.CSS.button ]);
+    const button = make('div', [this.CSS.button]);
 
-    button.innerHTML = this.config.buttonContent || `${buttonIcon} ${this.api.i18n.t('Select an Image')}`;
+    button.innerHTML =
+      this.config.buttonContent ||
+      `${buttonIcon} ${this.api.i18n.t('Select an Image')}`;
 
     button.addEventListener('click', () => {
       this.onSelectFile();
@@ -225,6 +233,18 @@ export default class Ui {
   }
 
   /**
+   * Shows linkUrl input
+   *
+   * @param {string} text - linkUrl text
+   * @returns {void}
+   */
+  fillLinkUrl(text) {
+    if (this.nodes.linkUrl) {
+      this.nodes.linkUrl.innerHTML = text;
+    }
+  }
+
+  /**
    * Changes UI status
    *
    * @param {string} status - see {@link Ui.status} constants
@@ -233,7 +253,10 @@ export default class Ui {
   toggleStatus(status) {
     for (const statusType in Ui.status) {
       if (Object.prototype.hasOwnProperty.call(Ui.status, statusType)) {
-        this.nodes.wrapper.classList.toggle(`${this.CSS.wrapper}--${Ui.status[statusType]}`, status === Ui.status[statusType]);
+        this.nodes.wrapper.classList.toggle(
+          `${this.CSS.wrapper}--${Ui.status[statusType]}`,
+          status === Ui.status[statusType]
+        );
       }
     }
   }
@@ -246,7 +269,10 @@ export default class Ui {
    * @returns {void}
    */
   applyTune(tuneName, status) {
-    this.nodes.wrapper.classList.toggle(`${this.CSS.wrapper}--${tuneName}`, status);
+    this.nodes.wrapper.classList.toggle(
+      `${this.CSS.wrapper}--${tuneName}`,
+      status
+    );
   }
 }
 
