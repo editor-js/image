@@ -63,6 +63,8 @@ import Uploader from './uploader';
  * @property {object} [uploader] - optional custom uploader
  * @property {function(File): Promise.<UploadResponseFormat>} [uploader.uploadByFile] - method that upload image by File
  * @property {function(string): Promise.<UploadResponseFormat>} [uploader.uploadByUrl] - method that upload image by URL
+ * @property {string} withCropper - if user wants to crop selected photo
+ * @property {object} cropperConfigs - @see {@link https://github.com/fengyuanchen/cropperjs}
  */
 
 /**
@@ -122,6 +124,8 @@ export default class ImageTool {
       buttonContent: config.buttonContent || '',
       uploader: config.uploader || undefined,
       actions: config.actions || [],
+      withCropper: config.withCropper || false,
+      cropperConfigs: config.cropperConfigs || {},
     };
 
     /**
@@ -139,12 +143,12 @@ export default class ImageTool {
     this.ui = new Ui({
       api,
       config: this.config,
-      onSelectFile: () => {
+      onSelectFile: (file) => {
         this.uploader.uploadSelectedFile({
           onPreview: (src) => {
             this.ui.showPreloader(src);
           },
-        });
+        }, file);
       },
       readOnly,
     });
@@ -325,6 +329,7 @@ export default class ImageTool {
    *
    * @param {object} file - uploaded file data
    */
+  // eslint-disable-next-line accessor-pairs
   set image(file) {
     this._data.file = file || {};
 

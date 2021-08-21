@@ -14,6 +14,7 @@ Image Block for the [Editor.js](https://editorjs.io).
 - Pasting files and screenshots from Clipboard
 - Allows adding a border, and a background
 - Allows stretching an image to the container's full-width
+- Allows image to be cropped before sending to webserver. Only works for upload by file
 
 **Notes**
 
@@ -98,6 +99,8 @@ Image Tool supports these configuration parameters:
 | buttonContent | `string` | Allows to override HTML content of «Select file» button |
 | uploader | `{{uploadByFile: function, uploadByUrl: function}}` | Optional custom uploading methods. See details below. |
 | actions | `array` | Array with custom actions to show in the tool's settings menu. See details below. |
+| withCropper | `boolean` | When is marked as true, the ImageTool will show an cropping area |
+| cropperConfigs | `Object` | [croppjs options](https://github.com/fengyuanchen/cropperjs)  |
 
 Note that if you don't implement your custom uploader methods, the `endpoints` param is required.
 
@@ -283,5 +286,34 @@ var editor = EditorJS({
   }
 
   ...
+});
+```
+
+## ImageTool with cropping
+
+```javascript
+var editor = new EditorJS({
+        /**
+         * Id of Element that should contain the Editor
+         */
+        holder: 'editor',
+        placeholder: 'Let`s write an awesome story!',
+        tools: {
+            image: {
+                class: ImageTool,
+                config: {
+                    captionPlaceholder: 'Caption',
+                    endpoints: {
+                        byFile: 'http://localhost:8008/upload/file',
+                        byUrl: 'http://localhost:8008/upload/url'
+                    },
+                    withCropper: true,
+                    cropperConfigs: {
+                        aspectRatio: 2/3
+                    }
+                },
+            }
+        }
+    });
 });
 ```
