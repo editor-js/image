@@ -361,9 +361,9 @@ export default class ImageTool {
   uploadingFailed(errorText) {
     console.log('Image Tool: uploading failed because of', errorText);
 
-    if(notifier && typeof notifier === 'function') {
-      notification = notifier(this.api.i18n.t('Couldn’t upload image. Please try another.'))
-      
+    if(this.config.notifier) {
+      notification = this.config.notifier(this.api.i18n.t('Couldn’t upload image. Please try another.'))
+
       if (!isPromise(notification)) {
         console.warn('Custom notification method should return a Promise');
       }
