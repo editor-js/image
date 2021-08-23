@@ -47,6 +47,7 @@ import Ui from './ui';
 import Tunes from './tunes';
 import ToolboxIcon from './svg/toolbox.svg';
 import Uploader from './uploader';
+import { isPromise } from './uploader';
 
 /**
  * @typedef {object} ImageConfig
