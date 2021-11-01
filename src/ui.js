@@ -19,6 +19,7 @@ export default class Ui {
     this.config = config;
     this.onSelectFile = onSelectFile;
     this.readOnly = readOnly;
+    this.appendCaptionOnDemand = true;
     this.nodes = {
       wrapper: make('div', [this.CSS.baseClass, this.CSS.wrapper]),
       imageContainer: make('div', [ this.CSS.imageContainer ]),
@@ -43,7 +44,10 @@ export default class Ui {
     this.nodes.caption.dataset.placeholder = this.config.captionPlaceholder;
     this.nodes.imageContainer.appendChild(this.nodes.imagePreloader);
     this.nodes.wrapper.appendChild(this.nodes.imageContainer);
-    this.nodes.wrapper.appendChild(this.nodes.caption);
+    if (!readOnly) {
+      this.nodes.wrapper.appendChild(this.nodes.caption);
+      this.appendCaptionOnDemand = false;
+    }
     this.nodes.wrapper.appendChild(this.nodes.fileButton);
   }
 
@@ -219,8 +223,14 @@ export default class Ui {
    * @returns {void}
    */
   fillCaption(text) {
-    if (this.nodes.caption) {
-      this.nodes.caption.innerHTML = text;
+    if (text) {
+      if (this.nodes.caption) {
+        if (this.appendCaptionOnDemand) {
+          this.nodes.wrapper.appendChild(this.nodes.caption);
+          this.appendCaptionOnDemand = false;
+        }
+        this.nodes.caption.innerHTML = text;
+      }
     }
   }
 
