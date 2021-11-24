@@ -177,6 +177,17 @@ export default class ImageTool {
   }
 
   /**
+   * Validate data: check if Image exists
+   *
+   * @param {ImageToolData} savedData — data received after saving
+   * @returns {boolean} false if saved data is not correct, otherwise true
+   * @public
+   */
+  validate(savedData) {
+    return savedData.file && savedData.file.url;
+  }
+
+  /**
    * Return Block data
    *
    * @public
