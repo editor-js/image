@@ -47,6 +47,7 @@ import Ui from './ui';
 import Tunes from './tunes';
 import ToolboxIcon from './svg/toolbox.svg';
 import Uploader from './uploader';
+import { isPromise } from './uploader';
 
 /**
  * @typedef {object} ImageConfig
@@ -63,6 +64,7 @@ import Uploader from './uploader';
  * @property {object} [uploader] - optional custom uploader
  * @property {function(File): Promise.<UploadResponseFormat>} [uploader.uploadByFile] - method that upload image by File
  * @property {function(string): Promise.<UploadResponseFormat>} [uploader.uploadByUrl] - method that upload image by URL
+ * @property {function(string): Promise} [notifier] - method that shows notification
  */
 
 /**
@@ -122,6 +124,7 @@ export default class ImageTool {
       buttonContent: config.buttonContent || '',
       uploader: config.uploader || undefined,
       actions: config.actions || [],
+      notifier: config.notifier || undefined,
     };
 
     /**
@@ -370,10 +373,18 @@ export default class ImageTool {
   uploadingFailed(errorText) {
     console.log('Image Tool: uploading failed because of', errorText);
 
-    this.api.notifier.show({
-      message: this.api.i18n.t('Couldn’t upload image. Please try another.'),
-      style: 'error',
-    });
+    if(this.config.notifier) {
+      let notification = this.config.notifier(this.api.i18n.t('Couldn’t upload image. Please try another.'))
+
+      if (!isPromise(notification)) {
+        console.warn('Custom notification method should return a Promise');
+      }
+    } else {
+      this.api.notifier.show({
+        message: this.api.i18n.t('Couldn’t upload image. Please try another.'),
+        style: 'error',
+      });
+    }
     this.ui.hidePreloader();
   }
 

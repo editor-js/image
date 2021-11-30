@@ -182,6 +182,6 @@ export default class Uploader {
  * @param  {*}  object - object to check
  * @returns {boolean}
  */
-function isPromise(object) {
+export function isPromise(object) {
   return object && typeof object.then === "function";
 }
