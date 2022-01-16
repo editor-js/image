@@ -156,8 +156,8 @@ This Tool returns `data` with following format
 }
 ```
 
-## Backend response format <a name="server-format"></a>
-
+## Backend response format <a name="server-format"></a>  
+  
 This Tool works by one of the following schemes:
 
 1. Uploading files from the device
@@ -176,8 +176,11 @@ Scenario:
 
 So, you can implement backend for file saving by your own way. It is a specific and trivial task depending on your
 environment and stack.
+  
+The tool executes request as `multipart/form-data`: https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/POST,
+with `field` from configuration as a value key.
 
-Response of your uploader **should** cover following format:
+Response of your uploader **should** response `200 OK` and with following format of the response body:
 
 ```json5
 {
@@ -201,10 +204,18 @@ Scenario:
 
 1. User pastes an URL of the image file to the Editor
 2. Editor pass pasted string to the Image Tool
-3. Tool sends it to **your** backend (on `config.endpoint.byUrl` route) via 'url' POST-parameter
+3. Tool sends it to **your** backend (on `config.endpoint.byUrl` route) via 'url' in request body
 3. Your backend should accept URL, **download and save the original file by passed URL** and return file data with JSON at specified format.
 4. Image tool shows saved image and stores server answer
-
+  
+The tool executes request as `application/json` with following request body:
+  
+```json5
+{
+  "url": "<pasted URL from the user>"
+}
+```
+  
 Response of your uploader should be at the same format as described at «[Uploading files from device](#from-device)» section
 
 
