@@ -103,6 +103,7 @@ export default class Tunes {
    *
    * @param {string} tuneName - clicked tune name
    * @param {Function} customFunction - function to execute on click
+   * @returns {void}
    */
   tuneClicked(tuneName, customFunction) {
     if (typeof customFunction === 'function') {

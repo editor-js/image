@@ -29,8 +29,8 @@ export default class Ui {
         contentEditable: !this.readOnly,
       }),
       alt: make('div', [this.CSS.input, this.CSS.alt], {
-        contentEditable: !this.readOnly
-      })
+        contentEditable: !this.readOnly,
+      }),
     };
 
     /**
@@ -73,7 +73,7 @@ export default class Ui {
       imagePreloader: 'image-tool__image-preloader',
       imageEl: 'image-tool__image-picture',
       caption: 'image-tool__caption',
-      alt: 'image-tool__alt'
+      alt: 'image-tool__alt',
     };
   };
 
@@ -233,6 +233,7 @@ export default class Ui {
 
   /**
    * Shows alt input
+   *
    * @param {string} text - alt text
    */
   fillAlt(text) {

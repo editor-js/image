@@ -121,7 +121,7 @@ export default class ImageTool {
       field: config.field || 'image',
       types: config.types || 'image/*',
       captionPlaceholder: this.api.i18n.t(config.captionPlaceholder || 'Caption'),
-      altPlaceholder:  this.api.i18n.t(config.altPlaceholder || 'Alt'),
+      altPlaceholder: this.api.i18n.t(config.altPlaceholder || 'Alt'),
       buttonContent: config.buttonContent || '',
       uploader: config.uploader || undefined,
       actions: config.actions || [],
