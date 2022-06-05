@@ -26,15 +26,6 @@ export default class Uploader {
    * @param {Function} onPreview - callback fired when preview is ready
    */
   uploadSelectedFile({ onPreview }) {
-    const preparePreview = function (file) {
-      const reader = new FileReader();
-
-      reader.readAsDataURL(file);
-      reader.onload = (e) => {
-        onPreview(e.target.result);
-      };
-    };
-
     /**
      * Custom uploading
      * or default uploading
@@ -43,8 +34,8 @@ export default class Uploader {
 
     // custom uploading
     if (this.config.uploader && typeof this.config.uploader.uploadByFile === 'function') {
-      upload = ajax.selectFiles({ accept: this.config.types }).then((files) => {
-        preparePreview(files[0]);
+      upload = ajax.selectFiles({ accept: this.config.types }).then(async (files) => {
+        onPreview(await preparePreview(files[0]));
 
         const customUpload = this.config.uploader.uploadByFile(files[0]);
 
@@ -62,8 +53,8 @@ export default class Uploader {
         data: this.config.additionalRequestData,
         accept: this.config.types,
         headers: this.config.additionalRequestHeaders,
-        beforeSend: (files) => {
-          preparePreview(files[0]);
+        beforeSend: async (files) => {
+          onPreview(await preparePreview(files[0]));
         },
         fieldName: this.config.field,
       }).then((response) => response.body);
@@ -122,18 +113,11 @@ export default class Uploader {
    * @param {File} file - file pasted by drag-n-drop
    * @param {Function} onPreview - file pasted by drag-n-drop
    */
-  uploadByFile(file, { onPreview }) {
+  async uploadByFile(file, { onPreview }) {
     /**
-     * Load file for preview
-     *
-     * @type {FileReader}
+     * Load preview
      */
-    const reader = new FileReader();
-
-    reader.readAsDataURL(file);
-    reader.onload = (e) => {
-      onPreview(e.target.result);
-    };
+    onPreview(await preparePreview(file));
 
     let upload;
 
@@ -185,3 +169,26 @@ export default class Uploader {
 function isPromise(object) {
   return object && typeof object.then === "function";
 }
+
+/**
+ * Prepare preview
+ *
+ * @param  {File}  file - file to preview
+ * @returns {Promise<string>}
+ */
+const preparePreview = (file) => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+
+    reader.readAsDataURL(file);
+    reader.onload = () => {
+      resolve(reader.result);
+    };
+    reader.onabort = () => {
+      reject(new Error('Aborted on file reading'));
+    };
+    reader.onerror = () => {
+      reject(new Error('Error on file reading'));
+    };
+  });
+};
