@@ -234,8 +234,11 @@ export default class ImageTool {
       /**
        * Paste HTML into Editor
        */
-      tags: [ 'img' ],
-
+      tags: [
+        {
+          img: { src: true },
+        },
+      ],
       /**
        * Paste URL of image into the Editor
        */
