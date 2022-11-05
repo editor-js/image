@@ -170,7 +170,7 @@ This Tool works by one of the following schemes:
 Scenario:
 
 1. User select file from the device
-2. Tool sends it to **your** backend (on `config.endpoint.byFile` route)
+2. Tool sends it to **your** backend (on `config.endpoints.byFile` route)
 3. Your backend should save file and return file data with JSON at specified format.
 4. Image tool shows saved image and stores server answer
 
@@ -201,7 +201,7 @@ Scenario:
 
 1. User pastes an URL of the image file to the Editor
 2. Editor pass pasted string to the Image Tool
-3. Tool sends it to **your** backend (on `config.endpoint.byUrl` route) via 'url' POST-parameter
+3. Tool sends it to **your** backend (on `config.endpoints.byUrl` route) via 'url' POST-parameter
 3. Your backend should accept URL, **download and save the original file by passed URL** and return file data with JSON at specified format.
 4. Image tool shows saved image and stores server answer
 
