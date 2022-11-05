@@ -232,6 +232,8 @@ export default class ImageTool {
    * @returns {Array}
    */
   renderSettings() {
+    // Merge default tunes with the ones that might be added by user
+    // @see https://github.com/editor-js/image/pull/49
     const tunes = ImageTool.tunes.concat(this.config.actions);
 
     return tunes.map(tune => ({
@@ -241,6 +243,7 @@ export default class ImageTool {
       toggle: tune.toggle,
       isActive: this.data[tune.name],
       onActivate: () => {
+        /* If it'a user defined tune, execute it's callback stored in action property */
         if (typeof tune.action === 'function') {
           tune.action(tune.name);
 
