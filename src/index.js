@@ -44,12 +44,9 @@
 import './index.css';
 
 import Ui from './ui';
-import ToolboxIcon from './svg/toolbox.svg';
 import Uploader from './uploader';
 
-import bgIcon from './svg/background.svg';
-import borderIcon from './svg/border.svg';
-import stretchedIcon from './svg/stretched.svg';
+import { IconAddBorder, IconStretch, IconAddBackground, IconPicture } from '@codexteam/icons';
 
 /**
  * @typedef {object} ImageConfig
@@ -96,7 +93,7 @@ export default class ImageTool {
    */
   static get toolbox() {
     return {
-      icon: ToolboxIcon,
+      icon: IconPicture,
       title: 'Image',
     };
   }
@@ -110,19 +107,19 @@ export default class ImageTool {
     return [
       {
         name: 'withBorder',
-        icon: borderIcon,
+        icon: IconAddBorder,
         title: 'With border',
         toggle: true,
       },
       {
         name: 'stretched',
-        icon: stretchedIcon,
+        icon: IconStretch,
         title: 'Stretch image',
         toggle: true,
       },
       {
         name: 'withBackground',
-        icon: bgIcon,
+        icon: IconAddBackground,
         title: 'With background',
         toggle: true,
       },

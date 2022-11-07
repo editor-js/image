@@ -1,4 +1,4 @@
-import buttonIcon from './svg/button-icon.svg';
+import { IconPicture } from '@codexteam/icons';
 
 /**
  * Class for working with UI:
@@ -110,7 +110,7 @@ export default class Ui {
   createFileButton() {
     const button = make('div', [ this.CSS.button ]);
 
-    button.innerHTML = this.config.buttonContent || `${buttonIcon} ${this.api.i18n.t('Select an Image')}`;
+    button.innerHTML = this.config.buttonContent || `${IconPicture} ${this.api.i18n.t('Select an Image')}`;
 
     button.addEventListener('click', () => {
       this.onSelectFile();
