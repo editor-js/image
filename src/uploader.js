@@ -1,4 +1,5 @@
 import ajax from '@codexteam/ajax';
+import isPromise from './utils/isPromise';
 
 /**
  * Module for file uploading. Handle 3 scenarios:
@@ -176,12 +177,3 @@ export default class Uploader {
   }
 }
 
-/**
- * Check if passed object is a Promise
- *
- * @param  {*}  object - object to check
- * @returns {boolean}
- */
-function isPromise(object) {
-  return object && typeof object.then === "function";
-}

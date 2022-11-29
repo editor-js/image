@@ -41,12 +41,12 @@
  * @property {string} file.url — image URL
  */
 
-// eslint-disable-next-line
-import css from './index.css';
+import './index.css';
+
 import Ui from './ui';
-import Tunes from './tunes';
-import ToolboxIcon from './svg/toolbox.svg';
 import Uploader from './uploader';
+
+import { IconAddBorder, IconStretch, IconAddBackground, IconPicture } from '@codexteam/icons';
 
 /**
  * @typedef {object} ImageConfig
@@ -93,9 +93,37 @@ export default class ImageTool {
    */
   static get toolbox() {
     return {
-      icon: ToolboxIcon,
+      icon: IconPicture,
       title: 'Image',
     };
+  }
+
+  /**
+   * Available image tools
+   *
+   * @returns {Array}
+   */
+  static get tunes() {
+    return [
+      {
+        name: 'withBorder',
+        icon: IconAddBorder,
+        title: 'With border',
+        toggle: true,
+      },
+      {
+        name: 'stretched',
+        icon: IconStretch,
+        title: 'Stretch image',
+        toggle: true,
+      },
+      {
+        name: 'withBackground',
+        icon: IconAddBackground,
+        title: 'With background',
+        toggle: true,
+      },
+    ];
   }
 
   /**
@@ -150,15 +178,6 @@ export default class ImageTool {
     });
 
     /**
-     * Module for working with tunes
-     */
-    this.tunes = new Tunes({
-      api,
-      actions: this.config.actions,
-      onChange: (tuneName) => this.tuneToggled(tuneName),
-    });
-
-    /**
      * Set saved state
      */
     this._data = {};
@@ -203,14 +222,33 @@ export default class ImageTool {
   }
 
   /**
-   * Makes buttons with tunes: add background, add border, stretch image
+   * Returns configuration for block tunes: add background, add border, stretch image
    *
    * @public
    *
-   * @returns {Element}
+   * @returns {Array}
    */
   renderSettings() {
-    return this.tunes.render(this.data);
+    // Merge default tunes with the ones that might be added by user
+    // @see https://github.com/editor-js/image/pull/49
+    const tunes = ImageTool.tunes.concat(this.config.actions);
+
+    return tunes.map(tune => ({
+      icon: tune.icon,
+      label: this.api.i18n.t(tune.title),
+      name: tune.name,
+      toggle: tune.toggle,
+      isActive: this.data[tune.name],
+      onActivate: () => {
+        /* If it'a user defined tune, execute it's callback stored in action property */
+        if (typeof tune.action === 'function') {
+          tune.action(tune.name);
+
+          return;
+        }
+        this.tuneToggled(tune.name);
+      },
+    }));
   }
 
   /**
@@ -311,7 +349,7 @@ export default class ImageTool {
     this._data.caption = data.caption || '';
     this.ui.fillCaption(this._data.caption);
 
-    Tunes.tunes.forEach(({ name: tune }) => {
+    ImageTool.tunes.forEach(({ name: tune }) => {
       const value = typeof data[tune] !== 'undefined' ? data[tune] === true || data[tune] === 'true' : false;
 
       this.setTune(tune, value);
