@@ -194,7 +194,13 @@ export default class Ui {
      *
      * @type {Element}
      */
-    this.nodes.imageEl = make(tag, this.CSS.imageEl, attributes);
+    if (this.nodes.imageEl) {
+      for (const attrName in attributes) {
+        this.nodes.imageEl[attrName] = attributes[attrName];
+      }
+    } else {
+      this.nodes.imageEl = make(tag, this.CSS.imageEl, attributes);
+    }
 
     /**
      * Add load event listener
