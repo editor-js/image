@@ -135,6 +135,17 @@
       }
     }
   }
+
+  .cdx-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    svg {
+      height: auto;
+      margin: 0 6px 0 0;
+    }
+  }
 }
 
 @keyframes image-preloader-spin {
