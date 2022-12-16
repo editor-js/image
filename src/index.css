@@ -9,7 +9,7 @@
     margin-bottom: 10px;
 
     &-picture {
-      max-width: 100%;
+      max-width: 70%;
       vertical-align: bottom;
       display: block;
     }
@@ -25,7 +25,7 @@
       background-position: center center;
 
       &::after {
-        content: "";
+        content: '';
         position: absolute;
         z-index: 3;
         width: 60px;
@@ -44,7 +44,7 @@
   }
 
   &__caption {
-    &[contentEditable="true"][data-placeholder]::before {
+    &[contentEditable='true'][data-placeholder]::before {
       position: absolute !important;
       content: attr(data-placeholder);
       color: #707684;
@@ -52,7 +52,7 @@
       display: none;
     }
 
-    &[contentEditable="true"][data-placeholder]:empty {
+    &[contentEditable='true'][data-placeholder]:empty {
       &::before {
         display: block;
       }
@@ -132,6 +132,27 @@
     ^&__image {
       &-picture {
         width: 100%;
+      }
+    }
+  }
+  &--alignleft {
+    ^&__image {
+      &-picture {
+        margin: 0;
+      }
+    }
+  }
+  &--aligncenter {
+    ^&__image {
+      &-picture {
+        margin: 0 auto;
+      }
+    }
+  }
+  &--alignright {
+    ^&__image {
+      &-picture {
+        margin: 0 0 0 auto;
       }
     }
   }
