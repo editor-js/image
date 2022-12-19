@@ -1,4 +1,5 @@
 import ajax from '@codexteam/ajax';
+import isPromise from './utils/isPromise';
 
 /**
  * Module for file uploading. Handle 3 scenarios:
