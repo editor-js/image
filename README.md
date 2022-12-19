@@ -177,10 +177,9 @@ Scenario:
 So, you can implement backend for file saving by your own way. It is a specific and trivial task depending on your
 environment and stack.
   
-The tool executes request as `multipart/form-data`: https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/POST,
-with `field` from configuration as a value key.
+The tool executes the request as [`multipart/form-data`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/POST), with the key as the value of `field`  in configuration.
 
-Response of your uploader **should** response `200 OK` and with following format of the response body:
+The response of your uploader **should**  cover the following format:
 
 ```json5
 {
@@ -208,11 +207,12 @@ Scenario:
 3. Your backend should accept URL, **download and save the original file by passed URL** and return file data with JSON at specified format.
 4. Image tool shows saved image and stores server answer
   
-The tool executes request as `application/json` with following request body:
+The tool executes the request as `application/json` with the following request body:
   
 ```json5
 {
   "url": "<pasted URL from the user>"
+  "additionalRequestData": "<additional request data from configuration>"
 }
 ```
   
