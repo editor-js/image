@@ -98,6 +98,7 @@ Image Tool supports these configuration parameters:
 | buttonContent | `string` | Allows to override HTML content of «Select file» button |
 | uploader | `{{uploadByFile: function, uploadByUrl: function}}` | Optional custom uploading methods. See details below. |
 | actions | `array` | Array with custom actions to show in the tool's settings menu. See details below. |
+| selectFiles | `function` | Optional custom file select method. If provided uploadByFile will be ignored. |
 
 Note that if you don't implement your custom uploader methods, the `endpoints` param is required.
 
@@ -161,6 +162,7 @@ This Tool returns `data` with following format
 This Tool works by one of the following schemes:
 
 1. Uploading files from the device
+2. Uploading files from a custom file picker
 2. Uploading by URL (handle image-like URL's pasting)
 3. Uploading by drag-n-drop file
 4. Uploading by pasting from Clipboard
@@ -196,6 +198,40 @@ The response of your uploader **should**  cover the following format:
 **file** - uploaded file data. **Must** contain an `url` field with full public path to the uploaded image.
 Also, can contain any additional fields you want to store. For example, width, height, id etc.
 All additional fields will be saved at the `file` object of output data.
+
+### Uploading from a custom file picker
+
+Scenario:
+1. User clicks on «Select file» button
+2. Editor invokes `selectFiles` method provided in the config
+3. `selectFiles` returns a Promise that resolves with an array of files
+4. Image tool shows the image and stores the answer
+
+Code example:
+
+```js
+var editor = EditorJS({
+  ...
+
+  tools: {
+    ...
+    image: {
+      class: ImageTool,
+      config: {
+        selectFiles: () => {
+          return new Promise((resolve, reject) => {
+            const image = { url: "https://via.placeholder.com/150" };
+            const files = [image];
+            resolve(files);
+          });
+        }
+      }
+    }
+  }
+
+  ...
+});
+```
 
 ### Uploading by pasted URL
 
