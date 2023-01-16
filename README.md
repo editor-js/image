@@ -4,7 +4,7 @@
 
 Image Block for the [Editor.js](https://editorjs.io).
 
-![](https://capella.pics/63a03d04-3816-45b2-87b2-d85e556f0066.jpg)
+![](assets/68747470733a2f2f636170656c6c612e706963732f36336130336430342d333831362d343562322d383762322d6438356535353666303036362e6a7067-2.jpeg)
 
 ## Features
 
@@ -103,7 +103,7 @@ Note that if you don't implement your custom uploader methods, the `endpoints` p
 
 ## Tool's settings
 
-![](https://capella.pics/c74cdeec-3405-48ac-a960-f784188cf9b4.jpg)
+![](assets/c74cdeec-3405-48ac-a960-f784188cf9b4.jpg)
 
 1. Add border
 
