@@ -4,7 +4,7 @@
 
 Image Block for the [Editor.js](https://editorjs.io).
 
-![](https://capella.pics/63a03d04-3816-45b2-87b2-d85e556f0066.jpg)
+![](assets/68747470733a2f2f636170656c6c612e706963732f36336130336430342d333831362d343562322d383762322d6438356535353666303036362e6a7067.jpeg)
 
 ## Features
 
@@ -103,7 +103,7 @@ Note that if you don't implement your custom uploader methods, the `endpoints` p
 
 ## Tool's settings
 
-![](https://capella.pics/c74cdeec-3405-48ac-a960-f784188cf9b4.jpg)
+![](assets/68747470733a2f2f636170656c6c612e706963732f63373463646565632d333430352d343861632d613936302d6637383431383863663962342e6a7067.jpeg)
 
 1. Add border
 
@@ -156,8 +156,8 @@ This Tool returns `data` with following format
 }
 ```
 
-## Backend response format <a name="server-format"></a>  
-  
+## Backend response format <a name="server-format"></a>
+
 This Tool works by one of the following schemes:
 
 1. Uploading files from the device
@@ -176,7 +176,7 @@ Scenario:
 
 So, you can implement backend for file saving by your own way. It is a specific and trivial task depending on your
 environment and stack.
-  
+
 The tool executes the request as [`multipart/form-data`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/POST), with the key as the value of `field`  in configuration.
 
 The response of your uploader **should**  cover the following format:
@@ -206,16 +206,16 @@ Scenario:
 3. Tool sends it to **your** backend (on `config.endpoints.byUrl` route) via 'url' in request body
 4. Your backend should accept URL, **download and save the original file by passed URL** and return file data with JSON at specified format.
 5. Image tool shows saved image and stores server answer
-  
+
 The tool executes the request as `application/json` with the following request body:
-  
+
 ```json5
 {
   "url": "<pasted URL from the user>"
   "additionalRequestData": "<additional request data from configuration>"
 }
 ```
-  
+
 Response of your uploader should be at the same format as described at «[Uploading files from device](#from-device)» section
 
 
