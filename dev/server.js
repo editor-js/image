@@ -118,7 +118,10 @@ class ServerExample {
       .then(({files, fields}) => {
         let url = fields.url;
 
-        let filename = this.uploadDir + '/' + this.md5(url) + '.png';
+        const results = url.match(/https?:\/\/\S+\.(gif|jpe?g|tiff|png|svg|webp)(\?[a-z0-9=]*)?$/i);
+        const extension = results ? results[1] : '.png';
+        
+        let filename = this.uploadDir + '/' + this.md5(url) + `.${extension}`;
 
         return this.downloadImage(url, filename)
           .then((path) => {
