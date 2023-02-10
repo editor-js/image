@@ -203,7 +203,7 @@ Scenario:
 
 1. User pastes an URL of the image file to the Editor
 2. Editor pass pasted string to the Image Tool
-3. Tool sends it to **your** backend (on `config.endpoint.byUrl` route) via 'url' in request body
+3. Tool sends it to **your** backend (on `config.endpoints.byUrl` route) via 'url' in request body
 4. Your backend should accept URL, **download and save the original file by passed URL** and return file data with JSON at specified format.
 5. Image tool shows saved image and stores server answer
   
