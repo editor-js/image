@@ -215,10 +215,10 @@ export default class ImageTool {
    */
   save() {
     const caption = this.ui.nodes.caption;
+    let savedata = this._data;
+    savedata = { ...savedata, caption: caption.innerHTML };
 
-    this._data.caption = caption.innerHTML;
-
-    return this.data;
+    return savedata;
   }
 
   /**
@@ -348,10 +348,10 @@ export default class ImageTool {
    */
   set data(data) {
     this.image = data.file;
-
-    this._data.caption = data.caption || '';
-    this.ui.fillCaption(this._data.caption);
-
+    let savedata = this._data;
+    savedata = { ...savedata, caption: data.caption || '';
+    this.ui.fillCaption(savedata.caption);
+    this._data = savedata;
     ImageTool.tunes.forEach(({ name: tune }) => {
       const value = typeof data[tune] !== 'undefined' ? data[tune] === true || data[tune] === 'true' : false;
 
