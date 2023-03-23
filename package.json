@@ -10,7 +10,10 @@
   ],
   "description": "Image Tool for Editor.js",
   "license": "MIT",
-  "repository": "https://github.com/editor-js/image",
+   "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Nutribitapp/editor-image"
+  },
   "main": "./dist/bundle.js",
   "scripts": {
     "build": "webpack --mode production",
@@ -18,6 +21,9 @@
     "lint": "eslint src/ --ext .js",
     "lint:errors": "eslint src/ --ext .js --quiet",
     "lint:fix": "eslint src/ --ext .js --fix"
+  },
+  "publishConfig": {
+    "@nutribitapp:registry": "https://npm.pkg.github.com"
   },
   "author": {
     "name": "CodeX",
