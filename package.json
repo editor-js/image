@@ -1,6 +1,6 @@
 {
   "name": "@nutribitapp/editor-image",
-  "version": "2.8.2",
+  "version": "2.8.4",
   "keywords": [
     "codex editor",
     "tool",
@@ -10,7 +10,7 @@
   ],
   "description": "Image Tool for Editor.js",
   "license": "MIT",
-   "repository": {
+  "repository": {
     "type": "git",
     "url": "git+https://github.com/Nutribitapp/editor-image"
   },
@@ -46,9 +46,9 @@
     "postcss-nested-ancestors": "^2.0.0",
     "request": "^2.88.0",
     "style-loader": "^1.1.4",
-    "svg-inline-loader": "^0.8.0",
-    "webpack": "^4.29.5",
-    "webpack-cli": "^3.2.3"
+    "svg-inline-loader": "^0.8.2",
+    "webpack": "^5.76.3",
+    "webpack-cli": "^5.0.1"
   },
   "dependencies": {
     "@codexteam/icons": "^0.0.6"

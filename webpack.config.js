@@ -35,8 +35,10 @@ module.exports = (env, argv) => {
           use: [
             {
               loader: 'babel-loader',
-              query: {
-                presets: ['@babel/preset-env'],
+              options: {
+                presets: [
+                  ['@babel/preset-env', { targets: "defaults" }]
+                ],
               },
             },
             'eslint-loader',
@@ -60,7 +62,7 @@ module.exports = (env, argv) => {
         },
         {
           test: /\.svg$/,
-          loader: 'svg-inline-loader?removeSVGTagAttrs=false',
+          loader: 'svg-inline-loader',
         },
       ],
     },

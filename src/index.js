@@ -348,8 +348,7 @@ export default class ImageTool {
    */
   set data(data) {
     this.image = data.file;
-    let savedata = this._data;
-    savedata = { ...savedata, caption: data.caption || '';
+    const savedata = { ...this._data, caption: data.caption || '' };
     this.ui.fillCaption(savedata.caption);
     this._data = savedata;
     ImageTool.tunes.forEach(({ name: tune }) => {
