@@ -22,7 +22,7 @@ export default class Ui {
     this.readOnly = readOnly;
     this.nodes = {
       wrapper: make('div', [this.CSS.baseClass, this.CSS.wrapper]),
-      imageContainer: make('div', [ this.CSS.imageContainer ]),
+      imageContainer: make('div', [this.CSS.imageContainer]),
       fileButton: this.createFileButton(),
       imageEl: undefined,
       imagePreloader: make('div', this.CSS.imagePreloader),
@@ -109,7 +109,7 @@ export default class Ui {
    * @returns {Element}
    */
   createFileButton() {
-    const button = make('div', [ this.CSS.button ]);
+    const button = make('div', [this.CSS.button]);
 
     button.innerHTML = this.config.buttonContent || `${IconPicture} ${this.api.i18n.t('Select an Image')}`;
 
@@ -148,7 +148,10 @@ export default class Ui {
    * @param {string} url - image source
    * @returns {void}
    */
-  fillImage(url) {
+  fillImage(file) {
+    const url = file.url;
+    const fileAttributes = file.fileAttributes || {};
+    const configAttributes = this.config.attributes || {};
     /**
      * Check for a source extension to compose element correctly: video tag for mp4, img — for others
      */
@@ -156,6 +159,8 @@ export default class Ui {
 
     const attributes = {
       src: url,
+      ...configAttributes,
+      ...fileAttributes
     };
 
     /**
