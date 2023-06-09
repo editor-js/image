@@ -75,6 +75,17 @@ import { IconAddBorder, IconStretch, IconAddBackground, IconPicture } from '@cod
  * @property {string} file.url - [Required] image source URL
  */
 export default class ImageTool {
+
+  /**
+   * Prevents image attributes from being removed during sanitization phase
+   *
+   */
+  static get sanitize() {
+    return {
+      img: true
+    };
+  }
+
   /**
    * Notify core that read-only mode is supported
    *
@@ -289,7 +300,7 @@ export default class ImageTool {
        * Drag n drop file from into the Editor
        */
       files: {
-        mimeTypes: [ 'image/*' ],
+        mimeTypes: ['image/*'],
       },
     };
   }
