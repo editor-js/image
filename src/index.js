@@ -80,9 +80,10 @@ export default class ImageTool {
    * Prevents image attributes from being removed during sanitization phase
    *
    */
+
   static get sanitize() {
     return {
-      img: true
+      'img': true
     };
   }
 
