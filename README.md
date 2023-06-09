@@ -189,7 +189,7 @@ The response of your uploader **should**  cover the following format:
         "url" : "https://www.tesla.com/tesla_theme/assets/img/_vehicle_redesign/roadster_and_semi/roadster/hero.jpg",
         // ... and any additional fields you want to store, such as width, height, color, extension, etc
         "attributes" : {
-          "loading" : "lazy",
+          "srcset": "clock-demo-200px.png 200w, clock-demo-400px.png 400w",
           "width" : "400",
           "height" : "400",
           // ... and any attributes you would like the image / video element tag to have such as adding width, height, etc
@@ -300,7 +300,7 @@ var editor = EditorJS({
          * Ability to added custom attribute to block output such as lazy loading tag 
          */
         attributes: {
-          loading:"lazy"
+          srcset: 'clock-demo-200px.png 200w, clock-demo-400px.png 400w'
         }
       }
     }
