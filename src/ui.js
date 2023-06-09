@@ -150,7 +150,7 @@ export default class Ui {
    */
   fillImage(file) {
     const url = file.url;
-    const fileAttributes = file.fileAttributes || {};
+    const fileAttributes = file.attributes || {};
     const configAttributes = this.config.attributes || {};
     /**
      * Check for a source extension to compose element correctly: video tag for mp4, img — for others
