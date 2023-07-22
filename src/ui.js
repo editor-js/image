@@ -1,5 +1,6 @@
 import { IconPicture } from '@codexteam/icons';
 import { make } from './utils/dom';
+import mediumZoom from 'medium-zoom';
 
 /**
  * Class for working with UI:
@@ -204,6 +205,11 @@ export default class Ui {
     });
 
     this.nodes.imageContainer.appendChild(this.nodes.imageEl);
+
+    mediumZoom(this.nodes.imageEl, {
+      background: '#191219',
+      scrollOffset: 0,
+    });
   }
 
   /**
