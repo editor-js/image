@@ -148,14 +148,23 @@ export default class Ui {
    * @param {string} url - image source
    * @returns {void}
    */
-  fillImage(url) {
+  async fillImage(url, file) {
+    let resultUrl;
+
+    // Check if downloader function exists in the config
+    if (this.config.downloader) {
+      resultUrl = await this.config.downloader.download(url, file);
+    } else {
+      resultUrl = url;
+    }
+
     /**
      * Check for a source extension to compose element correctly: video tag for mp4, img — for others
      */
-    const tag = /\.mp4$/.test(url) ? 'VIDEO' : 'IMG';
+    const tag = /\.mp4$/.test(resultUrl) ? 'VIDEO' : 'IMG';
 
     const attributes = {
-      src: url,
+      src: resultUrl,
     };
 
     /**

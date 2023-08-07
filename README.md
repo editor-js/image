@@ -97,6 +97,7 @@ Image Tool supports these configuration parameters:
 | captionPlaceholder | `string` | (default: `Caption`) Placeholder for Caption input |
 | buttonContent | `string` | Allows to override HTML content of «Select file» button |
 | uploader | `{{uploadByFile: function, uploadByUrl: function}}` | Optional custom uploading methods. See details below. |
+| downloader | `{{download: function}}` | Optional custom for downloading image. See details below. |
 | actions | `array` | Array with custom actions to show in the tool's settings menu. See details below. |
 
 Note that if you don't implement your custom uploader methods, the `endpoints` param is required.
@@ -289,6 +290,48 @@ var editor = EditorJS({
             })
           }
         }
+      }
+    }
+  }
+
+  ...
+});
+```
+
+## Providing custom download method
+
+As mentioned at the Config Params section, you have an ability to provide own custom downloading methods.
+It is a quite simple: implement `download` method and pass them via `downloader` config param.
+
+
+| Method         | Arguments | Return value    | Description |
+| -------------- | --------- | -------------   | ------------|
+| download   | `url`, `File` | `url | blobUrl` | Custom download function to get image data |
+
+Example:
+
+```js
+import ImageTool from '@editorjs/image';
+
+var editor = EditorJS({
+  ...
+
+  tools: {
+    ...
+    image: {
+      class: ImageTool,
+      config: {
+        /**
+         * Custom downloader
+         */
+            downloader: {
+              async download(url: string, file: any) {
+                const data = await getImageData(); 
+                const blob = new Blob([data]);
+                const blobUrl = URL.createObjectURL(blob);
+                return blobUrl;
+              },
+            },
       }
     }
   }
