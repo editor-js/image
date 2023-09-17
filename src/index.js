@@ -41,12 +41,18 @@
  * @property {string} file.url — image URL
  */
 
+import Deleter from './deleter';
 import './index.css';
 
 import Ui from './ui';
 import Uploader from './uploader';
 
-import { IconAddBorder, IconStretch, IconAddBackground, IconPicture } from '@codexteam/icons';
+import {
+  IconAddBorder,
+  IconStretch,
+  IconAddBackground,
+  IconPicture,
+} from '@codexteam/icons';
 
 /**
  * @typedef {object} ImageConfig
@@ -61,6 +67,7 @@ import { IconAddBorder, IconStretch, IconAddBackground, IconPicture } from '@cod
  * @property {object} additionalRequestHeaders - allows to pass custom headers with Request
  * @property {string} buttonContent - overrides for Select File button
  * @property {object} [uploader] - optional custom uploader
+ * @property {object} [deleter] - optional custom deleter
  * @property {function(File): Promise.<UploadResponseFormat>} [uploader.uploadByFile] - method that upload image by File
  * @property {function(string): Promise.<UploadResponseFormat>} [uploader.uploadByUrl] - method that upload image by URL
  */
@@ -146,10 +153,13 @@ export default class ImageTool {
       additionalRequestHeaders: config.additionalRequestHeaders || {},
       field: config.field || 'image',
       types: config.types || 'image/*',
-      captionPlaceholder: this.api.i18n.t(config.captionPlaceholder || 'Caption'),
+      captionPlaceholder: this.api.i18n.t(
+        config.captionPlaceholder || 'Caption'
+      ),
       buttonContent: config.buttonContent || '',
       uploader: config.uploader || undefined,
       actions: config.actions || [],
+      deleter: config.deleter || undefined,
     };
 
     /**
@@ -159,6 +169,15 @@ export default class ImageTool {
       config: this.config,
       onUpload: (response) => this.onUpload(response),
       onError: (error) => this.uploadingFailed(error),
+    });
+
+    /**
+     * Module for file deleting
+     */
+    this.deleter = new Deleter({
+      config: this.config,
+      onDelete: (response) => this.onDelete(response),
+      onError: (error) => this.deletingingFailed(error),
     });
 
     /**
@@ -233,7 +252,7 @@ export default class ImageTool {
     // @see https://github.com/editor-js/image/pull/49
     const tunes = ImageTool.tunes.concat(this.config.actions);
 
-    return tunes.map(tune => ({
+    return tunes.map((tune) => ({
       icon: tune.icon,
       label: this.api.i18n.t(tune.title),
       name: tune.name,
@@ -288,7 +307,7 @@ export default class ImageTool {
        * Drag n drop file from into the Editor
        */
       files: {
-        mimeTypes: [ 'image/*' ],
+        mimeTypes: ['image/*'],
       },
     };
   }
@@ -353,7 +372,10 @@ export default class ImageTool {
     this.ui.fillCaption(this._data.caption);
 
     ImageTool.tunes.forEach(({ name: tune }) => {
-      const value = typeof data[tune] !== 'undefined' ? data[tune] === true || data[tune] === 'true' : false;
+      const value =
+        typeof data[tune] !== 'undefined'
+          ? data[tune] === true || data[tune] === 'true'
+          : false;
 
       this.setTune(tune, value);
     });
@@ -402,7 +424,23 @@ export default class ImageTool {
   }
 
   /**
-   * Handle uploader errors
+   * File deleting callback
+   *
+   * @private
+   *
+   * @param {UploadResponseFormat} response - deleting server response
+   * @returns {void}
+   */
+  onDelete(response) {
+    if (response.success) {
+      this.image = '';
+    } else {
+      this.deletingingFailed(`incorrect response ${JSON.stringify(response)}`);
+    }
+  }
+
+  /**
+   * Handle deleter errors
    *
    * @private
    * @param {string} errorText - uploading error text
@@ -413,6 +451,23 @@ export default class ImageTool {
 
     this.api.notifier.show({
       message: this.api.i18n.t('Couldn’t upload image. Please try another.'),
+      style: 'error',
+    });
+    this.ui.hidePreloader();
+  }
+
+  /**
+   * Handle uploader errors
+   *
+   * @private
+   * @param {string} errorText - deleting error text
+   * @returns {void}
+   */
+  deletingingFailed(errorText) {
+    console.log('Image Tool: deleting failed because of', errorText);
+
+    this.api.notifier.show({
+      message: this.api.i18n.t('Couldn’t delete image. Please try another.'),
       style: 'error',
     });
     this.ui.hidePreloader();
@@ -447,12 +502,13 @@ export default class ImageTool {
       /**
        * Wait until the API is ready
        */
-      Promise.resolve().then(() => {
-        const blockId = this.api.blocks.getCurrentBlockIndex();
+      Promise.resolve()
+        .then(() => {
+          const blockId = this.api.blocks.getCurrentBlockIndex();
 
-        this.api.blocks.stretchBlock(blockId, value);
-      })
-        .catch(err => {
+          this.api.blocks.stretchBlock(blockId, value);
+        })
+        .catch((err) => {
           console.error(err);
         });
     }
@@ -481,5 +537,20 @@ export default class ImageTool {
   uploadUrl(url) {
     this.ui.showPreloader(url);
     this.uploader.uploadByUrl(url);
+  }
+
+  /**
+   * Show deleteing loader and delete image by target url
+   *
+   * @param {string} url - file url to be deleted
+   * @returns {void}
+   */
+  deleteFile(url) {
+    this.ui.showDeleteLoader();
+    this.deleter.deleteFile(url, {
+      onPreview: () => {
+        this.ui.showDeleteLoader();
+      },
+    });
   }
 }

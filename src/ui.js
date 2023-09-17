@@ -22,10 +22,11 @@ export default class Ui {
     this.readOnly = readOnly;
     this.nodes = {
       wrapper: make('div', [this.CSS.baseClass, this.CSS.wrapper]),
-      imageContainer: make('div', [ this.CSS.imageContainer ]),
+      imageContainer: make('div', [this.CSS.imageContainer]),
       fileButton: this.createFileButton(),
       imageEl: undefined,
       imagePreloader: make('div', this.CSS.imagePreloader),
+      imageDeleteLoader: make('div', this.CSS.imageDeleteLoader),
       caption: make('div', [this.CSS.input, this.CSS.caption], {
         contentEditable: !this.readOnly,
       }),
@@ -66,10 +67,11 @@ export default class Ui {
       wrapper: 'image-tool',
       imageContainer: 'image-tool__image',
       imagePreloader: 'image-tool__image-preloader',
+      imageDeleteLoader: 'image-tool__image-deleteloader',
       imageEl: 'image-tool__image-picture',
       caption: 'image-tool__caption',
     };
-  };
+  }
 
   /**
    * Ui statuses:
@@ -77,13 +79,14 @@ export default class Ui {
    * - uploading
    * - filled
    *
-   * @returns {{EMPTY: string, UPLOADING: string, FILLED: string}}
+   * @returns {{EMPTY: string, UPLOADING: string, FILLED: string, DELETING: string}}
    */
   static get status() {
     return {
       EMPTY: 'empty',
       UPLOADING: 'loading',
       FILLED: 'filled',
+      DELETING: 'deleting',
     };
   }
 
@@ -109,9 +112,11 @@ export default class Ui {
    * @returns {Element}
    */
   createFileButton() {
-    const button = make('div', [ this.CSS.button ]);
+    const button = make('div', [this.CSS.button]);
 
-    button.innerHTML = this.config.buttonContent || `${IconPicture} ${this.api.i18n.t('Select an Image')}`;
+    button.innerHTML =
+      this.config.buttonContent ||
+      `${IconPicture} ${this.api.i18n.t('Select an Image')}`;
 
     button.addEventListener('click', () => {
       this.onSelectFile();
@@ -139,6 +144,28 @@ export default class Ui {
    */
   hidePreloader() {
     this.nodes.imagePreloader.style.backgroundImage = '';
+    this.toggleStatus(Ui.status.EMPTY);
+  }
+
+  /**
+   * Shows deleting loader
+   *
+   * @param {string} src - preview source
+   * @returns {void}
+   */
+  showDeleteLoader(src) {
+    // this.nodes.imageDeleteLoader.style.backgroundImage = `url(${src})`;
+    this.nodes.imageDeleteLoader.textContent = 'Deleting';
+    this.toggleStatus(Ui.status.DELETING);
+  }
+
+  /**
+   * Hide delete loader
+   *
+   * @returns {void}
+   */
+  hideDeleteLoader() {
+    this.nodes.imageDeleteLoader.style.backgroundImage = '';
     this.toggleStatus(Ui.status.EMPTY);
   }
 
@@ -234,7 +261,10 @@ export default class Ui {
   toggleStatus(status) {
     for (const statusType in Ui.status) {
       if (Object.prototype.hasOwnProperty.call(Ui.status, statusType)) {
-        this.nodes.wrapper.classList.toggle(`${this.CSS.wrapper}--${Ui.status[statusType]}`, status === Ui.status[statusType]);
+        this.nodes.wrapper.classList.toggle(
+          `${this.CSS.wrapper}--${Ui.status[statusType]}`,
+          status === Ui.status[statusType]
+        );
       }
     }
   }
@@ -247,7 +277,9 @@ export default class Ui {
    * @returns {void}
    */
   applyTune(tuneName, status) {
-    this.nodes.wrapper.classList.toggle(`${this.CSS.wrapper}--${tuneName}`, status);
+    this.nodes.wrapper.classList.toggle(
+      `${this.CSS.wrapper}--${tuneName}`,
+      status
+    );
   }
 }
-

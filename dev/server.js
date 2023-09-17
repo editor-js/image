@@ -19,13 +19,33 @@ const fs = require('fs');
 const request = require('request');
 const crypto = require('crypto');
 
+/**
+ *
+ */
 class ServerExample {
-  constructor({port, fieldName}) {
-    this.uploadDir = __dirname + '/\.tmp';
+  constructor
+  /**
+   *
+   */
+  /**
+   *
+   */
+  /**
+   *
+   */
+  /**
+   *
+   */
+  /**
+   *
+   */({ port, fieldName }) {
+    this.uploadDir = __dirname + '/.tmp';
     this.fieldName = fieldName;
-    this.server = http.createServer((req, res) => {
-      this.onRequest(req, res);
-    }).listen(port);
+    this.server = http
+      .createServer((req, res) => {
+        this.onRequest(req, res);
+      })
+      .listen(port);
 
     this.server.on('listening', () => {
       console.log('Server is listening ' + port + '...');
@@ -38,16 +58,18 @@ class ServerExample {
 
   /**
    * Request handler
+   *
    * @param {http.IncomingMessage} request
    * @param {http.ServerResponse} response
    */
   onRequest(request, response) {
     this.allowCors(response);
 
-    const {method, url} = request;
+    const { method, url } = request;
 
     if (method.toLowerCase() !== 'post') {
       response.end();
+
       return;
     }
 
@@ -65,85 +87,96 @@ class ServerExample {
 
   /**
    * Allows CORS requests for debugging
+   *
    * @param response
    */
   allowCors(response) {
     response.setHeader('Access-Control-Allow-Origin', '*');
     response.setHeader('Access-Control-Allow-Credentials', 'true');
-    response.setHeader('Access-Control-Allow-Methods', 'GET,HEAD,OPTIONS,POST,PUT');
-    response.setHeader('Access-Control-Allow-Headers', 'Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers');
+    response.setHeader(
+      'Access-Control-Allow-Methods',
+      'GET,HEAD,OPTIONS,POST,PUT'
+    );
+    response.setHeader(
+      'Access-Control-Allow-Headers',
+      'Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers'
+    );
   }
 
   /**
    * Handles uploading by file
+   *
    * @param request
    * @param response
    */
   uploadFile(request, response) {
-    let responseJson = {
-      success: 0
+    const responseJson = {
+      success: 0,
     };
 
     this.getForm(request)
-      .then(({files}) => {
-        let image = files[this.fieldName] || {};
+      .then(({ files }) => {
+        const image = files[this.fieldName] || {};
 
         responseJson.success = 1;
         responseJson.file = {
           url: image.path,
           name: image.name,
-          size: image.size
+          size: image.size,
         };
       })
       .catch((error) => {
         console.log('Uploading error', error);
       })
       .finally(() => {
-        response.writeHead(200, {'Content-Type': 'application/json'});
+        response.writeHead(200, { 'Content-Type': 'application/json' });
         response.end(JSON.stringify(responseJson));
       });
   }
 
   /**
    * Handles uploading by URL
+   *
    * @param request
    * @param response
    */
   fetchUrl(request, response) {
-    let responseJson = {
-      success: 0
+    const responseJson = {
+      success: 0,
     };
 
     this.getForm(request)
-      .then(({files, fields}) => {
-        let url = fields.url;
+      .then(({ files, fields }) => {
+        const url = fields.url;
 
-        const results = url.match(/https?:\/\/\S+\.(gif|jpe?g|tiff|png|svg|webp)(\?[a-z0-9=]*)?$/i);
+        const results = url.match(
+          /https?:\/\/\S+\.(gif|jpe?g|tiff|png|svg|webp)(\?[a-z0-9=]*)?$/i
+        );
         const extension = results ? results[1] : '.png';
-        
-        let filename = this.uploadDir + '/' + this.md5(url) + `.${extension}`;
 
-        return this.downloadImage(url, filename)
-          .then((path) => {
-            responseJson.success = 1;
-            responseJson.file = {
-              url: path
-            };
-          });
+        const filename = this.uploadDir + '/' + this.md5(url) + `.${extension}`;
+
+        return this.downloadImage(url, filename).then((path) => {
+          responseJson.success = 1;
+          responseJson.file = {
+            url: path,
+          };
+        });
       })
       .catch((error) => {
         console.log('Uploading error', error);
       })
       .finally(() => {
-        response.writeHead(200, {'Content-Type': 'application/json'});
+        response.writeHead(200, { 'Content-Type': 'application/json' });
         response.end(JSON.stringify(responseJson));
       });
   }
 
   /**
    * Accepts post form data
+   *
    * @param request
-   * @return {Promise<{files: object, fields: object}>}
+   * @returns {Promise<{files: object, fields: object}>}
    */
   getForm(request) {
     return new Promise((resolve, reject) => {
@@ -158,7 +191,10 @@ class ServerExample {
         } else {
           console.log('fields', fields);
           console.log('files', files);
-          resolve({files, fields});
+          resolve({
+            files,
+            fields,
+          });
         }
       });
     });
@@ -166,14 +202,16 @@ class ServerExample {
 
   /**
    * Download image by Url
+   *
    * @param {string} uri - endpoint
    * @param {string} filename - path for file saving
-   * @return {Promise<string>} - filename
+   * @returns {Promise<string>} - filename
    */
   downloadImage(uri, filename) {
     return new Promise((resolve, reject) => {
       request.head(uri, function (err, res, body) {
-        request(uri).pipe(fs.createWriteStream(filename).on('erorr', reject))
+        request(uri)
+          .pipe(fs.createWriteStream(filename).on('erorr', reject))
           .on('close', () => {
             resolve(filename);
           });
@@ -183,8 +221,9 @@ class ServerExample {
 
   /**
    * Generates md5 hash for string
+   *
    * @param string
-   * @return {string}
+   * @returns {string}
    */
   md5(string) {
     return crypto.createHash('md5').update(string).digest('hex');
@@ -193,5 +232,5 @@ class ServerExample {
 
 new ServerExample({
   port: 8008,
-  fieldName: 'image'
+  fieldName: 'image',
 });
