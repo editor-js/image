@@ -119,33 +119,6 @@ export default class Ui {
   };
 
   /**
-   * create svg element
-   *
-   * @param {string} icon - src
-   * @param {number} width - pixel width
-   * @param {number} height - pixel height
-   * @returns {Element}
-   */
-  createSvg(icon = DeleteIconSvg, width = 24, height = 24) {
-    // image
-    const image = document.createElement('img');
-
-    image.src = icon;
-    image.style.width = this.pxToRem(width);
-    image.style.height = this.pxToRem(height);
-
-    // svg
-    const svg = document.createElement('svg');
-
-    svg.style.display = 'contents';
-    svg.style.height = this.pxToRem(width);
-    svg.style.width = this.pxToRem(height);
-    svg.append(image);
-
-    return svg;
-  }
-
-  /**
    * Creates upload-file button
    *
    * @returns {Element}
@@ -235,7 +208,7 @@ export default class Ui {
      * compose iconWrapper
      */
     const iconWrapper = document.createElement('div');
-    const icon = this.createSvg();
+    const icon = DeleteIconSvg;
 
     iconWrapper.style.position = 'absolute';
     iconWrapper.style.right = this.pxToRem(0);
