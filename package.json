@@ -10,7 +10,7 @@
   ],
   "description": "Image Tool for Editor.js",
   "license": "MIT",
-  "repository": "https://github.com/editor-js/image",
+  "repository": "https://github.com/personal-ai/editorjs-image-fork.git@custom-image-ui",
   "main": "./dist/bundle.js",
   "scripts": {
     "build": "webpack --mode production",
