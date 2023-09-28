@@ -235,7 +235,10 @@ export default class Ui {
      * compose iconWrapper
      */
     const iconWrapper = document.createElement('div');
-    const icon = this.createSvg();
+
+    // iconWrapper.style.backgroundImage = DeleteIconSvg;
+    // const icon = this.createSvg();
+    iconWrapper.innerHTML = DeleteIconSvg;
 
     iconWrapper.style.position = 'absolute';
     iconWrapper.style.right = this.pxToRem(0);
@@ -244,7 +247,7 @@ export default class Ui {
     iconWrapper.addEventListener('click', () => {
       this.api.blocks.delete(this.api.blocks.getCurrentBlockIndex());
     });
-    iconWrapper.appendChild(icon);
+    // iconWrapper.appendChild(icon);
     this.nodes.imageDeleteIcon = iconWrapper;
     this.nodes.imageDeleteIcon.style.display = 'none';
 
