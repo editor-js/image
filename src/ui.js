@@ -25,7 +25,7 @@ export default class Ui {
       wrapper: make('div', [this.CSS.baseClass, this.CSS.wrapper]),
       imageContainer: make('div', [ this.CSS.imageContainer ]),
       fileButton: this.createFileButton(),
-			imageWrapper: make('div', [this.CSS.imageWrapper, 'tw-relative', 'tw-w-24', 'tw-h-24']),
+      imageWrapper: make('div', [this.CSS.imageWrapper, 'tw-relative', 'tw-w-24', 'tw-h-24']),
       imageEl: undefined,
       imageDeleteIcon: undefined,
       imagePreloader: make('div', this.CSS.imagePreloader),
@@ -70,7 +70,7 @@ export default class Ui {
       wrapper: 'image-tool',
       imageContainer: 'image-tool__image',
       imagePreloader: 'image-tool__image-preloader',
-			imageWrapper: 'image-tool__image-wrapper',
+      imageWrapper: 'image-tool__image-wrapper',
       imageEl: 'image-tool__image-picture',
       caption: 'image-tool__caption',
     };
@@ -108,27 +108,42 @@ export default class Ui {
     return this.nodes.wrapper;
   }
 
-  	/**
-	 * create svg element
-	 * @param icon
-	 * @returns
-	 */
-	createSvg(icon = DeleteIconSvg, width = 24, height = 24) {
-		// image
-		const image = document.createElement('img');
-		image.src = icon;
-		image.style.width = pxToRem(width);
-		image.style.height = pxToRem(height);
+  /**
+   * convert pixels to rem
+   *
+   * @param {number} size - size of px
+   * @returns {string}
+   */
+  pxToRem(size) {
+    return `${(size / 16) * 1}rem`;
+  };
 
-		// svg
-		const svg = document.createElement('svg');
-		svg.style.display = 'contents';
-		svg.style.height = pxToRem(width);
-		svg.style.width = pxToRem(height);
-		svg.append(image);
+  /**
+   * create svg element
+   *
+   * @param {string} icon - src
+   * @param {number} width - pixel width
+   * @param {number} height - pixel height
+   * @returns {Element}
+   */
+  createSvg(icon = DeleteIconSvg, width = 24, height = 24) {
+    // image
+    const image = document.createElement('img');
 
-		return svg;
-	}
+    image.src = icon;
+    image.style.width = this.pxToRem(width);
+    image.style.height = this.pxToRem(height);
+
+    // svg
+    const svg = document.createElement('svg');
+
+    svg.style.display = 'contents';
+    svg.style.height = this.pxToRem(width);
+    svg.style.width = this.pxToRem(height);
+    svg.append(image);
+
+    return svg;
+  }
 
   /**
    * Creates upload-file button
@@ -220,17 +235,18 @@ export default class Ui {
      * compose iconWrapper
      */
     const iconWrapper = document.createElement('div');
-		const icon = this.createSvg(AppConfigService.AppImageURLs.icons.common.xCircle);
-		iconWrapper.style.position = 'absolute';
-		iconWrapper.style.right = pxToRem(0);
-		iconWrapper.style.top = pxToRem(0);
-		iconWrapper.style.cursor = 'pointer';
-		iconWrapper.addEventListener('click', () => {
-			this.api.blocks.delete(this.api.blocks.getCurrentBlockIndex());
-		});
-		iconWrapper.appendChild(icon);
+    const icon = this.createSvg();
+
+    iconWrapper.style.position = 'absolute';
+    iconWrapper.style.right = this.pxToRem(0);
+    iconWrapper.style.top = this.pxToRem(0);
+    iconWrapper.style.cursor = 'pointer';
+    iconWrapper.addEventListener('click', () => {
+      this.api.blocks.delete(this.api.blocks.getCurrentBlockIndex());
+    });
+    iconWrapper.appendChild(icon);
     this.nodes.imageDeleteIcon = iconWrapper;
-		this.nodes.imageDeleteIcon.style.display = 'none';
+    this.nodes.imageDeleteIcon.style.display = 'none';
 
     /**
      * Compose tag with defined attributes
@@ -238,18 +254,24 @@ export default class Ui {
      * @type {Element}
      */
     this.nodes.imageEl = make(tag, [this.CSS.imageEl, 'tw-w-24', 'tw-h-24'], attributes);
+    this.nodes.imageEl.style.width = this.pxToRem(96);
+    this.nodes.imageEl.style.height = this.pxToRem(96);
 
     /**
      * add imageWrapper hover event listener
      */
     this.nodes.imageWrapper.addEventListener('mouseover', () => {
-			if (!this.nodes.imageDeleteIcon) return;
-			this.nodes.imageDeleteIcon.style.display = 'block';
-		});
-		this.nodes.imageWrapper.addEventListener('mouseout', () => {
-			if (!this.nodes.imageDeleteIcon) return;
-			this.nodes.imageDeleteIcon.style.display = 'none';
-		});
+      if (!this.nodes.imageDeleteIcon) {
+        return;
+      }
+      this.nodes.imageDeleteIcon.style.display = 'block';
+    });
+    this.nodes.imageWrapper.addEventListener('mouseout', () => {
+      if (!this.nodes.imageDeleteIcon) {
+        return;
+      }
+      this.nodes.imageDeleteIcon.style.display = 'none';
+    });
 
     /**
      * Add load event listener
