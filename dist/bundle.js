@@ -1,7 +1,7 @@
 /*!
  * Image tool
  * 
- * @version 2.8.13
+ * @version 2.8.1
  * 
  * @package https://github.com/editor-js/image
  * @licence MIT
