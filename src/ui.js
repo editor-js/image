@@ -223,10 +223,10 @@ export default class Ui {
     /**
      * add iconWrapper hover event listener
      */
-    iconWrapper.addEventListener('mouseenter', () => {
+    iconWrapper.addEventListener('pointerenter', () => {
       iconWrapper.innerHTML = IconCloseHover;
     });
-    iconWrapper.addEventListener('mouseleave', () => {
+    iconWrapper.addEventListener('pointerleave', () => {
       iconWrapper.innerHTML = IconClose;
     });
     this.nodes.imageDeleteIcon = iconWrapper;
