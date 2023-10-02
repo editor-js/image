@@ -1,6 +1,7 @@
 import { IconPicture } from '@codexteam/icons';
 import { make } from './utils/dom';
 import IconClose from './assets/x-circle.svg';
+import IconCloseHover from './assets/x-circle-hover.svg';
 
 /**
  * Class for working with UI:
@@ -218,6 +219,14 @@ export default class Ui {
     iconWrapper.style.cursor = 'pointer';
     iconWrapper.addEventListener('click', () => {
       this.api.blocks.delete(this.api.blocks.getCurrentBlockIndex());
+    });
+    iconWrapper.addEventListener('mouseover', (event) => {
+      event.stopPropagation();
+      iconWrapper.innerHTML = IconCloseHover;
+    });
+    iconWrapper.addEventListener('mouseout', (event) => {
+      event.stopPropagation();
+      iconWrapper.innerHTML = IconClose;
     });
     this.nodes.imageDeleteIcon = iconWrapper;
     this.nodes.imageDeleteIcon.style.display = 'none';
