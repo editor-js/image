@@ -252,7 +252,7 @@ export default class Ui {
         return;
       }
       this.nodes.imageDeleteIcon.style.display = 'block';
-    }, true);
+    });
     this.nodes.imageWrapper.addEventListener('mouseout', (event) => {
       event.preventDefault();
       event.stopPropagation();
@@ -260,7 +260,7 @@ export default class Ui {
         return;
       }
       this.nodes.imageDeleteIcon.style.display = 'none';
-    }, true);
+    });
 
     /**
      * Add load event listener
