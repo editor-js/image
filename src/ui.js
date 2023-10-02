@@ -249,13 +249,13 @@ export default class Ui {
         return;
       }
       this.nodes.imageDeleteIcon.style.display = 'block';
-    });
+    }, true);
     this.nodes.imageWrapper.addEventListener('mouseout', () => {
       if (!this.nodes.imageDeleteIcon) {
         return;
       }
       this.nodes.imageDeleteIcon.style.display = 'none';
-    });
+    }, true);
 
     /**
      * Add load event listener
