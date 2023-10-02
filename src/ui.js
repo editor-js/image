@@ -221,10 +221,12 @@ export default class Ui {
       this.api.blocks.delete(this.api.blocks.getCurrentBlockIndex());
     });
     iconWrapper.addEventListener('mouseover', (event) => {
+      event.preventDefault();
       event.stopPropagation();
       iconWrapper.innerHTML = IconCloseHover;
     });
     iconWrapper.addEventListener('mouseout', (event) => {
+      event.preventDefault();
       event.stopPropagation();
       iconWrapper.innerHTML = IconClose;
     });
@@ -243,13 +245,17 @@ export default class Ui {
     /**
      * add imageWrapper hover event listener
      */
-    this.nodes.imageWrapper.addEventListener('mouseover', () => {
+    this.nodes.imageWrapper.addEventListener('mouseover', (event) => {
+      event.preventDefault();
+      event.stopPropagation();
       if (!this.nodes.imageDeleteIcon) {
         return;
       }
       this.nodes.imageDeleteIcon.style.display = 'block';
     }, true);
-    this.nodes.imageWrapper.addEventListener('mouseout', () => {
+    this.nodes.imageWrapper.addEventListener('mouseout', (event) => {
+      event.preventDefault();
+      event.stopPropagation();
       if (!this.nodes.imageDeleteIcon) {
         return;
       }
