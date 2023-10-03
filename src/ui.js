@@ -1,7 +1,6 @@
 import { IconPicture } from '@codexteam/icons';
 import { make } from './utils/dom';
 import IconClose from './assets/x-circle.svg';
-import IconCloseHover from './assets/x-circle-hover.svg';
 
 /**
  * Class for working with UI:
@@ -210,7 +209,6 @@ export default class Ui {
      */
     const iconWrapper = document.createElement('div');
 
-    iconWrapper.innerHTML = IconClose;
     iconWrapper.style.strokeWidth = '0px';
 
     iconWrapper.style.position = 'absolute';
@@ -220,16 +218,20 @@ export default class Ui {
     iconWrapper.addEventListener('click', () => {
       this.api.blocks.delete(this.api.blocks.getCurrentBlockIndex());
     });
-    iconWrapper.addEventListener('mouseover', (event) => {
-      event.preventDefault();
-      event.stopPropagation();
-      iconWrapper.innerHTML = IconCloseHover;
+    iconWrapper.addEventListener('mouseover', () => {
+      const svgWrapper = iconWrapper.firstChild;
+
+      svgWrapper.style.fill = '#585A68';
     });
-    iconWrapper.addEventListener('mouseout', (event) => {
-      event.preventDefault();
-      event.stopPropagation();
-      iconWrapper.innerHTML = IconClose;
+    iconWrapper.addEventListener('mouseout', () => {
+      const svgWrapper = iconWrapper.firstChild;
+
+      svgWrapper.style.fill = '#7E8194';
     });
+    iconWrapper.innerHTML = IconClose;
+    const svgWrapper = iconWrapper.firstChild;
+
+    svgWrapper.style.fill = '#7E8194';
     this.nodes.imageDeleteIcon = iconWrapper;
     this.nodes.imageDeleteIcon.style.display = 'none';
 
@@ -247,7 +249,6 @@ export default class Ui {
      */
     this.nodes.imageWrapper.addEventListener('mouseover', (event) => {
       event.preventDefault();
-      event.stopPropagation();
       if (!this.nodes.imageDeleteIcon) {
         return;
       }
@@ -255,7 +256,6 @@ export default class Ui {
     });
     this.nodes.imageWrapper.addEventListener('mouseout', (event) => {
       event.preventDefault();
-      event.stopPropagation();
       if (!this.nodes.imageDeleteIcon) {
         return;
       }
