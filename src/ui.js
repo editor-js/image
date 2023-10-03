@@ -1,5 +1,6 @@
 import { IconPicture } from '@codexteam/icons';
 import { make } from './utils/dom';
+import IconClose from './assets/x-circle.svg';
 
 /**
  * Class for working with UI:
@@ -24,7 +25,9 @@ export default class Ui {
       wrapper: make('div', [this.CSS.baseClass, this.CSS.wrapper]),
       imageContainer: make('div', [ this.CSS.imageContainer ]),
       fileButton: this.createFileButton(),
+      imageWrapper: make('div', [this.CSS.imageWrapper, 'tw-relative', 'tw-w-24', 'tw-h-24']),
       imageEl: undefined,
+      imageDeleteIcon: undefined,
       imagePreloader: make('div', this.CSS.imagePreloader),
       caption: make('div', [this.CSS.input, this.CSS.caption], {
         contentEditable: !this.readOnly,
@@ -43,6 +46,7 @@ export default class Ui {
      */
     this.nodes.caption.dataset.placeholder = this.config.captionPlaceholder;
     this.nodes.imageContainer.appendChild(this.nodes.imagePreloader);
+    this.nodes.imageContainer.appendChild(this.nodes.imageWrapper);
     this.nodes.wrapper.appendChild(this.nodes.imageContainer);
     this.nodes.wrapper.appendChild(this.nodes.caption);
     this.nodes.wrapper.appendChild(this.nodes.fileButton);
@@ -66,6 +70,7 @@ export default class Ui {
       wrapper: 'image-tool',
       imageContainer: 'image-tool__image',
       imagePreloader: 'image-tool__image-preloader',
+      imageWrapper: 'image-tool__image-wrapper',
       imageEl: 'image-tool__image-picture',
       caption: 'image-tool__caption',
     };
@@ -102,6 +107,16 @@ export default class Ui {
 
     return this.nodes.wrapper;
   }
+
+  /**
+   * convert pixels to rem
+   *
+   * @param {number} size - size of px
+   * @returns {string}
+   */
+  pxToRem(size) {
+    return `${(size / 16) * 1}rem`;
+  };
 
   /**
    * Creates upload-file button
@@ -190,11 +205,62 @@ export default class Ui {
     }
 
     /**
+     * compose iconWrapper
+     */
+    const iconWrapper = document.createElement('div');
+
+    iconWrapper.style.strokeWidth = '0px';
+
+    iconWrapper.style.position = 'absolute';
+    iconWrapper.style.right = this.pxToRem(0);
+    iconWrapper.style.top = this.pxToRem(0);
+    iconWrapper.style.cursor = 'pointer';
+    iconWrapper.addEventListener('click', () => {
+      this.api.blocks.delete(this.api.blocks.getCurrentBlockIndex());
+    });
+    iconWrapper.addEventListener('mouseover', () => {
+      const svgWrapper = iconWrapper.firstChild;
+
+      svgWrapper.style.fill = '#585A68';
+    });
+    iconWrapper.addEventListener('mouseout', () => {
+      const svgWrapper = iconWrapper.firstChild;
+
+      svgWrapper.style.fill = '#7E8194';
+    });
+    iconWrapper.innerHTML = IconClose;
+    const svgWrapper = iconWrapper.firstChild;
+
+    svgWrapper.style.fill = '#7E8194';
+    this.nodes.imageDeleteIcon = iconWrapper;
+    this.nodes.imageDeleteIcon.style.display = 'none';
+
+    /**
      * Compose tag with defined attributes
      *
      * @type {Element}
      */
-    this.nodes.imageEl = make(tag, this.CSS.imageEl, attributes);
+    this.nodes.imageEl = make(tag, [this.CSS.imageEl, 'tw-w-24', 'tw-h-24'], attributes);
+    this.nodes.imageEl.style.width = this.pxToRem(96);
+    this.nodes.imageEl.style.height = this.pxToRem(96);
+
+    /**
+     * add imageWrapper hover event listener
+     */
+    this.nodes.imageWrapper.addEventListener('mouseover', (event) => {
+      event.preventDefault();
+      if (!this.nodes.imageDeleteIcon) {
+        return;
+      }
+      this.nodes.imageDeleteIcon.style.display = 'block';
+    });
+    this.nodes.imageWrapper.addEventListener('mouseout', (event) => {
+      event.preventDefault();
+      if (!this.nodes.imageDeleteIcon) {
+        return;
+      }
+      this.nodes.imageDeleteIcon.style.display = 'none';
+    });
 
     /**
      * Add load event listener
@@ -210,7 +276,8 @@ export default class Ui {
       }
     });
 
-    this.nodes.imageContainer.appendChild(this.nodes.imageEl);
+    this.nodes.imageWrapper.appendChild(this.nodes.imageDeleteIcon);
+    this.nodes.imageWrapper.appendChild(this.nodes.imageEl);
   }
 
   /**
@@ -250,4 +317,3 @@ export default class Ui {
     this.nodes.wrapper.classList.toggle(`${this.CSS.wrapper}--${tuneName}`, status);
   }
 }
-
