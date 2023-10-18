@@ -450,13 +450,7 @@ export default class ImageTool {
        * Wait until the API is ready
        */
       Promise.resolve().then(() => {
-        if (this.block && this.block.id) {
-          this.block.stretched = value;
-        } else {
-          const blockId = this.api.blocks.getCurrentBlockIndex();
-
-          this.api.blocks.stretchBlock(blockId, value);
-        }
+        this.block.stretched = value;
       })
         .catch(err => {
           console.error(err);
