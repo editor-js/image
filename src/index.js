@@ -132,10 +132,12 @@ export default class ImageTool {
    * @param {ImageConfig} tool.config - user config for Tool
    * @param {object} tool.api - Editor.js API
    * @param {boolean} tool.readOnly - read-only mode flag
+   * @param {BlockAPI|{}} tool.block - current Block API
    */
-  constructor({ data, config, api, readOnly }) {
+  constructor({ data, config, api, readOnly, block }) {
     this.api = api;
     this.readOnly = readOnly;
+    this.block = block;
 
     /**
      * Tool's initial config
@@ -448,9 +450,7 @@ export default class ImageTool {
        * Wait until the API is ready
        */
       Promise.resolve().then(() => {
-        const blockId = this.api.blocks.getCurrentBlockIndex();
-
-        this.api.blocks.stretchBlock(blockId, value);
+        this.block.stretched = value;
       })
         .catch(err => {
           console.error(err);
