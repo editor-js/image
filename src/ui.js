@@ -25,7 +25,10 @@ export default class Ui {
       imageContainer: make('div', [ this.CSS.imageContainer ]),
       fileButton: this.createFileButton(),
       imageEl: undefined,
-      imagePreloader: make('div', this.CSS.imagePreloader)
+      imagePreloader: make('div', this.CSS.imagePreloader),
+      caption: make('div', [this.CSS.input, this.CSS.caption], {
+        contentEditable: !this.readOnly,
+      }),
     };
 
     /**
@@ -34,11 +37,14 @@ export default class Ui {
      *    <image-container>
      *      <image-preloader />
      *    </image-container>
+     *    <caption />
      *    <select-file-button />
      *  </wrapper>
      */
+    this.nodes.caption.dataset.placeholder = this.config.captionPlaceholder;
     this.nodes.imageContainer.appendChild(this.nodes.imagePreloader);
     this.nodes.wrapper.appendChild(this.nodes.imageContainer);
+    this.nodes.wrapper.appendChild(this.nodes.caption);
     this.nodes.wrapper.appendChild(this.nodes.fileButton);
   }
 
@@ -60,7 +66,8 @@ export default class Ui {
       wrapper: 'image-tool',
       imageContainer: 'image-tool__image',
       imagePreloader: 'image-tool__image-preloader',
-      imageEl: 'image-tool__image-picture'
+      imageEl: 'image-tool__image-picture',
+      caption: 'image-tool__caption',
     };
   };
 
@@ -204,6 +211,18 @@ export default class Ui {
     });
 
     this.nodes.imageContainer.appendChild(this.nodes.imageEl);
+  }
+
+  /**
+   * Shows caption input
+   *
+   * @param {string} text - caption text
+   * @returns {void}
+   */
+  fillCaption(text) {
+    if (this.nodes.caption) {
+      this.nodes.caption.innerHTML = text;
+    }
   }
 
   /**
