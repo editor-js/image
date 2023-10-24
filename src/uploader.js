@@ -44,7 +44,6 @@ export default class Uploader {
     
     // custom file select
     if (this.config.selectFiles && typeof this.config.selectFiles === 'function') {
-      console.log('selectFiles');
       upload = this.config.selectFiles()
         .then((files) => {
           if (!files || !files[0]) {
@@ -58,10 +57,8 @@ export default class Uploader {
             file: files[0],
           };
         });
-
       // custom uploading
     } else if (this.config.uploader && typeof this.config.uploader.uploadByFile === 'function') {
-      console.log('uploadByFile');
       upload = ajax.selectFiles({ accept: this.config.types }).then((files) => {
         preparePreview(files[0]);
 
@@ -76,7 +73,6 @@ export default class Uploader {
 
     // default uploading
     } else {
-      console.log('uploadSelectedFile - default uploading');
       upload = ajax.transport({
         url: this.config.endpoints.byFile,
         data: this.config.additionalRequestData,
@@ -109,14 +105,12 @@ export default class Uploader {
      * Custom uploading
      */
     if (this.config.uploader && typeof this.config.uploader.uploadByUrl === 'function') {
-      console.log('uploadByUrl');
       upload = this.config.uploader.uploadByUrl(url);
 
       if (!isPromise(upload)) {
         console.warn('Custom uploader method uploadByUrl should return a Promise');
       }
     } else {
-      console.log('uploadByUrl- default uploading');
       /**
        * Default uploading
        */

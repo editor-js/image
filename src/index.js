@@ -33,7 +33,6 @@
 /**
  * @typedef {object} ImageToolData
  * @description Image Tool's input and output data format
- * @property {string} caption — image caption
  * @property {boolean} withBorder - should image be rendered with border
  * @property {boolean} withBackground - should image be rendered with background
  * @property {boolean} stretched - should image be stretched to full width of container
@@ -56,7 +55,6 @@ import { IconAddBorder, IconStretch, IconAddBackground, IconPicture } from '@cod
  * @property {string} endpoints.byUrl - upload by URL
  * @property {string} field - field name for uploaded image
  * @property {string} types - available mime-types
- * @property {string} captionPlaceholder - placeholder for Caption field
  * @property {object} additionalRequestData - any data to send with requests
  * @property {object} additionalRequestHeaders - allows to pass custom headers with Request
  * @property {string} buttonContent - overrides for Select File button
@@ -147,7 +145,6 @@ export default class ImageTool {
       additionalRequestHeaders: config.additionalRequestHeaders || {},
       field: config.field || 'image',
       types: config.types || 'image/*',
-      captionPlaceholder: this.api.i18n.t(config.captionPlaceholder || 'Caption'),
       buttonContent: config.buttonContent || '',
       uploader: config.uploader || undefined,
       actions: config.actions || [],
@@ -216,10 +213,6 @@ export default class ImageTool {
    * @returns {ImageToolData}
    */
   save() {
-    const caption = this.ui.nodes.caption;
-
-    this._data.caption = caption.innerHTML;
-
     return this.data;
   }
 
@@ -350,9 +343,6 @@ export default class ImageTool {
    */
   set data(data) {
     this.image = data.file;
-
-    this._data.caption = data.caption || '';
-    this.ui.fillCaption(this._data.caption);
 
     ImageTool.tunes.forEach(({ name: tune }) => {
       const value = typeof data[tune] !== 'undefined' ? data[tune] === true || data[tune] === 'true' : false;
