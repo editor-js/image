@@ -8,7 +8,7 @@
  * To developers.
  * To simplify Tool structure, we split it to 4 parts:
  *  1) index.js — main Tool's interface, public API and methods for working with data
- *  2) uploader.js — module that has methods for sending files via AJAX: from device, by URL or File pasting
+ *  2) uploader.js — module that has methods for sending files via AJAX: from media gallery component
  *  3) ui.js — module for UI manipulations: render, showing preloader, etc
  *  4) tunes.js — working with Block Tunes: render buttons, handle clicks
  *
@@ -22,10 +22,7 @@
  * image: {
  *   class: ImageTool,
  *   config: {
- *     endpoints: {
- *       byFile: 'http://localhost:8008/uploadFile',
- *       byUrl: 'http://localhost:8008/fetchUrl',
- *     }
+ *     selectFiles: () => { }
  *   },
  * },
  */
@@ -61,9 +58,7 @@ import { IconAddBorder, IconStretch, IconAddBackground, IconPicture } from '@cod
  * @property {object} additionalRequestHeaders - allows to pass custom headers with Request
  * @property {string} buttonContent - overrides for Select File button
  * @property {object} [uploader] - optional custom uploader
- * @property {function(File): Promise.<UploadResponseFormat>} [uploader.uploadByFile] - method that upload image by File
- * @property {function(string): Promise.<UploadResponseFormat>} [uploader.uploadByUrl] - method that upload image by URL
- * @property {function(): Promise.<UploadResponseFormat>} selectFiles - method that selects images from a custom file manager
+ * @property {function(): Promise.<UploadResponseFormat>} selectFiles - method that selects images from a custom file manager/ image gallery
  */
 
 /**
@@ -264,79 +259,6 @@ export default class ImageTool {
   }
 
   /**
-   * Specify paste substitutes
-   *
-   * @see {@link https://github.com/codex-team/editor.js/blob/master/docs/tools.md#paste-handling}
-   * @returns {{tags: string[], patterns: object<string, RegExp>, files: {extensions: string[], mimeTypes: string[]}}}
-   */
-  static get pasteConfig() {
-    return {
-      /**
-       * Paste HTML into Editor
-       */
-      tags: [
-        {
-          img: { src: true },
-        },
-      ],
-      /**
-       * Paste URL of image into the Editor
-       */
-      patterns: {
-        image: /https?:\/\/\S+\.(gif|jpe?g|tiff|png|svg|webp)(\?[a-z0-9=]*)?$/i,
-      },
-
-      /**
-       * Drag n drop file from into the Editor
-       */
-      files: {
-        mimeTypes: [ 'image/*' ],
-      },
-    };
-  }
-
-  /**
-   * Specify paste handlers
-   *
-   * @public
-   * @see {@link https://github.com/codex-team/editor.js/blob/master/docs/tools.md#paste-handling}
-   * @param {CustomEvent} event - editor.js custom paste event
-   *                              {@link https://github.com/codex-team/editor.js/blob/master/types/tools/paste-events.d.ts}
-   * @returns {void}
-   */
-  async onPaste(event) {
-    switch (event.type) {
-      case 'tag': {
-        const image = event.detail.data;
-
-        /** Images from PDF */
-        if (/^blob:/.test(image.src)) {
-          const response = await fetch(image.src);
-          const file = await response.blob();
-
-          this.uploadFile(file);
-          break;
-        }
-
-        this.uploadUrl(image.src);
-        break;
-      }
-      case 'pattern': {
-        const url = event.detail.data;
-
-        this.uploadUrl(url);
-        break;
-      }
-      case 'file': {
-        const file = event.detail.file;
-
-        this.uploadFile(file);
-        break;
-      }
-    }
-  }
-
-  /**
    * Private methods
    * ̿̿ ̿̿ ̿̿ ̿'̿'\̵͇̿̿\з= ( ▀ ͜͞ʖ▀) =ε/̵͇̿̿/’̿’̿ ̿ ̿̿ ̿̿ ̿̿
    */
@@ -458,30 +380,5 @@ export default class ImageTool {
           console.error(err);
         });
     }
-  }
-
-  /**
-   * Show preloader and upload image file
-   *
-   * @param {File} file - file that is currently uploading (from paste)
-   * @returns {void}
-   */
-  uploadFile(file) {
-    this.uploader.uploadByFile(file, {
-      onPreview: (src) => {
-        this.ui.showPreloader(src);
-      },
-    });
-  }
-
-  /**
-   * Show preloader and upload image by target url
-   *
-   * @param {string} url - url pasted
-   * @returns {void}
-   */
-  uploadUrl(url) {
-    this.ui.showPreloader(url);
-    this.uploader.uploadByUrl(url);
   }
 }
