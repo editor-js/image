@@ -1,87 +1,23 @@
-/**
- * Webpack configuration
- *
- * @author Codex Team
- * @copyright Khaydarov Murod
- */
-'use strict';
+import path from "path";
+import cssInjectedByJsPlugin from "vite-plugin-css-injected-by-js";
+import * as pkg from "./package.json";
 
-module.exports = (env, argv) => {
-  const path = require('path');
-  const pkg = require('./package.json');
+const NODE_ENV = process.argv.mode || "development";
+const VERSION = pkg.version;
 
-  /**
-   * Environment
-   *
-   * @type {any}
-   */
-  const NODE_ENV = argv.mode || 'development';
-  const VERSION = process.env.VERSION || pkg.version;
-
-  /**
-   * Plugins for bundle
-   *
-   * @type {webpack}
-   */
-  const webpack = require('webpack');
-
-  return {
-    entry: ['./src/index.js'],
-    module: {
-      rules: [
-        {
-          test: /\.js$/,
-          exclude: /node_modules/,
-          use: [
-            {
-              loader: 'babel-loader',
-              query: {
-                presets: ['@babel/preset-env'],
-              },
-            },
-            'eslint-loader',
-          ],
-        },
-        {
-          test: /\.css$/,
-          use: [
-            'style-loader',
-            'css-loader',
-            {
-              loader: 'postcss-loader',
-              options: {
-                plugins: [
-                  require('postcss-nested-ancestors'),
-                  require('postcss-nested'),
-                ],
-              },
-            },
-          ],
-        },
-        {
-          test: /\.svg$/,
-          loader: 'svg-inline-loader?removeSVGTagAttrs=false',
-        },
-      ],
+export default {
+  build: {
+    copyPublicDir: false,
+    lib: {
+      entry: path.resolve(__dirname, "src", "index.js"),
+      name: "Image",
+      fileName: "image",
     },
-    plugins: [
-      /** Pass variables into modules */
-      new webpack.DefinePlugin({
-        NODE_ENV: JSON.stringify(NODE_ENV),
-        VERSION: JSON.stringify(VERSION),
-      }),
+  },
+  define: {
+    NODE_ENV: JSON.stringify(NODE_ENV),
+    VERSION: JSON.stringify(VERSION),
+  },
 
-      new webpack.BannerPlugin({
-        banner: `Image tool\n\n@version ${VERSION}\n\n@package https://github.com/editor-js/image\n@licence MIT\n@author CodeX <https://codex.so>`,
-      }),
-    ],
-    output: {
-      path: path.join(__dirname, '/dist'),
-      publicPath: '/',
-      filename: 'bundle.js',
-      library: 'ImageTool',
-      libraryTarget: 'umd',
-      libraryExport: 'default',
-    },
-  };
+  plugins: [cssInjectedByJsPlugin()],
 };

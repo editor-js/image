@@ -3,7 +3,6 @@
   "version": "2.8.2",
   "keywords": [
     "codex editor",
-    "tool",
     "image",
     "editor.js",
     "editorjs"
@@ -11,10 +10,20 @@
   "description": "Image Tool for Editor.js",
   "license": "MIT",
   "repository": "https://github.com/editor-js/image",
-  "main": "./dist/bundle.js",
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/image.umd.js",
+  "module": "./dist/image.mjs",
+  "exports": {
+    ".": {
+      "import": "./dist/image.mjs",
+      "require": "./dist/image.umd.js"
+    }
+  },
   "scripts": {
-    "build": "webpack --mode production",
-    "build:dev": "webpack --mode development --watch",
+    "dev": "vite",
+    "build": "vite build",
     "lint": "eslint src/ --ext .js",
     "lint:errors": "eslint src/ --ext .js --quiet",
     "lint:fix": "eslint src/ --ext .js --fix"
