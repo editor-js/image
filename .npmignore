@@ -3,5 +3,5 @@ dev/
 src/
 .babelrc
 .eslintrc
-webpack.config.js
+vite.config.js
 yarn.lock
