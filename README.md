@@ -36,13 +36,8 @@ Include module at your application
 import ImageTool from '@editorjs/image';
 ```
 
-#### Loading from CDN
+Optionally, you can load this tool from CDN [JsDelivr CDN](https://cdn.jsdelivr.net/npm/@editorjs/image@latest)
 
-You can load a specific version of package from [jsDelivr CDN](https://www.jsdelivr.com/package/npm/@editorjs/image).
-
-`https://cdn.jsdelivr.net/npm/@editorjs/image@latest`
-
-Then require this script on page with Editor.js through the `<script src=""></script>` tag.
 
 ## Usage
 
