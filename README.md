@@ -24,8 +24,6 @@ This Tool is also capable of uploading & displaying video files using the `<vide
 
 ## Installation
 
-### Install via NPM
-
 Get the package
 
 ```shell
