@@ -38,7 +38,6 @@ import ImageTool from '@editorjs/image';
 
 Optionally, you can load this tool from CDN [JsDelivr CDN](https://cdn.jsdelivr.net/npm/@editorjs/image@latest)
 
-
 ## Usage
 
 Add a new Tool to the `tools` property of the Editor.js initial config.
