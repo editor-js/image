@@ -36,7 +36,7 @@ Include module at your application
 import ImageTool from '@editorjs/image';
 ```
 
-Optionally, you can load this tool from CDN [JsDelivr CDN](https://cdn.jsdelivr.net/npm/@editorjs/image@latest)
+Optionally, you can load this tool from [JsDelivr CDN](https://cdn.jsdelivr.net/npm/@editorjs/image@latest)
 
 ## Usage
 
