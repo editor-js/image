@@ -1,4 +1,3 @@
-import { IconPicture } from '@codexteam/icons';
 import { make } from './utils/dom';
 
 /**
@@ -111,7 +110,7 @@ export default class Ui {
   createFileButton() {
     const button = make('div', [ this.CSS.button ]);
 
-    button.innerHTML = this.config.buttonContent || `${IconPicture} ${this.api.i18n.t('Select an Image')}`;
+    button.innerHTML = this.config.buttonContent || `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path fill="#5C6B7A" fill-rule="nonzero" d="M20 17.778V2.222A2.222 2.222 0 0 0 17.778 0H2.222A2.222 2.222 0 0 0 0 2.222v15.556C0 19.006.994 20 2.222 20h15.556A2.222 2.222 0 0 0 20 17.778ZM6.111 11.667l2.778 3.339L12.778 10l5 6.667H2.222l3.89-5Z"/></svg> ${this.api.i18n.t('Click to select an image...')}`;
 
     button.addEventListener('click', () => {
       this.onSelectFile();
@@ -250,4 +249,3 @@ export default class Ui {
     this.nodes.wrapper.classList.toggle(`${this.CSS.wrapper}--${tuneName}`, status);
   }
 }
-

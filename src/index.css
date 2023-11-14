@@ -1,14 +1,15 @@
 .image-tool {
-  --bg-color: #cdd1e0;
+  --bg-color: #ebf0f5;
   --front-color: #388ae5;
-  --border-color: #e8e8eb;
+  --border-color: #d3dce6;
 
   &__image {
     border-radius: 3px;
     overflow: hidden;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
 
     &-picture {
+      width: 100%;
       max-width: 100%;
       vertical-align: bottom;
       display: block;
@@ -44,12 +45,21 @@
   }
 
   &__caption {
+    font-size: 14px;
+    color: #2d3640;
+    height: 40px;
+    padding: 9px 10px;
+    box-shadow: none;
+    border-radius: 3px;
+    border: 1px solid #d3dde6;
+
     &[contentEditable="true"][data-placeholder]::before {
       position: absolute !important;
       content: attr(data-placeholder);
-      color: #707684;
+      color: #5c6b7a;
       font-weight: normal;
       display: none;
+      font-size: 14px;
     }
 
     &[contentEditable="true"][data-placeholder]:empty {
@@ -60,6 +70,10 @@
       &:focus::before {
         display: none;
       }
+    }
+
+    &:hover {
+      border-color: #0080ff;
     }
   }
 
@@ -80,13 +94,36 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    border: 1px dashed #d3dce6;
+    background-color: #f5f7fa;
+    border-radius: 6px;
+    padding: 38px;
+    color: #5c6b7a;
+    font-size: 14px;
 
     svg {
-      height: auto;
-      margin: 0 6px 0 0;
+      width: 20px;
+      height: 20px;
+      margin: 0 8px 0 0;
+
+      path {
+        stroke: none;
+      }
+    }
+
+    &:hover {
+      color: #0080ff;
+
+      svg {
+        fill: #0080ff;
+
+        path {
+          fill: #0080ff;
+        }
+      }
     }
   }
-  
+
   &--filled {
     .cdx-button {
       display: none;
@@ -122,18 +159,18 @@
    */
 
   &--withBorder {
-    ^&__image {
+    ^&__image-picture {
       border: 1px solid var(--border-color);
     }
   }
 
   &--withBackground {
     ^&__image {
-      padding: 15px;
+      padding: 24px;
       background: var(--bg-color);
 
       &-picture {
-        max-width: 60%;
+        max-width: 80%;
         margin: 0 auto;
       }
     }
@@ -141,12 +178,15 @@
 
   &--stretched {
     ^&__image {
-      &-picture {
-        width: 100%;
+      margin-left: -56px;
+      margin-right: -56px;
+
+      &-caption {
+        margin-left: 56px;
+        margin-right: 56px;
       }
     }
   }
-
 }
 
 @keyframes image-preloader-spin {

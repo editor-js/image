@@ -26,7 +26,8 @@ export default class Uploader {
   uploadSelectedFile({ onPreview }) {
     upload = this.config.selectFiles()
       .then(() => {
-        onPreview("");
+        onPreview('');
+
         return {
           success: 1,
           file: '',

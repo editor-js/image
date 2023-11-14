@@ -43,8 +43,6 @@ import './index.css';
 import Ui from './ui';
 import Uploader from './uploader';
 
-import { IconAddBorder, IconStretch, IconAddBackground, IconPicture } from '@codexteam/icons';
-
 /**
  * @typedef {object} ImageConfig
  * @description Config supported by Tool
@@ -89,8 +87,8 @@ export default class ImageTool {
    */
   static get toolbox() {
     return {
-      icon: IconPicture,
       title: 'Image',
+      icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 641 640"><path fill="#5C6B7A" fill-rule="nonzero" d="M76.438 511.569C85.043 519.7 95.075 524 106.555 524h426.911c11.46 0 21.512-4.3 30.117-12.431 8.115-8.6 12.417-18.626 12.417-30.1V157.531c0-11.474-4.302-21.5-12.417-30.1C554.978 119.3 544.925 115 533.466 115H106.555c-11.48 0-21.512 4.3-30.117 12.431-8.136 8.6-12.438 18.626-12.438 30.1v323.938c0 11.474 4.302 21.5 12.438 30.1ZM97.95 157.53c0-2.385.959-4.3 2.386-6.216 1.917-1.426 3.833-2.384 6.219-2.384h426.911c2.386 0 4.303.958 6.22 2.384 1.427 1.916 2.385 3.831 2.385 6.216v323.938c0 2.385-.958 4.3-2.385 6.216-1.917 1.426-3.834 2.384-6.22 2.384H106.555c-2.386 0-4.302-.958-6.22-2.384-1.426-1.916-2.385-3.831-2.385-6.216V157.531Zm409.702 298.14V336.21L396.73 225.37 260.48 362.03l-43.024-43.02-85.088 85.53v51.13h375.283ZM183.528 285.1c14.334 0 26.283-4.79 36.315-14.816 10.053-10.026 14.824-21.989 14.824-36.314 0-14.326-4.771-26.268-14.824-36.315-10.032-10.026-21.98-14.816-36.315-14.816-14.355 0-26.303 4.79-36.335 14.816-10.053 10.047-14.824 21.989-14.824 36.315 0 14.325 4.77 26.288 14.824 36.314 10.032 10.026 21.98 14.816 36.335 14.816Z"/></svg>`,
     };
   }
 
@@ -102,21 +100,21 @@ export default class ImageTool {
   static get tunes() {
     return [
       {
-        name: 'withBorder',
-        icon: IconAddBorder,
-        title: 'With border',
-        toggle: true,
-      },
-      {
         name: 'stretched',
-        icon: IconStretch,
+        icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 641 640"><path fill="#5C6B7A" fill-rule="nonzero" d="M1 160h640v320H1V160Zm120-80h400v20H121V80Zm0 460h400v20H121v-20Z"/></svg>`,
         title: 'Stretch image',
         toggle: true,
       },
       {
         name: 'withBackground',
-        icon: IconAddBackground,
+        icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 641 640"><path fill="#5C6B7A" fill-rule="nonzero" d="M181 200h280v240H181V200ZM81 120h480v20H81v-20Zm0 380h480v20H81v-20Z"/></svg>`,
         title: 'With background',
+        toggle: true,
+      },
+      {
+        name: 'withBorder',
+        icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 641 640"><rect width="512" height="409" x="64" y="115" fill="none" fill-rule="evenodd" stroke="#5C6B7A" stroke-linecap="round" stroke-width="34" rx="40"/></svg>`,
+        title: 'With border',
         toggle: true,
       },
     ];
