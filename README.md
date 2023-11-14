@@ -24,12 +24,10 @@ This Tool is also capable of uploading & displaying video files using the `<vide
 
 ## Installation
 
-### Install via NPM
-
 Get the package
 
 ```shell
-npm i --save-dev @editorjs/image
+yarn add @editorjs/image
 ```
 
 Include module at your application
@@ -38,20 +36,7 @@ Include module at your application
 import ImageTool from '@editorjs/image';
 ```
 
-### Other methods
-
-#### Manual downloading and connecting
-
-1. Upload folder `dist` from repository
-2. Add `dist/bundle.js` file to your page.
-
-#### Loading from CDN
-
-You can load a specific version of package from [jsDelivr CDN](https://www.jsdelivr.com/package/npm/@editorjs/image).
-
-`https://cdn.jsdelivr.net/npm/@editorjs/image@2.3.0`
-
-Then require this script on page with Editor.js through the `<script src=""></script>` tag.
+Optionally, you can load this tool from [JsDelivr CDN](https://cdn.jsdelivr.net/npm/@editorjs/image@latest)
 
 ## Usage
 
