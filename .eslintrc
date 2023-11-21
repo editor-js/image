@@ -5,6 +5,7 @@
   "globals": {
     "fetch": true,
     "ImageConfig": true,
-    "ImageToolData": true
+    "ImageToolData": true,
+    "quote-props": ["error", "consistent"]
   }
 }

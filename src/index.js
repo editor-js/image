@@ -75,6 +75,18 @@ import { IconAddBorder, IconStretch, IconAddBackground, IconPicture } from '@cod
  * @property {string} file.url - [Required] image source URL
  */
 export default class ImageTool {
+
+  /**
+   * Prevents image attributes from being removed during sanitization phase
+   *
+   */
+
+  static get 'sanitize'() {
+    return {
+      'img': true
+    };
+  }
+
   /**
    * Notify core that read-only mode is supported
    *
@@ -152,6 +164,7 @@ export default class ImageTool {
       buttonContent: config.buttonContent || '',
       uploader: config.uploader || undefined,
       actions: config.actions || [],
+      attributes: config.attributes || {}
     };
 
     /**
@@ -290,7 +303,7 @@ export default class ImageTool {
        * Drag n drop file from into the Editor
        */
       files: {
-        mimeTypes: [ 'image/*' ],
+        mimeTypes: ['image/*'],
       },
     };
   }
@@ -383,7 +396,7 @@ export default class ImageTool {
     this._data.file = file || {};
 
     if (file && file.url) {
-      this.ui.fillImage(file.url);
+      this.ui.fillImage(file);
     }
   }
 

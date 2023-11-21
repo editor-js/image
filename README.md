@@ -83,6 +83,7 @@ Image Tool supports these configuration parameters:
 | buttonContent | `string` | Allows to override HTML content of «Select file» button |
 | uploader | `{{uploadByFile: function, uploadByUrl: function}}` | Optional custom uploading methods. See details below. |
 | actions | `array` | Array with custom actions to show in the tool's settings menu. See details below. |
+| attributes | `object` | Object with attribute names to add to block html output such as lazy loading tag  |
 
 Note that if you don't implement your custom uploader methods, the `endpoints` param is required.
 
@@ -172,6 +173,12 @@ The response of your uploader **should**  cover the following format:
     "file": {
         "url" : "https://www.tesla.com/tesla_theme/assets/img/_vehicle_redesign/roadster_and_semi/roadster/hero.jpg",
         // ... and any additional fields you want to store, such as width, height, color, extension, etc
+        "attributes" : {
+          "srcset": "clock-demo-200px.png 200w, clock-demo-400px.png 400w",
+          "width" : "400",
+          "height" : "400",
+          // ... and any attributes you would like the image / video element tag to have such as adding width, height, etc
+        }
     }
 }
 ```
@@ -273,6 +280,12 @@ var editor = EditorJS({
               }
             })
           }
+        }
+         /**
+         * Ability to added custom attribute to block output such as lazy loading tag 
+         */
+        attributes: {
+          srcset: 'clock-demo-200px.png 200w, clock-demo-400px.png 400w'
         }
       }
     }
