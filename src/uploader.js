@@ -41,9 +41,25 @@ export default class Uploader {
      * or default uploading
      */
     let upload;
+    
+    // custom file select
+    if (this.config.selectFiles && typeof this.config.selectFiles === 'function') {
+      upload = this.config.selectFiles()
+        .then((files) => {
+          if (!files || !files[0]) {
+            return;
+          }
 
-    // custom uploading
-    if (this.config.uploader && typeof this.config.uploader.uploadByFile === 'function') {
+          onPreview(files[0].url);
+
+          return {
+            success: 1,
+            file: files[0],
+          };
+        });
+
+      // custom uploading
+    } else if (this.config.uploader && typeof this.config.uploader.uploadByFile === 'function') {
       upload = ajax.selectFiles({ accept: this.config.types }).then((files) => {
         preparePreview(files[0]);
 
