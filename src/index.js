@@ -54,6 +54,7 @@ import { IconAddBorder, IconStretch, IconAddBackground, IconPicture } from '@cod
  * @property {object} endpoints - upload endpoints
  * @property {string} endpoints.byFile - upload by file
  * @property {string} endpoints.byUrl - upload by URL
+ * @property {boolean} withCredentials - XMLHttpRequest's withCredentials option
  * @property {string} field - field name for uploaded image
  * @property {string} types - available mime-types
  * @property {string} captionPlaceholder - placeholder for Caption field

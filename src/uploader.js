@@ -63,6 +63,7 @@ export default class Uploader {
         data: this.config.additionalRequestData,
         accept: this.config.types,
         headers: this.config.additionalRequestHeaders,
+        withCredentials: this.config.withCredentials,
         beforeSend: (files) => {
           preparePreview(files[0]);
         },
