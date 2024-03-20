@@ -210,6 +210,10 @@ export default class Ui {
       }
     });
 
+    this.nodes.imageEl.addEventListener('click', () => {
+      this.openLightbox(this.nodes.imageEl.src);
+    });
+
     this.nodes.imageContainer.appendChild(this.nodes.imageEl);
   }
 
@@ -249,5 +253,22 @@ export default class Ui {
   applyTune(tuneName, status) {
     this.nodes.wrapper.classList.toggle(`${this.CSS.wrapper}--${tuneName}`, status);
   }
-}
 
+  /**
+   * Open lightbox with an image
+   * 
+   * @param {string} url - image source url
+   */
+  openLightbox(url) {
+    const lightbox = make('div', 'lightbox-panel');
+    const overflow = document.body.style.overflow;
+
+    lightbox.innerHTML = `<div class="lightbox-item"><img src="${url}" alt="image" /></div>`;
+    lightbox.addEventListener('click', () => {
+      document.body.style.overflow = overflow;
+      lightbox.remove();
+    });
+    document.body.style.overflow = 'hidden';
+    document.body.appendChild(lightbox);
+  }
+}
