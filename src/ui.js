@@ -208,10 +208,12 @@ export default class Ui {
       if (this.nodes.imagePreloader) {
         this.nodes.imagePreloader.style.backgroundImage = '';
       }
-    });
 
-    this.nodes.imageEl.addEventListener('click', () => {
-      this.openLightbox(this.nodes.imageEl.src);
+      if (tag === 'IMG') {
+        this.nodes.imageEl.addEventListener('click', () => {
+          this.openLightbox(this.nodes.imageEl.src);
+        });
+      }
     });
 
     this.nodes.imageContainer.appendChild(this.nodes.imageEl);
