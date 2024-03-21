@@ -262,14 +262,27 @@ export default class Ui {
    * @param {string} url - image source url
    */
   openLightbox(url) {
-    const lightbox = make('div', 'lightbox-panel');
     const overflow = document.body.style.overflow;
 
-    lightbox.innerHTML = `<div class="lightbox-item"><img src="${url}" alt="image" /></div>`;
-    lightbox.addEventListener('click', () => {
+    const lightbox = make('div', 'image-lightbox');
+    const imageContainer = make('div', 'image-lightbox__item');
+    const image = make('img', 'image-lightbox__image', { src: url });
+    const closeBtn = make('button', 'image-lightbox__close');
+
+    const closeLightbox = () => {
       document.body.style.overflow = overflow;
       lightbox.remove();
-    });
+    };
+
+    closeBtn.innerHTML = '<svg width="20" height="20" viewBox="0 0 20 20"><line fill="none" stroke="#000" stroke-width="1.4" x1="1" y1="1" x2="19" y2="19"></line><line fill="none" stroke="#000" stroke-width="1.4" x1="19" y1="1" x2="1" y2="19"></line></svg>';
+
+    imageContainer.appendChild(image);
+    lightbox.appendChild(imageContainer);
+    lightbox.appendChild(closeBtn);
+
+    closeBtn.addEventListener('click', closeLightbox);
+    image.addEventListener('click', closeLightbox);
+
     document.body.style.overflow = 'hidden';
     document.body.appendChild(lightbox);
   }

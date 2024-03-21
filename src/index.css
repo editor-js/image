@@ -159,7 +159,7 @@
   }
 }
 
-.lightbox-panel {
+.image-lightbox {
   z-index: 1000;
   display: block;
   position: fixed;
@@ -172,7 +172,7 @@
   transition: opacity .15s linear;
   touch-action: pinch-zoom;
 
-  .lightbox-item {
+  &__item {
     display: flex;
     position: absolute;
     top: 0;
@@ -190,5 +190,16 @@
       max-height: 100vh;
       cursor: pointer;
     }
+  }
+
+  &__close {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    cursor: pointer;
+    color: #fff;
+    font-size: 24px;
+    line-height: 1;
+    padding: 20px;
   }
 }
