@@ -7,12 +7,14 @@
     border-radius: 3px;
     overflow: hidden;
     margin-bottom: 10px;
-    cursor: pointer;
 
     &-picture {
       max-width: 100%;
-      vertical-align: bottom;
       display: block;
+    }
+
+    img {
+      cursor: zoom-in;
     }
 
     &-preloader {
