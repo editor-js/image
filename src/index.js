@@ -10,7 +10,6 @@
  *  1) index.js — main Tool's interface, public API and methods for working with data
  *  2) uploader.js — module that has methods for sending files via AJAX: from device, by URL or File pasting
  *  3) ui.js — module for UI manipulations: render, showing preloader, etc
- *  4) tunes.js — working with Block Tunes: render buttons, handle clicks
  *
  * For debug purposes there is a testing server
  * that can save uploaded files and return a Response {@link UploadResponseFormat}
