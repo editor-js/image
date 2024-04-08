@@ -152,7 +152,7 @@ export default class Ui {
     /**
      * Check for a source extension to compose element correctly: video tag for mp4, img — for others
      */
-    const tag = /\.mp4$/.test(url) ? 'VIDEO' : 'IMG';
+    const tag = /\.mp4$/i.test(url) ? 'VIDEO' : 'IMG';
 
     const attributes = {
       src: url,

@@ -290,7 +290,7 @@ export default class ImageTool {
        * Drag n drop file from into the Editor
        */
       files: {
-        mimeTypes: [ 'image/*', 'video/*' ],
+        mimeTypes: [ 'image/*', 'video/mp4' ],
       },
     };
   }
