@@ -399,7 +399,8 @@ export default class ImageTool {
     if (response.success && response.file) {
       this.image = response.file;
     } else {
-      this.uploadingFailed('incorrect response: ' + JSON.stringify(response));
+      const customErrorMessage = typeof response.message === 'string' ? response.message : undefined;
+      this.uploadingFailed('incorrect response: ' + JSON.stringify(response), customErrorMessage);
     }
   }
 
@@ -408,13 +409,14 @@ export default class ImageTool {
    *
    * @private
    * @param {string} errorText - uploading error text
+   * @param {string | undefined} customErrorText - displayed error text
    * @returns {void}
    */
-  uploadingFailed(errorText) {
+  uploadingFailed(errorText, customErrorText) {
     console.log('Image Tool: uploading failed because of', errorText);
 
     this.api.notifier.show({
-      message: this.api.i18n.t('Couldn’t upload image. Please try another.'),
+      message: customErrorText ?? this.api.i18n.t('Couldn’t upload image. Please try another.'),
       style: 'error',
     });
     this.ui.hidePreloader();
