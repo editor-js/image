@@ -152,7 +152,7 @@ export default class Ui {
     /**
      * Check for a source extension to compose element correctly: video tag for mp4, img — for others
      */
-    const tag = /\.mp4$/.test(url) ? 'VIDEO' : 'IMG';
+    const tag = /\.mp4$/i.test(url) ? 'VIDEO' : 'IMG';
 
     const attributes = {
       src: url,
@@ -208,6 +208,12 @@ export default class Ui {
       if (this.nodes.imagePreloader) {
         this.nodes.imagePreloader.style.backgroundImage = '';
       }
+
+      if (tag === 'IMG') {
+        this.nodes.imageEl.addEventListener('click', () => {
+          this.openLightbox(this.nodes.imageEl.src);
+        });
+      }
     });
 
     this.nodes.imageContainer.appendChild(this.nodes.imageEl);
@@ -249,5 +255,35 @@ export default class Ui {
   applyTune(tuneName, status) {
     this.nodes.wrapper.classList.toggle(`${this.CSS.wrapper}--${tuneName}`, status);
   }
-}
 
+  /**
+   * Open lightbox with an image
+   * 
+   * @param {string} url - image source url
+   */
+  openLightbox(url) {
+    const overflow = document.body.style.overflow;
+
+    const lightbox = make('div', 'image-lightbox');
+    const imageContainer = make('div', 'image-lightbox__item');
+    const image = make('img', 'image-lightbox__image', { src: url });
+    const closeBtn = make('button', 'image-lightbox__close');
+
+    const closeLightbox = () => {
+      document.body.style.overflow = overflow;
+      lightbox.remove();
+    };
+
+    closeBtn.innerHTML = '<svg width="20" height="20" viewBox="0 0 20 20"><line fill="none" stroke="#000" stroke-width="1.4" x1="1" y1="1" x2="19" y2="19"></line><line fill="none" stroke="#000" stroke-width="1.4" x1="19" y1="1" x2="1" y2="19"></line></svg>';
+
+    imageContainer.appendChild(image);
+    lightbox.appendChild(imageContainer);
+    lightbox.appendChild(closeBtn);
+
+    closeBtn.addEventListener('click', closeLightbox);
+    image.addEventListener('click', closeLightbox);
+
+    document.body.style.overflow = 'hidden';
+    document.body.appendChild(lightbox);
+  }
+}

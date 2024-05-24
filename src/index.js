@@ -106,15 +106,15 @@ export default class ImageTool {
   static get tunes() {
     return [
       {
-        name: 'withBorder',
-        icon: IconAddBorder,
-        title: 'With border',
-        toggle: true,
-      },
-      {
         name: 'stretched',
         icon: IconStretch,
         title: 'Stretch image',
+        toggle: true,
+      },
+      {
+        name: 'withBorder',
+        icon: IconAddBorder,
+        title: 'With border',
         toggle: true,
       },
       {
@@ -290,7 +290,7 @@ export default class ImageTool {
        * Drag n drop file from into the Editor
        */
       files: {
-        mimeTypes: [ 'image/*' ],
+        mimeTypes: [ 'image/*', 'video/mp4' ],
       },
     };
   }
