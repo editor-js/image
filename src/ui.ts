@@ -1,5 +1,43 @@
 import { IconPicture } from '@codexteam/icons';
 import { make } from './utils/dom';
+import { AttributesType, CSSType, StatusType, UploadResponseFormat } from './types/types';
+import { ImageConfig } from './index';
+import { API } from '@editorjs/editorjs';
+
+/**
+ * ImageToolData interface representing the input and output data format for the image tool.
+ */
+interface ImageToolData {
+  caption: string;
+  withBorder: boolean;
+  withBackground: boolean;
+  stretched: boolean;
+  file: {
+    url: string;
+  };
+}
+
+/**
+ * Nodes interface representing various elements in the UI.
+ */
+interface Nodes {
+  wrapper: HTMLElement;
+  imageContainer: HTMLElement;
+  fileButton: HTMLElement;
+  imageEl?: HTMLElement;
+  imagePreloader: HTMLElement;
+  caption: HTMLElement;
+}
+
+/**
+ * ConstructorParams interface representing parameters for the Ui class constructor.
+ */
+interface ConstructorParams {
+  api: API;
+  config: ImageConfig;
+  onSelectFile: Function;
+  readOnly: boolean
+}
 
 /**
  * Class for working with UI:
@@ -8,6 +46,11 @@ import { make } from './utils/dom';
  *  - apply tune view
  */
 export default class Ui {
+  private api: API;
+  private config: ImageConfig;
+  private onSelectFile: Function;
+  private readOnly: boolean;
+  public nodes: Nodes;
   /**
    * @param {object} ui - image tool Ui module
    * @param {object} ui.api - Editor.js API
@@ -15,7 +58,7 @@ export default class Ui {
    * @param {Function} ui.onSelectFile - callback for clicks on Select file button
    * @param {boolean} ui.readOnly - read-only mode flag
    */
-  constructor({ api, config, onSelectFile, readOnly }) {
+  constructor({ api, config, onSelectFile, readOnly }: ConstructorParams) {
     this.api = api;
     this.config = config;
     this.onSelectFile = onSelectFile;
@@ -53,7 +96,7 @@ export default class Ui {
    *
    * @returns {object}
    */
-  get CSS() {
+  get CSS(): CSSType {
     return {
       baseClass: this.api.styles.block,
       loading: this.api.styles.loader,
@@ -79,7 +122,7 @@ export default class Ui {
    *
    * @returns {{EMPTY: string, UPLOADING: string, FILLED: string}}
    */
-  static get status() {
+  static get status(): StatusType {
     return {
       EMPTY: 'empty',
       UPLOADING: 'loading',
@@ -93,7 +136,7 @@ export default class Ui {
    * @param {ImageToolData} toolData - saved tool data
    * @returns {Element}
    */
-  render(toolData) {
+  render(toolData: ImageToolData): HTMLElement  {
     if (!toolData.file || Object.keys(toolData.file).length === 0) {
       this.toggleStatus(Ui.status.EMPTY);
     } else {
@@ -108,7 +151,7 @@ export default class Ui {
    *
    * @returns {Element}
    */
-  createFileButton() {
+  createFileButton(): HTMLElement {
     const button = make('div', [ this.CSS.button ]);
 
     button.innerHTML = this.config.buttonContent || `${IconPicture} ${this.api.i18n.t('Select an Image')}`;
@@ -126,7 +169,7 @@ export default class Ui {
    * @param {string} src - preview source
    * @returns {void}
    */
-  showPreloader(src) {
+  showPreloader(src: string): void {
     this.nodes.imagePreloader.style.backgroundImage = `url(${src})`;
 
     this.toggleStatus(Ui.status.UPLOADING);
@@ -137,7 +180,7 @@ export default class Ui {
    *
    * @returns {void}
    */
-  hidePreloader() {
+  hidePreloader(): void {
     this.nodes.imagePreloader.style.backgroundImage = '';
     this.toggleStatus(Ui.status.EMPTY);
   }
@@ -148,13 +191,13 @@ export default class Ui {
    * @param {string} url - image source
    * @returns {void}
    */
-  fillImage(url) {
+  fillImage(url: string): void {
     /**
      * Check for a source extension to compose element correctly: video tag for mp4, img — for others
      */
     const tag = /\.mp4$/.test(url) ? 'VIDEO' : 'IMG';
 
-    const attributes = {
+    const attributes: AttributesType = {
       src: url,
     };
 
@@ -219,7 +262,7 @@ export default class Ui {
    * @param {string} text - caption text
    * @returns {void}
    */
-  fillCaption(text) {
+  fillCaption(text: string): void {
     if (this.nodes.caption) {
       this.nodes.caption.innerHTML = text;
     }
@@ -231,11 +274,10 @@ export default class Ui {
    * @param {string} status - see {@link Ui.status} constants
    * @returns {void}
    */
-  toggleStatus(status) {
+  toggleStatus(status: string): void {
     for (const statusType in Ui.status) {
       if (Object.prototype.hasOwnProperty.call(Ui.status, statusType)) {
-        this.nodes.wrapper.classList.toggle(`${this.CSS.wrapper}--${Ui.status[statusType]}`, status === Ui.status[statusType]);
-      }
+        this.nodes.wrapper.classList.toggle(`${this.CSS.wrapper}--${Ui.status[statusType as keyof StatusType]}`, status === Ui.status[statusType as keyof StatusType]);      }
     }
   }
 
@@ -246,7 +288,7 @@ export default class Ui {
    * @param {boolean} status - true for enable, false for disable
    * @returns {void}
    */
-  applyTune(tuneName, status) {
+  applyTune(tuneName: string, status: boolean): void {
     this.nodes.wrapper.classList.toggle(`${this.CSS.wrapper}--${tuneName}`, status);
   }
 }

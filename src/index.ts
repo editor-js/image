@@ -30,40 +30,69 @@
  * },
  */
 
-/**
- * @typedef {object} ImageToolData
- * @description Image Tool's input and output data format
- * @property {string} caption — image caption
- * @property {boolean} withBorder - should image be rendered with border
- * @property {boolean} withBackground - should image be rendered with background
- * @property {boolean} stretched - should image be stretched to full width of container
- * @property {object} file — Image file data returned from backend
- * @property {string} file.url — image URL
- */
 
+import { API } from '@editorjs/editorjs';
 import './index.css';
 
 import Ui from './ui';
 import Uploader from './uploader';
 
 import { IconAddBorder, IconStretch, IconAddBackground, IconPicture } from '@codexteam/icons';
+import { PasteConfigType, RenderSettingsType, TonesType, ToolsboxType } from './types/types';
 
 /**
- * @typedef {object} ImageConfig
- * @description Config supported by Tool
- * @property {object} endpoints - upload endpoints
- * @property {string} endpoints.byFile - upload by file
- * @property {string} endpoints.byUrl - upload by URL
- * @property {string} field - field name for uploaded image
- * @property {string} types - available mime-types
- * @property {string} captionPlaceholder - placeholder for Caption field
- * @property {object} additionalRequestData - any data to send with requests
- * @property {object} additionalRequestHeaders - allows to pass custom headers with Request
- * @property {string} buttonContent - overrides for Select File button
- * @property {object} [uploader] - optional custom uploader
- * @property {function(File): Promise.<UploadResponseFormat>} [uploader.uploadByFile] - method that upload image by File
- * @property {function(string): Promise.<UploadResponseFormat>} [uploader.uploadByUrl] - method that upload image by URL
+ *
+ * @description Image Tool's input and output data format
  */
+interface ImageToolData {
+  /* image caption */
+  caption: string;
+  /* should image be rendered with border */
+  withBorder: boolean;
+  /* should image be rendered with background */
+  withBackground: boolean;
+  /* should image be stretched to full width of container */
+  stretched: boolean;
+  /* Image file data returned from backend */
+  file: {
+    /* image URL */
+    url: string;
+  };
+}
+
+/**
+ *
+ * @description Config supported by Tool
+ */
+export interface ImageConfig {
+  /* upload endpoints*/
+  endpoints: {
+    /* upload by file */
+    byFile: string;
+    /** upload by URL */
+    byUrl: string;
+  };
+  /* field name for uploaded image */
+  field: string;
+  /* available mime-types */
+  types: string;
+  /* placeholder for Caption field */
+  captionPlaceholder: string;
+  /* any data to send with requests */
+  additionalRequestData: object;
+  /* allows to pass custom headers with Request */
+  additionalRequestHeaders: object;
+  /* overrides for Select File button */
+  buttonContent: string;
+  /* optional custom uploader */
+  uploader?: {
+    /* method that upload image by File */
+    uploadByFile?: (file: File) => Promise<UploadResponseFormat>;
+    /* method that upload image by URL */
+    uploadByUrl?: (url: string) => Promise<UploadResponseFormat>;
+  };
+  actions?: Array<any>;
+}
 
 /**
  * @typedef {object} UploadResponseFormat
@@ -74,57 +103,46 @@ import { IconAddBorder, IconStretch, IconAddBackground, IconPicture } from '@cod
  *                           also can contain any additional data that will be saved and passed back
  * @property {string} file.url - [Required] image source URL
  */
+interface UploadResponseFormat {
+  /* success - 1 for successful uploading, 0 for failure */
+  success: number;
+  /* Object with file data.
+  *             'url' is required,
+  *             also can contain any additional data that will be saved and passed back*/
+  file: {
+    /* image source URL */
+    url: string;
+  };
+}
+
+interface ConstructorParams {
+  /* ImageTool data */
+  data: ImageToolData;
+  /* ImageTool configuration */
+  config: ImageConfig;
+  /* Editor.js API */
+  api: API;
+  /* Flag indicating read-only mod */
+  readOnly: boolean;
+  /* Current Block API */
+  block: any;
+}
+
 export default class ImageTool {
-  /**
-   * Notify core that read-only mode is supported
-   *
-   * @returns {boolean}
-   */
-  static get isReadOnlySupported() {
-    return true;
-  }
-
-  /**
-   * Get Tool toolbox settings
-   * icon - Tool icon's SVG
-   * title - title to show in toolbox
-   *
-   * @returns {{icon: string, title: string}}
-   */
-  static get toolbox() {
-    return {
-      icon: IconPicture,
-      title: 'Image',
-    };
-  }
-
-  /**
-   * Available image tools
-   *
-   * @returns {Array}
-   */
-  static get tunes() {
-    return [
-      {
-        name: 'withBorder',
-        icon: IconAddBorder,
-        title: 'With border',
-        toggle: true,
-      },
-      {
-        name: 'stretched',
-        icon: IconStretch,
-        title: 'Stretch image',
-        toggle: true,
-      },
-      {
-        name: 'withBackground',
-        icon: IconAddBackground,
-        title: 'With background',
-        toggle: true,
-      },
-    ];
-  }
+  /** Editor.js API instance */
+  private api: API;
+  /** Flag indicating read-only mode */
+  private readOnly: boolean;
+  /** Current Block API instance*/
+  private block: any;
+  /** Configuration for the ImageTool */
+  private config: ImageConfig;
+  /** Uploader module instance */
+  private uploader: Uploader;
+  /** UI module instance */
+  private ui: Ui;
+  /** Partial data for the ImageTool */
+  private _data: Partial<ImageToolData>;
 
   /**
    * @param {object} tool - tool properties got from editor.js
@@ -134,7 +152,7 @@ export default class ImageTool {
    * @param {boolean} tool.readOnly - read-only mode flag
    * @param {BlockAPI|{}} tool.block - current Block API
    */
-  constructor({ data, config, api, readOnly, block }) {
+  constructor({ data, config, api, readOnly, block }: ConstructorParams) {
     this.api = api;
     this.readOnly = readOnly;
     this.block = block;
@@ -185,6 +203,56 @@ export default class ImageTool {
     this._data = {};
     this.data = data;
   }
+  /**
+   * Notify core that read-only mode is supported
+   *
+   * @returns {boolean}
+   */
+  static get isReadOnlySupported(): boolean {
+    return true;
+  }
+
+  /**
+   * Get Tool toolbox settings
+   * icon - Tool icon's SVG
+   * title - title to show in toolbox
+   *
+   * @returns {{icon: string, title: string}}
+   */
+  static get toolbox(): ToolsboxType {
+    return {
+      icon: IconPicture,
+      title: 'Image',
+    };
+  }
+
+  /**
+   * Available image tools
+   *
+   * @returns {Array}
+   */
+  static get tunes(): Array<TonesType> {
+    return [
+      {
+        name: 'withBorder',
+        icon: IconAddBorder,
+        title: 'With border',
+        toggle: true,
+      },
+      {
+        name: 'stretched',
+        icon: IconStretch,
+        title: 'Stretch image',
+        toggle: true,
+      },
+      {
+        name: 'withBackground',
+        icon: IconAddBackground,
+        title: 'With background',
+        toggle: true,
+      },
+    ];
+  }
 
   /**
    * Renders Block content
@@ -193,8 +261,8 @@ export default class ImageTool {
    *
    * @returns {HTMLDivElement}
    */
-  render() {
-    return this.ui.render(this.data);
+  render(): HTMLDivElement  {
+    return this.ui.render(this.data) as HTMLDivElement;
   }
 
   /**
@@ -204,8 +272,8 @@ export default class ImageTool {
    * @returns {boolean} false if saved data is not correct, otherwise true
    * @public
    */
-  validate(savedData) {
-    return savedData.file && savedData.file.url;
+  validate(savedData: ImageToolData): boolean {
+    return !!savedData.file?.url ;
   }
 
   /**
@@ -215,7 +283,7 @@ export default class ImageTool {
    *
    * @returns {ImageToolData}
    */
-  save() {
+  save(): ImageToolData {
     const caption = this.ui.nodes.caption;
 
     this._data.caption = caption.innerHTML;
@@ -230,17 +298,17 @@ export default class ImageTool {
    *
    * @returns {Array}
    */
-  renderSettings() {
+  renderSettings(): Array<RenderSettingsType> {
     // Merge default tunes with the ones that might be added by user
     // @see https://github.com/editor-js/image/pull/49
-    const tunes = ImageTool.tunes.concat(this.config.actions);
+    const tunes = ImageTool.tunes.concat(this.config.actions || []);
 
     return tunes.map(tune => ({
       icon: tune.icon,
       label: this.api.i18n.t(tune.title),
       name: tune.name,
       toggle: tune.toggle,
-      isActive: this.data[tune.name],
+      isActive: this.data[tune.name as keyof ImageToolData] as boolean,
       onActivate: () => {
         /* If it'a user defined tune, execute it's callback stored in action property */
         if (typeof tune.action === 'function') {
@@ -269,7 +337,7 @@ export default class ImageTool {
    * @see {@link https://github.com/codex-team/editor.js/blob/master/docs/tools.md#paste-handling}
    * @returns {{tags: string[], patterns: object<string, RegExp>, files: {extensions: string[], mimeTypes: string[]}}}
    */
-  static get pasteConfig() {
+  static get pasteConfig(): PasteConfigType {
     return {
       /**
        * Paste HTML into Editor
@@ -304,7 +372,7 @@ export default class ImageTool {
    *                              {@link https://github.com/codex-team/editor.js/blob/master/types/tools/paste-events.d.ts}
    * @returns {void}
    */
-  async onPaste(event) {
+  async onPaste(event: CustomEvent): Promise<void> {
     switch (event.type) {
       case 'tag': {
         const image = event.detail.data;
@@ -312,7 +380,8 @@ export default class ImageTool {
         /** Images from PDF */
         if (/^blob:/.test(image.src)) {
           const response = await fetch(image.src);
-          const file = await response.blob();
+          const blob = await response.blob();
+          const file = new File([blob], 'image.jpg', { type: blob.type, lastModified: Date.now() });
 
           this.uploadFile(file);
           break;
@@ -348,14 +417,14 @@ export default class ImageTool {
    *
    * @param {ImageToolData} data - data in Image Tool format
    */
-  set data(data) {
+  set data(data: ImageToolData) {
     this.image = data.file;
 
     this._data.caption = data.caption || '';
     this.ui.fillCaption(this._data.caption);
 
     ImageTool.tunes.forEach(({ name: tune }) => {
-      const value = typeof data[tune] !== 'undefined' ? data[tune] === true || data[tune] === 'true' : false;
+      const value = typeof data[tune as keyof ImageToolData] !== 'undefined' ? data[tune as keyof ImageToolData] === true || data[tune as keyof ImageToolData] === 'true' : false;
 
       this.setTune(tune, value);
     });
@@ -368,8 +437,8 @@ export default class ImageTool {
    *
    * @returns {ImageToolData}
    */
-  get data() {
-    return this._data;
+  get data(): ImageToolData {
+    return this._data as ImageToolData;
   }
 
   /**
@@ -379,7 +448,7 @@ export default class ImageTool {
    *
    * @param {object} file - uploaded file data
    */
-  set image(file) {
+  set image(file:{ url: string }) {
     this._data.file = file || {};
 
     if (file && file.url) {
@@ -395,7 +464,7 @@ export default class ImageTool {
    * @param {UploadResponseFormat} response - uploading server response
    * @returns {void}
    */
-  onUpload(response) {
+  onUpload(response: UploadResponseFormat):void {
     if (response.success && response.file) {
       this.image = response.file;
     } else {
@@ -410,7 +479,7 @@ export default class ImageTool {
    * @param {string} errorText - uploading error text
    * @returns {void}
    */
-  uploadingFailed(errorText) {
+  uploadingFailed(errorText: string): void {
     console.log('Image Tool: uploading failed because of', errorText);
 
     this.api.notifier.show({
@@ -428,9 +497,9 @@ export default class ImageTool {
    * @param {string} tuneName - tune that has been clicked
    * @returns {void}
    */
-  tuneToggled(tuneName) {
+  tuneToggled(tuneName: string): void {
     // inverse tune state
-    this.setTune(tuneName, !this._data[tuneName]);
+    this.setTune(tuneName, !this._data[tuneName as keyof ImageToolData]);
   }
 
   /**
@@ -440,11 +509,10 @@ export default class ImageTool {
    * @param {boolean} value - tune state
    * @returns {void}
    */
-  setTune(tuneName, value) {
-    this._data[tuneName] = value;
+  setTune(tuneName: string, value: boolean): void {
+    (this._data[tuneName as keyof ImageToolData] as boolean) = value;
 
     this.ui.applyTune(tuneName, value);
-
     if (tuneName === 'stretched') {
       /**
        * Wait until the API is ready
@@ -464,7 +532,7 @@ export default class ImageTool {
    * @param {File} file - file that is currently uploading (from paste)
    * @returns {void}
    */
-  uploadFile(file) {
+  uploadFile(file: File): void {
     this.uploader.uploadByFile(file, {
       onPreview: (src) => {
         this.ui.showPreloader(src);
@@ -478,7 +546,7 @@ export default class ImageTool {
    * @param {string} url - url pasted
    * @returns {void}
    */
-  uploadUrl(url) {
+  uploadUrl(url: string): void {
     this.ui.showPreloader(url);
     this.uploader.uploadByUrl(url);
   }

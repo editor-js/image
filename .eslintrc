@@ -1,10 +1,15 @@
 {
   "extends": [
-    "codex"
+    "codex",
+    "plugin:@typescript-eslint/recommended"
   ],
   "globals": {
     "fetch": true,
     "ImageConfig": true,
     "ImageToolData": true
-  }
+  },
+  "parser": "@typescript-eslint/parser",
+  "plugins": [
+    "@typescript-eslint"
+  ]
 }
