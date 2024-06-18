@@ -38,7 +38,7 @@ import Ui from './ui';
 import Uploader from './uploader';
 
 import { IconAddBorder, IconStretch, IconAddBackground, IconPicture } from '@codexteam/icons';
-import { PasteConfigType, RenderSettingsType, TonesType, ToolsboxType } from './types/types';
+import { PasteConfig, RenderSettings, Tones, Toolsbox } from './types/types';
 
 /**
  *
@@ -189,7 +189,7 @@ export default class ImageTool {
       config: this.config,
       onSelectFile: () => {
         this.uploader.uploadSelectedFile({
-          onPreview: (src) => {
+          onPreview: (src: string) => {
             this.ui.showPreloader(src);
           },
         });
@@ -219,7 +219,7 @@ export default class ImageTool {
    *
    * @returns {{icon: string, title: string}}
    */
-  static get toolbox(): ToolsboxType {
+  static get toolbox(): Toolsbox {
     return {
       icon: IconPicture,
       title: 'Image',
@@ -231,7 +231,7 @@ export default class ImageTool {
    *
    * @returns {Array}
    */
-  static get tunes(): Array<TonesType> {
+  static get tunes(): Array<Tones> {
     return [
       {
         name: 'withBorder',
@@ -298,7 +298,7 @@ export default class ImageTool {
    *
    * @returns {Array}
    */
-  renderSettings(): Array<RenderSettingsType> {
+  renderSettings(): Array<RenderSettings> {
     // Merge default tunes with the ones that might be added by user
     // @see https://github.com/editor-js/image/pull/49
     const tunes = ImageTool.tunes.concat(this.config.actions || []);
@@ -337,7 +337,7 @@ export default class ImageTool {
    * @see {@link https://github.com/codex-team/editor.js/blob/master/docs/tools.md#paste-handling}
    * @returns {{tags: string[], patterns: object<string, RegExp>, files: {extensions: string[], mimeTypes: string[]}}}
    */
-  static get pasteConfig(): PasteConfigType {
+  static get pasteConfig(): PasteConfig {
     return {
       /**
        * Paste HTML into Editor
@@ -534,7 +534,7 @@ export default class ImageTool {
    */
   uploadFile(file: File): void {
     this.uploader.uploadByFile(file, {
-      onPreview: (src) => {
+      onPreview: (src: string) => {
         this.ui.showPreloader(src);
       },
     });

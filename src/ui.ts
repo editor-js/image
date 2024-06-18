@@ -1,6 +1,6 @@
 import { IconPicture } from '@codexteam/icons';
 import { make } from './utils/dom';
-import { AttributesType, CSSType, StatusType, UploadResponseFormat } from './types/types';
+import { Attributes, CSS, Status, StatusEnum, UploadResponseFormat } from './types/types';
 import { ImageConfig } from './index';
 import { API } from '@editorjs/editorjs';
 
@@ -8,10 +8,25 @@ import { API } from '@editorjs/editorjs';
  * ImageToolData interface representing the input and output data format for the image tool.
  */
 interface ImageToolData {
+  /**
+   * Caption for the image.
+   */
   caption: string;
+  /**
+   * Flag indicating whether the image has a border.
+   */
   withBorder: boolean;
+  /**
+   * Flag indicating whether the image has a background.
+   */
   withBackground: boolean;
+  /**
+   * Flag indicating whether the image is stretched.
+   */
   stretched: boolean;
+  /**
+   * Object containing the URL of the image file.
+   */
   file: {
     url: string;
   };
@@ -21,11 +36,29 @@ interface ImageToolData {
  * Nodes interface representing various elements in the UI.
  */
 interface Nodes {
+  /**
+   * Wrapper element in the UI.
+   */
   wrapper: HTMLElement;
+  /**
+   * Container for the image element in the UI.
+   */
   imageContainer: HTMLElement;
+  /**
+   * Button for selecting files.
+   */
   fileButton: HTMLElement;
+  /**
+   * The image element in the UI, if available.
+   */
   imageEl?: HTMLElement;
+  /**
+   * Preloader element for the image.
+   */
   imagePreloader: HTMLElement;
+  /**
+   * Caption element for the image.
+   */
   caption: HTMLElement;
 }
 
@@ -33,10 +66,22 @@ interface Nodes {
  * ConstructorParams interface representing parameters for the Ui class constructor.
  */
 interface ConstructorParams {
+  /**
+   * Editor.js API.
+   */
   api: API;
+  /**
+   * Configuration for the image.
+   */
   config: ImageConfig;
+  /**
+   * Callback function for selecting a file.
+   */
   onSelectFile: Function;
-  readOnly: boolean
+  /**
+   * Flag indicating if the UI is in read-only mode.
+   */
+  readOnly: boolean;
 }
 
 /**
@@ -46,11 +91,30 @@ interface ConstructorParams {
  *  - apply tune view
  */
 export default class Ui {
-  private api: API;
-  private config: ImageConfig;
-  private onSelectFile: Function;
-  private readOnly: boolean;
-  public nodes: Nodes;
+/**
+ * API instance for Editor.js.
+ */
+private api: API;
+
+/**
+ * Configuration for the image tool.
+ */
+private config: ImageConfig;
+
+/**
+ * Callback function for selecting a file.
+ */
+private onSelectFile: Function;
+
+/**
+ * Flag indicating if the UI is in read-only mode.
+ */
+private readOnly: boolean;
+
+/**
+ * Nodes representing various elements in the UI.
+ */
+public nodes: Nodes;
   /**
    * @param {object} ui - image tool Ui module
    * @param {object} ui.api - Editor.js API
@@ -96,7 +160,7 @@ export default class Ui {
    *
    * @returns {object}
    */
-  get CSS(): CSSType {
+  get CSS(): CSS {
     return {
       baseClass: this.api.styles.block,
       loading: this.api.styles.loader,
@@ -122,11 +186,11 @@ export default class Ui {
    *
    * @returns {{EMPTY: string, UPLOADING: string, FILLED: string}}
    */
-  static get status(): StatusType {
+  static get status(): Status {
     return {
-      EMPTY: 'empty',
-      UPLOADING: 'loading',
-      FILLED: 'filled',
+      EMPTY: 'EMPTY',
+      UPLOADING: 'UPLOADING',
+      FILLED: 'FILLED',
     };
   }
 
@@ -138,11 +202,10 @@ export default class Ui {
    */
   render(toolData: ImageToolData): HTMLElement  {
     if (!toolData.file || Object.keys(toolData.file).length === 0) {
-      this.toggleStatus(Ui.status.EMPTY);
+      this.toggleStatus(Ui.status.EMPTY as keyof Status);
     } else {
-      this.toggleStatus(Ui.status.UPLOADING);
+      this.toggleStatus(Ui.status.UPLOADING as keyof Status);
     }
-
     return this.nodes.wrapper;
   }
 
@@ -172,7 +235,7 @@ export default class Ui {
   showPreloader(src: string): void {
     this.nodes.imagePreloader.style.backgroundImage = `url(${src})`;
 
-    this.toggleStatus(Ui.status.UPLOADING);
+    this.toggleStatus(Ui.status.UPLOADING as keyof Status);
   }
 
   /**
@@ -182,7 +245,7 @@ export default class Ui {
    */
   hidePreloader(): void {
     this.nodes.imagePreloader.style.backgroundImage = '';
-    this.toggleStatus(Ui.status.EMPTY);
+    this.toggleStatus(Ui.status.EMPTY as keyof Status);
   }
 
   /**
@@ -197,7 +260,7 @@ export default class Ui {
      */
     const tag = /\.mp4$/.test(url) ? 'VIDEO' : 'IMG';
 
-    const attributes: AttributesType = {
+    const attributes: Attributes = {
       src: url,
     };
 
@@ -243,7 +306,7 @@ export default class Ui {
      * Add load event listener
      */
     this.nodes.imageEl.addEventListener(eventName, () => {
-      this.toggleStatus(Ui.status.FILLED);
+      this.toggleStatus(Ui.status.FILLED as keyof Status);
 
       /**
        * Preloader does not exists on first rendering with presaved data
@@ -274,10 +337,10 @@ export default class Ui {
    * @param {string} status - see {@link Ui.status} constants
    * @returns {void}
    */
-  toggleStatus(status: string): void {
+  toggleStatus(status: keyof Status): void {
     for (const statusType in Ui.status) {
       if (Object.prototype.hasOwnProperty.call(Ui.status, statusType)) {
-        this.nodes.wrapper.classList.toggle(`${this.CSS.wrapper}--${Ui.status[statusType as keyof StatusType]}`, status === Ui.status[statusType as keyof StatusType]);      }
+        this.nodes.wrapper.classList.toggle(`${this.CSS.wrapper}--${Ui.status[statusType as keyof Status]}`, status === Ui.status[statusType as keyof Status]);      }
     }
   }
 
