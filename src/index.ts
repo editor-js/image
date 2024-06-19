@@ -30,15 +30,15 @@
  * },
  */
 
-
-import type { API, ToolboxConfig } from '@editorjs/editorjs';
+import type { TunesMenuConfig } from "@editorjs/editorjs/types/tools";
+import type { API, ToolboxConfig, PasteConfig } from '@editorjs/editorjs';
 import './index.css';
 
 import Ui from './ui';
 import Uploader from './uploader';
 
 import { IconAddBorder, IconStretch, IconAddBackground, IconPicture } from '@codexteam/icons';
-import { PasteConfig, ExtendedTunes, Tunes } from './types/types';
+import { TunesConfig } from './types/types';
 
 /**
  * ImageToolData interface representing the input and output data format for the image tool.
@@ -117,7 +117,7 @@ export interface ImageConfig {
     /**
      * Method to upload an image by file.
      */
-    uploadByFile?: (file: File) => Promise<UploadResponseFormat>;
+    uploadByFile?: (file: Blob) => Promise<UploadResponseFormat>;
     /**
      * Method to upload an image by URL.
      */
@@ -126,7 +126,7 @@ export interface ImageConfig {
   /**
    * Additional actions for the tool.
    */
-  actions?: Array<Tunes>;
+  actions?: Array<TunesConfig>;
 }
 
 /**
@@ -140,40 +140,41 @@ export interface ImageConfig {
  */
 interface UploadResponseFormat {
   /**
-  * success - 1 for successful uploading, 0 for failure 
+   * success - 1 for successful uploading, 0 for failure 
   */
   success: number;
   /**
-   * Object with file data.
-  *             'url' is required,
-  *             also can contain any additional data that will be saved and passed back*/
+  * Object with file data.
+   *             'url' is required,
+   *             also can contain any additional data that will be saved and passed back
+  */
   file: {
     /**
      * The URL of the uploaded image.
-     * */
+    */
     url: string;
   };
 }
 
 interface ConstructorParams {
   /**
-  * previously saved data as ImageTool data.
+   * Previously saved data as ImageTool data.
   */
   data: ImageToolData;
   /**
-  * user config for Tool.
+   * User config for Tool.
   */
   config: ImageConfig;
   /**
-  * Editor.js API 
+   * Editor.js API.
   */
   api: API;
   /**
-  * Flag indicating read-only mod
+   * Flag indicating read-only mode.
   */
   readOnly: boolean;
   /**
-  * Current Block API 
+   * Current Block API.
   */
   block: any;
 }
@@ -206,7 +207,7 @@ export default class ImageTool {
   /** 
    * Partial data for the ImageTool 
   */
-  private _data: Partial<ImageToolData>;
+  private _data: ImageToolData;
 
   /**
    * @param {object} tool - tool properties got from editor.js
@@ -264,7 +265,15 @@ export default class ImageTool {
     /**
      * Set saved state
      */
-    this._data = {};
+    this._data = {
+      caption: '',
+      withBorder: false,
+      withBackground: false,
+      stretched: false,
+      file: {
+        url: '',
+      },
+    };
     this.data = data;
   }
   /**
@@ -295,7 +304,7 @@ export default class ImageTool {
    *
    * @returns {Array}
    */
-  static get tunes(): Array<Tunes> {
+  static get tunes(): Array<TunesConfig> {
     return [
       {
         name: 'withBorder',
@@ -362,7 +371,7 @@ export default class ImageTool {
    *
    * @returns {Array}
    */
-  renderSettings(): Array<ExtendedTunes> {
+  renderSettings(): Array<TunesMenuConfig> {
     // Merge default tunes with the ones that might be added by user
     // @see https://github.com/editor-js/image/pull/49
     const tunes = ImageTool.tunes.concat(this.config.actions || []);
@@ -448,8 +457,7 @@ export default class ImageTool {
            * the return value of response.blob() is Promise<blob>, which can't be used in the function uploadFile.
            * So, it is converted to File, and then use the file in the uploadFile function.
            */
-          const blob = await response.blob();
-          const file = new File([blob], 'image.jpg', { type: blob.type, lastModified: Date.now() });
+          const file = await response.blob();
 
           this.uploadFile(file);
           break;
@@ -600,7 +608,7 @@ export default class ImageTool {
    * @param {File} file - file that is currently uploading (from paste)
    * @returns {void}
    */
-  uploadFile(file: File): void {
+  uploadFile(file: Blob): void {
     this.uploader.uploadByFile(file, {
       onPreview: (src: string) => {
         this.ui.showPreloader(src);

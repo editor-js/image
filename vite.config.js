@@ -14,7 +14,7 @@ export default {
       entry: path.resolve(__dirname, "src", "index.ts"),
       name: "ImageTool",
       fileName: "image",
-    },
+    }
   },
   define: {
     NODE_ENV: JSON.stringify(NODE_ENV),

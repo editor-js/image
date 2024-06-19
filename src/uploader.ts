@@ -1,7 +1,7 @@
 import ajax from '@codexteam/ajax';
 import isPromise from './utils/isPromise';
 import { ImageConfig } from './index';
-import { Preview } from './types/types';
+import { PreviewCallback } from './types/types';
 import { UploadResponseFormat } from './types/types';
 
 /**
@@ -54,7 +54,7 @@ export default class Uploader {
    *
    * @param {Function} onPreview - callback fired when preview is ready
    */
-  uploadSelectedFile({ onPreview }: Preview) {
+  uploadSelectedFile({ onPreview }: PreviewCallback) {
     const preparePreview = function (file: File) {
       const reader = new FileReader();
 
@@ -151,7 +151,7 @@ export default class Uploader {
    * @param {File} file - file pasted by drag-n-drop
    * @param {Function} onPreview - file pasted by drag-n-drop
    */
-  uploadByFile(file: File, { onPreview }: Preview) {
+  uploadByFile(file: Blob, { onPreview }: PreviewCallback) {
     /**
      * Load file for preview
      *
