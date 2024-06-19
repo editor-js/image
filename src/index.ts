@@ -31,7 +31,7 @@
  */
 
 import type { TunesMenuConfig } from "@editorjs/editorjs/types/tools";
-import type { API, ToolboxConfig, PasteConfig } from '@editorjs/editorjs';
+import type { API, ToolboxConfig, PasteConfig, BaseTool } from '@editorjs/editorjs';
 import './index.css';
 
 import Ui from './ui';
@@ -72,7 +72,7 @@ export interface ImageToolData {
  *
  * @description Config supported by Tool
  */
-export interface ImageConfig {
+export interface ImageToolConfig {
   /**
    * Endpoints for upload, whether using file or URL.
    */
@@ -141,72 +141,72 @@ export interface ImageConfig {
 interface UploadResponseFormat {
   /**
    * success - 1 for successful uploading, 0 for failure 
-  */
+   */
   success: number;
   /**
-  * Object with file data.
+   * Object with file data.
    *             'url' is required,
    *             also can contain any additional data that will be saved and passed back
-  */
+   */
   file: {
     /**
      * The URL of the uploaded image.
-    */
+     */
     url: string;
   };
 }
 
-interface ConstructorParams {
+interface BlockToolConstructorOptions {
   /**
    * Previously saved data as ImageTool data.
-  */
+   */
   data: ImageToolData;
   /**
    * User config for Tool.
-  */
-  config: ImageConfig;
+   */
+  config: ImageToolConfig;
   /**
    * Editor.js API.
-  */
+   */
   api: API;
   /**
    * Flag indicating read-only mode.
-  */
+   */
   readOnly: boolean;
   /**
    * Current Block API.
-  */
+   */
   block: any;
 }
 
-export default class ImageTool {
+export default class ImageTool implements BaseTool{
   /** 
    * Editor.js API instance 
-  */
+   */
   private api: API;
   /** 
    * Flag indicating read-only mode 
-  */
+   */
   private readOnly: boolean;
   /** 
    * Current Block API instance
-  */
+   */
   private block: any;
   /** 
    * Configuration for the ImageTool
-  */
-  private config: ImageConfig;
+   */
+  private config: ImageToolConfig;
   /** 
    * Uploader module instance 
-  */
+   */
   private uploader: Uploader;
   /** 
    * UI module instance
-  */
+   */
   private ui: Ui;
   /** 
    * Partial data for the ImageTool 
-  */
+   */
   private _data: ImageToolData;
 
   /**
@@ -217,7 +217,7 @@ export default class ImageTool {
    * @param {boolean} tool.readOnly - read-only mode flag
    * @param {BlockAPI|{}} tool.block - current Block API
    */
-  constructor({ data, config, api, readOnly, block }: ConstructorParams) {
+  constructor({ data, config, api, readOnly, block }: BlockToolConstructorOptions) {
     this.api = api;
     this.readOnly = readOnly;
     this.block = block;
@@ -453,10 +453,7 @@ export default class ImageTool {
         /** Images from PDF */
         if (/^blob:/.test(image.src)) {
           const response = await fetch(image.src);
-          /**
-           * the return value of response.blob() is Promise<blob>, which can't be used in the function uploadFile.
-           * So, it is converted to File, and then use the file in the uploadFile function.
-           */
+
           const file = await response.blob();
 
           this.uploadFile(file);

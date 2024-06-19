@@ -1,25 +1,12 @@
-/** 
- * Preview: Represents a function to handle previewing with a source string.
-*/
-export type PreviewCallback = { onPreview: (src: string) => void };
+/**
+ * Represents options for uploading, including a function to handle previewing.
+ */
+export interface UploadOptions  { 
+  onPreview: (src: string) => void 
+};
 
 /** 
- * UICSS: Represents a key-value pair of CSS properties.
-*/
-export type UICSS = { [key: string]: string };
-
-/** 
- * UIStatus: Represents different statuses like EMPTY, UPLOADING, FILLED.
-*/
-export type UIStatus = {EMPTY: string, UPLOADING: string, FILLED: string};
-
-/** 
- * UIAttributes: Represents a key-value pair of attributes.
-*/
-export type UIAttributes = { [key: string]: any};
-
-/** 
- * Tunes: Represents a tone with name, icon, title, toggle, and optional action.
+ * User configuration of Image block tunes. Allows to add custom tunes through the config
 */
 export type TunesConfig = { name: string; icon: string; title: string; toggle: boolean, action?: Function };
 

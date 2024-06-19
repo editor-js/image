@@ -1,7 +1,7 @@
 import ajax from '@codexteam/ajax';
 import isPromise from './utils/isPromise';
-import { ImageConfig } from './index';
-import { PreviewCallback } from './types/types';
+import { ImageToolConfig } from './index';
+import { UploadOptions } from './types/types';
 import { UploadResponseFormat } from './types/types';
 
 /**
@@ -11,7 +11,7 @@ interface UploaderParams {
   /**
    * Configuration for the uploader
    */
-  config: ImageConfig;
+  config: ImageToolConfig;
   /**
    * 
    * @param response: Callback function for successful upload
@@ -33,12 +33,12 @@ interface UploaderParams {
  *  3. Upload by pasting file from Clipboard or by Drag'n'Drop
  */
 export default class Uploader {
-  private config: ImageConfig;
+  private config: ImageToolConfig;
   private onUpload: (response: UploadResponseFormat) => void;
   private onError: (error: any) => void;
   /**
    * @param {object} params - uploader module params
-   * @param {ImageConfig} params.config - image tool config
+   * @param {ImageToolConfig} params.config - image tool config
    * @param {Function} params.onUpload - one callback for all uploading (file, url, d-n-d, pasting)
    * @param {Function} params.onError - callback for uploading errors
    */
@@ -54,7 +54,7 @@ export default class Uploader {
    *
    * @param {Function} onPreview - callback fired when preview is ready
    */
-  uploadSelectedFile({ onPreview }: PreviewCallback) {
+  uploadSelectedFile({ onPreview }: UploadOptions) {
     const preparePreview = function (file: File) {
       const reader = new FileReader();
 
@@ -151,7 +151,7 @@ export default class Uploader {
    * @param {File} file - file pasted by drag-n-drop
    * @param {Function} onPreview - file pasted by drag-n-drop
    */
-  uploadByFile(file: Blob, { onPreview }: PreviewCallback) {
+  uploadByFile(file: Blob, { onPreview }: UploadOptions) {
     /**
      * Load file for preview
      *

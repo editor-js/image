@@ -1,11 +1,14 @@
 import { IconPicture } from '@codexteam/icons';
 import { make } from './utils/dom';
-import { UIAttributes, UICSS, UIStatus } from './types/types';
-import { ImageConfig } from './index';
-import { API } from '@editorjs/editorjs';
+import { ImageToolConfig } from './index';
+import type { API } from '@editorjs/editorjs';
 import { ImageToolData } from './index';
 
-
+enum UiState {
+  EMPTY = "empty",
+  UPLOADING = 'uploading', 
+  FILLED = 'filled'
+};
 
 /**
  * Nodes interface representing various elements in the UI.
@@ -48,11 +51,11 @@ interface ConstructorParams {
   /**
    * Configuration for the image.
    */
-  config: ImageConfig;
+  config: ImageToolConfig;
   /**
    * Callback function for selecting a file.
    */
-  onSelectFile: Function;
+  onSelectFile: () => void;
   /**
    * Flag indicating if the UI is in read-only mode.
    */
@@ -74,7 +77,7 @@ private api: API;
 /**
  * Configuration for the image tool.
  */
-private config: ImageConfig;
+private config: ImageToolConfig;
 
 /**
  * Callback function for selecting a file.
@@ -93,7 +96,7 @@ public nodes: Nodes;
   /**
    * @param {object} ui - image tool Ui module
    * @param {object} ui.api - Editor.js API
-   * @param {ImageConfig} ui.config - user config
+   * @param {ImageToolConfig} ui.config - user config
    * @param {Function} ui.onSelectFile - callback for clicks on Select file button
    * @param {boolean} ui.readOnly - read-only mode flag
    */
@@ -135,7 +138,7 @@ public nodes: Nodes;
    *
    * @returns {object}
    */
-  get CSS(): UICSS {
+  get CSS(): Record<string, string> {
     return {
       baseClass: this.api.styles.block,
       loading: this.api.styles.loader,
@@ -161,12 +164,8 @@ public nodes: Nodes;
    *
    * @returns {{EMPTY: string, UPLOADING: string, FILLED: string}}
    */
-  static get status(): UIStatus {
-    return {
-      EMPTY: 'empty',
-      UPLOADING: 'uploading',
-      FILLED: 'filled',
-    };
+  static get status(): typeof UiState {
+    return UiState;
   }
 
   /**
@@ -177,9 +176,9 @@ public nodes: Nodes;
    */
   render(toolData: ImageToolData): HTMLElement  {
     if (!toolData.file || Object.keys(toolData.file).length === 0) {
-      this.toggleStatus(Ui.status.EMPTY as keyof UIStatus);
+      this.toggleStatus(Ui.status.EMPTY);
     } else {
-      this.toggleStatus(Ui.status.UPLOADING as keyof UIStatus);
+      this.toggleStatus(Ui.status.UPLOADING);
     }
     return this.nodes.wrapper;
   }
@@ -210,7 +209,7 @@ public nodes: Nodes;
   showPreloader(src: string): void {
     this.nodes.imagePreloader.style.backgroundImage = `url(${src})`;
 
-    this.toggleStatus(Ui.status.UPLOADING as keyof UIStatus);
+    this.toggleStatus(Ui.status.UPLOADING);
   }
 
   /**
@@ -220,7 +219,7 @@ public nodes: Nodes;
    */
   hidePreloader(): void {
     this.nodes.imagePreloader.style.backgroundImage = '';
-    this.toggleStatus(Ui.status.EMPTY as keyof UIStatus);
+    this.toggleStatus(Ui.status.EMPTY);
   }
 
   /**
@@ -235,7 +234,7 @@ public nodes: Nodes;
      */
     const tag = /\.mp4$/.test(url) ? 'VIDEO' : 'IMG';
 
-    const attributes: UIAttributes = {
+    const attributes: { [key: string]: any} = {
       src: url,
     };
 
@@ -281,7 +280,7 @@ public nodes: Nodes;
      * Add load event listener
      */
     this.nodes.imageEl.addEventListener(eventName, () => {
-      this.toggleStatus(Ui.status.FILLED as keyof UIStatus);
+      this.toggleStatus(Ui.status.FILLED);
 
       /**
        * Preloader does not exists on first rendering with presaved data
@@ -312,10 +311,11 @@ public nodes: Nodes;
    * @param {string} status - see {@link Ui.status} constants
    * @returns {void}
    */
-  toggleStatus(status: keyof UIStatus): void {
+  toggleStatus(status: UiState): void {
     for (const statusType in Ui.status) {
       if (Object.prototype.hasOwnProperty.call(Ui.status, statusType)) {
-        this.nodes.wrapper.classList.toggle(`${this.CSS.wrapper}--${Ui.status[statusType as keyof UIStatus]}`, status === Ui.status[statusType as keyof UIStatus]);      }
+          this.nodes.wrapper.classList.toggle(`${this.CSS.wrapper}--${Ui.status[statusType as keyof typeof UiState]}`, status === Ui.status[statusType as keyof typeof UiState]);
+      }
     }
   }
 
