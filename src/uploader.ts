@@ -2,24 +2,27 @@ import ajax from '@codexteam/ajax';
 import isPromise from './utils/isPromise';
 import { ImageConfig } from './index';
 import { Preview } from './types/types';
-
-/**
- * UploadResponseFormat interface
- */
-interface UploadResponseFormat {
-  success: number;
-  file: {
-    url: string;
-    [key: string]: any;
-  };
-}
+import { UploadResponseFormat } from './types/types';
 
 /**
  * Params interface for Uploader constructor
  */
 interface UploaderParams {
+  /**
+   * Configuration for the uploader
+   */
   config: ImageConfig;
+  /**
+   * 
+   * @param response: Callback function for successful upload
+   * @returns void
+   */
   onUpload: (response: UploadResponseFormat) => void;
+  /**
+   * 
+   * @param error : error type
+   * @returns void
+   */
   onError: (error: any) => void;
 }
 
@@ -69,7 +72,7 @@ export default class Uploader {
 
     // custom uploading
     if (this.config.uploader && typeof this.config.uploader.uploadByFile === 'function') {
-      upload = ajax.selectFiles({ accept: this.config.types }).then((files: File[]) => {
+      upload = ajax.selectFiles({ accept: this.config.types || ''}).then((files: File[]) => {
         preparePreview(files[0]);
 
         const customUpload = this.config.uploader && this.config.uploader.uploadByFile && this.config.uploader.uploadByFile(files[0]);
@@ -84,7 +87,7 @@ export default class Uploader {
     // default uploading
     } else {
       upload = ajax.transport({
-        url: this.config.endpoints.byFile,
+        url: this.config.endpoints.byFile || '',
         data: this.config.additionalRequestData,
         accept: this.config.types,
         headers: this.config.additionalRequestHeaders as Record<string, string>,
@@ -125,7 +128,7 @@ export default class Uploader {
        * Default uploading
        */
       upload = ajax.post({
-        url: this.config.endpoints.byUrl,
+        url: this.config.endpoints.byUrl || '',
         data: Object.assign({
           url: url,
         }, this.config.additionalRequestData),
@@ -178,7 +181,9 @@ export default class Uploader {
        */
       const formData = new FormData();
 
-      formData.append(this.config.field, file);
+      if (this.config.field) {
+        formData.append(this.config.field, file);
+      }
 
       if (this.config.additionalRequestData && Object.keys(this.config.additionalRequestData).length) {
         Object.entries(this.config.additionalRequestData).forEach(([name, value]: [string, any]) => {
@@ -187,7 +192,7 @@ export default class Uploader {
       }
 
       upload = ajax.post({
-        url: this.config.endpoints.byFile,
+        url: this.config.endpoints.byFile || '',
         data: formData,
         type: ajax.contentType.JSON,
         headers: this.config.additionalRequestHeaders as Record<string, string>,

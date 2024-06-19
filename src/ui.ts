@@ -1,36 +1,11 @@
 import { IconPicture } from '@codexteam/icons';
 import { make } from './utils/dom';
-import { Attributes, CSS, Status, StatusEnum, UploadResponseFormat } from './types/types';
+import { UIAttributes, UICSS, UIStatus } from './types/types';
 import { ImageConfig } from './index';
 import { API } from '@editorjs/editorjs';
+import { ImageToolData } from './index';
 
-/**
- * ImageToolData interface representing the input and output data format for the image tool.
- */
-interface ImageToolData {
-  /**
-   * Caption for the image.
-   */
-  caption: string;
-  /**
-   * Flag indicating whether the image has a border.
-   */
-  withBorder: boolean;
-  /**
-   * Flag indicating whether the image has a background.
-   */
-  withBackground: boolean;
-  /**
-   * Flag indicating whether the image is stretched.
-   */
-  stretched: boolean;
-  /**
-   * Object containing the URL of the image file.
-   */
-  file: {
-    url: string;
-  };
-}
+
 
 /**
  * Nodes interface representing various elements in the UI.
@@ -160,7 +135,7 @@ public nodes: Nodes;
    *
    * @returns {object}
    */
-  get CSS(): CSS {
+  get CSS(): UICSS {
     return {
       baseClass: this.api.styles.block,
       loading: this.api.styles.loader,
@@ -186,11 +161,11 @@ public nodes: Nodes;
    *
    * @returns {{EMPTY: string, UPLOADING: string, FILLED: string}}
    */
-  static get status(): Status {
+  static get status(): UIStatus {
     return {
-      EMPTY: 'EMPTY',
-      UPLOADING: 'UPLOADING',
-      FILLED: 'FILLED',
+      EMPTY: 'empty',
+      UPLOADING: 'uploading',
+      FILLED: 'filled',
     };
   }
 
@@ -202,9 +177,9 @@ public nodes: Nodes;
    */
   render(toolData: ImageToolData): HTMLElement  {
     if (!toolData.file || Object.keys(toolData.file).length === 0) {
-      this.toggleStatus(Ui.status.EMPTY as keyof Status);
+      this.toggleStatus(Ui.status.EMPTY as keyof UIStatus);
     } else {
-      this.toggleStatus(Ui.status.UPLOADING as keyof Status);
+      this.toggleStatus(Ui.status.UPLOADING as keyof UIStatus);
     }
     return this.nodes.wrapper;
   }
@@ -235,7 +210,7 @@ public nodes: Nodes;
   showPreloader(src: string): void {
     this.nodes.imagePreloader.style.backgroundImage = `url(${src})`;
 
-    this.toggleStatus(Ui.status.UPLOADING as keyof Status);
+    this.toggleStatus(Ui.status.UPLOADING as keyof UIStatus);
   }
 
   /**
@@ -245,7 +220,7 @@ public nodes: Nodes;
    */
   hidePreloader(): void {
     this.nodes.imagePreloader.style.backgroundImage = '';
-    this.toggleStatus(Ui.status.EMPTY as keyof Status);
+    this.toggleStatus(Ui.status.EMPTY as keyof UIStatus);
   }
 
   /**
@@ -260,7 +235,7 @@ public nodes: Nodes;
      */
     const tag = /\.mp4$/.test(url) ? 'VIDEO' : 'IMG';
 
-    const attributes: Attributes = {
+    const attributes: UIAttributes = {
       src: url,
     };
 
@@ -306,7 +281,7 @@ public nodes: Nodes;
      * Add load event listener
      */
     this.nodes.imageEl.addEventListener(eventName, () => {
-      this.toggleStatus(Ui.status.FILLED as keyof Status);
+      this.toggleStatus(Ui.status.FILLED as keyof UIStatus);
 
       /**
        * Preloader does not exists on first rendering with presaved data
@@ -337,10 +312,10 @@ public nodes: Nodes;
    * @param {string} status - see {@link Ui.status} constants
    * @returns {void}
    */
-  toggleStatus(status: keyof Status): void {
+  toggleStatus(status: keyof UIStatus): void {
     for (const statusType in Ui.status) {
       if (Object.prototype.hasOwnProperty.call(Ui.status, statusType)) {
-        this.nodes.wrapper.classList.toggle(`${this.CSS.wrapper}--${Ui.status[statusType as keyof Status]}`, status === Ui.status[statusType as keyof Status]);      }
+        this.nodes.wrapper.classList.toggle(`${this.CSS.wrapper}--${Ui.status[statusType as keyof UIStatus]}`, status === Ui.status[statusType as keyof UIStatus]);      }
     }
   }
 

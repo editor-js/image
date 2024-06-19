@@ -31,31 +31,39 @@
  */
 
 
-import { API } from '@editorjs/editorjs';
+import type { API, ToolboxConfig } from '@editorjs/editorjs';
 import './index.css';
 
 import Ui from './ui';
 import Uploader from './uploader';
 
 import { IconAddBorder, IconStretch, IconAddBackground, IconPicture } from '@codexteam/icons';
-import { PasteConfig, RenderSettings, Tones, Toolsbox } from './types/types';
+import { PasteConfig, ExtendedTunes, Tunes } from './types/types';
 
 /**
- *
- * @description Image Tool's input and output data format
+ * ImageToolData interface representing the input and output data format for the image tool.
  */
-interface ImageToolData {
-  /* image caption */
+export interface ImageToolData {
+  /**
+   * Caption for the image.
+   */
   caption: string;
-  /* should image be rendered with border */
+  /**
+   * Flag indicating whether the image has a border.
+   */
   withBorder: boolean;
-  /* should image be rendered with background */
+  /**
+   * Flag indicating whether the image has a background.
+   */
   withBackground: boolean;
-  /* should image be stretched to full width of container */
+  /**
+   * Flag indicating whether the image is stretched.
+   */
   stretched: boolean;
-  /* Image file data returned from backend */
+  /**
+   * Object containing the URL of the image file.
+   */
   file: {
-    /* image URL */
     url: string;
   };
 }
@@ -65,33 +73,60 @@ interface ImageToolData {
  * @description Config supported by Tool
  */
 export interface ImageConfig {
-  /* upload endpoints*/
+  /**
+   * Endpoints for upload, whether using file or URL.
+   */
   endpoints: {
-    /* upload by file */
-    byFile: string;
-    /** upload by URL */
-    byUrl: string;
+    /**
+     * Endpoint for file upload.
+     */
+    byFile?: string;
+    /**
+     * Endpoints for URL upload.
+     */
+    byUrl?: string;
   };
-  /* field name for uploaded image */
-  field: string;
-  /* available mime-types */
-  types: string;
-  /* placeholder for Caption field */
-  captionPlaceholder: string;
-  /* any data to send with requests */
-  additionalRequestData: object;
-  /* allows to pass custom headers with Request */
-  additionalRequestHeaders: object;
-  /* overrides for Select File button */
-  buttonContent: string;
-  /* optional custom uploader */
+  /**
+   * Field name for the uploaded image.
+   */
+  field?: string;
+  /**
+   * Allowed mime-types for the uploaded image.
+   */
+  types?: string;
+  /**
+   * Placeholder text for the caption field.
+   */
+  captionPlaceholder?: string;
+  /**
+   * Additional data to send with requests.
+   */
+  additionalRequestData?: object;
+  /**
+   * Additional headers to send with requests.
+   */
+  additionalRequestHeaders?: object;
+  /**
+   * Custom content for the select file button.
+   */
+  buttonContent?: string;
+  /**
+   * Optional custom uploader.
+   */
   uploader?: {
-    /* method that upload image by File */
+    /**
+     * Method to upload an image by file.
+     */
     uploadByFile?: (file: File) => Promise<UploadResponseFormat>;
-    /* method that upload image by URL */
+    /**
+     * Method to upload an image by URL.
+     */
     uploadByUrl?: (url: string) => Promise<UploadResponseFormat>;
   };
-  actions?: Array<any>;
+  /**
+   * Additional actions for the tool.
+   */
+  actions?: Array<Tunes>;
 }
 
 /**
@@ -104,44 +139,73 @@ export interface ImageConfig {
  * @property {string} file.url - [Required] image source URL
  */
 interface UploadResponseFormat {
-  /* success - 1 for successful uploading, 0 for failure */
+  /**
+  * success - 1 for successful uploading, 0 for failure 
+  */
   success: number;
-  /* Object with file data.
+  /**
+   * Object with file data.
   *             'url' is required,
   *             also can contain any additional data that will be saved and passed back*/
   file: {
-    /* image source URL */
+    /**
+     * The URL of the uploaded image.
+     * */
     url: string;
   };
 }
 
 interface ConstructorParams {
-  /* ImageTool data */
+  /**
+  * previously saved data as ImageTool data.
+  */
   data: ImageToolData;
-  /* ImageTool configuration */
+  /**
+  * user config for Tool.
+  */
   config: ImageConfig;
-  /* Editor.js API */
+  /**
+  * Editor.js API 
+  */
   api: API;
-  /* Flag indicating read-only mod */
+  /**
+  * Flag indicating read-only mod
+  */
   readOnly: boolean;
-  /* Current Block API */
+  /**
+  * Current Block API 
+  */
   block: any;
 }
 
 export default class ImageTool {
-  /** Editor.js API instance */
+  /** 
+   * Editor.js API instance 
+  */
   private api: API;
-  /** Flag indicating read-only mode */
+  /** 
+   * Flag indicating read-only mode 
+  */
   private readOnly: boolean;
-  /** Current Block API instance*/
+  /** 
+   * Current Block API instance
+  */
   private block: any;
-  /** Configuration for the ImageTool */
+  /** 
+   * Configuration for the ImageTool
+  */
   private config: ImageConfig;
-  /** Uploader module instance */
+  /** 
+   * Uploader module instance 
+  */
   private uploader: Uploader;
-  /** UI module instance */
+  /** 
+   * UI module instance
+  */
   private ui: Ui;
-  /** Partial data for the ImageTool */
+  /** 
+   * Partial data for the ImageTool 
+  */
   private _data: Partial<ImageToolData>;
 
   /**
@@ -219,7 +283,7 @@ export default class ImageTool {
    *
    * @returns {{icon: string, title: string}}
    */
-  static get toolbox(): Toolsbox {
+  static get toolbox(): ToolboxConfig {
     return {
       icon: IconPicture,
       title: 'Image',
@@ -231,7 +295,7 @@ export default class ImageTool {
    *
    * @returns {Array}
    */
-  static get tunes(): Array<Tones> {
+  static get tunes(): Array<Tunes> {
     return [
       {
         name: 'withBorder',
@@ -273,7 +337,7 @@ export default class ImageTool {
    * @public
    */
   validate(savedData: ImageToolData): boolean {
-    return !!savedData.file?.url ;
+    return savedData.file?.url !== undefined;
   }
 
   /**
@@ -298,7 +362,7 @@ export default class ImageTool {
    *
    * @returns {Array}
    */
-  renderSettings(): Array<RenderSettings> {
+  renderSettings(): Array<ExtendedTunes> {
     // Merge default tunes with the ones that might be added by user
     // @see https://github.com/editor-js/image/pull/49
     const tunes = ImageTool.tunes.concat(this.config.actions || []);
@@ -310,7 +374,7 @@ export default class ImageTool {
       toggle: tune.toggle,
       isActive: this.data[tune.name as keyof ImageToolData] as boolean,
       onActivate: () => {
-        /* If it'a user defined tune, execute it's callback stored in action property */
+        /**If it'a user defined tune, execute it's callback stored in action property */
         if (typeof tune.action === 'function') {
           tune.action(tune.name);
 
@@ -380,6 +444,10 @@ export default class ImageTool {
         /** Images from PDF */
         if (/^blob:/.test(image.src)) {
           const response = await fetch(image.src);
+          /**
+           * the return value of response.blob() is Promise<blob>, which can't be used in the function uploadFile.
+           * So, it is converted to File, and then use the file in the uploadFile function.
+           */
           const blob = await response.blob();
           const file = new File([blob], 'image.jpg', { type: blob.type, lastModified: Date.now() });
 

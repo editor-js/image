@@ -10,14 +10,12 @@
  * - RenderSettings: Represents settings for rendering with icon, label, name, toggle, isActive, and onActivate function.
  */
 export type Preview = { onPreview: (src: string) => void };
-export type CSS = { [key: string]: string };
-export type Status = {EMPTY: string, UPLOADING: string, FILLED: string};
-export enum StatusEnum {EMPTY = 'empty', UPLOADING = 'loading',FILLED = 'filled'}
-export type Attributes = { [key: string]: any};
-export type Toolsbox = {icon: string, title: string};
-export type Tones = { name: string; icon: string; title: string; toggle: boolean, action?: Function };
+export type UICSS = { [key: string]: string };
+export type UIStatus = {EMPTY: string, UPLOADING: string, FILLED: string};
+export type UIAttributes = { [key: string]: any};
+export type Tunes = { name: string; icon: string; title: string; toggle: boolean, action?: Function };
 export type PasteConfig = { tags: Array<{ img: { src: boolean } }>; patterns: { image: RegExp }; files: { mimeTypes: string[] } };
-export type RenderSettings = { icon: string; label: string; name: string; toggle: boolean; isActive: boolean; onActivate: () => void };
+export type ExtendedTunes = { icon: string; label: string; name: string; toggle: boolean; isActive: boolean; onActivate: () => void };
 
 /**
  * UploadResponseFormat interface representing the response format expected from the backend on file uploading.

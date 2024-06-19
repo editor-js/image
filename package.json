@@ -35,6 +35,7 @@
   },
   "devDependencies": {
     "@codexteam/ajax": "^4.2.0",
+    "@editorjs/editorjs": "^2.29.1",
     "@typescript-eslint/eslint-plugin": "^7.13.1",
     "@typescript-eslint/parser": "^7.13.1",
     "eslint": "^9.5.0",
@@ -51,6 +52,6 @@
   },
   "dependencies": {
     "@codexteam/icons": "^0.3.0",
-    "@editorjs/editorjs": "^2.29.1"
+    "@eslint/eslintrc": "^3.1.0"
   }
 }
