@@ -1,13 +1,12 @@
 import { IconPicture } from '@codexteam/icons';
 import { make } from './utils/dom';
-import { ImageToolConfig } from './index';
 import type { API } from '@editorjs/editorjs';
-import { ImageToolData } from './index';
+import { ImageToolData, ImageToolConfig } from './types/types';
 
 enum UiState {
-  EMPTY = "empty",
-  UPLOADING = 'uploading', 
-  FILLED = 'filled'
+  Empty = "EMPTY",
+  Uploading = "UPLOADING", 
+  Filled = "FILLED"
 };
 
 /**
@@ -27,7 +26,7 @@ interface Nodes {
    */
   fileButton: HTMLElement;
   /**
-   * The image element in the UI, if available.
+   * Represents the image element in the UI, if one is present; otherwise, it's undefined.
    */
   imageEl?: HTMLElement;
   /**
@@ -82,7 +81,7 @@ private config: ImageToolConfig;
 /**
  * Callback function for selecting a file.
  */
-private onSelectFile: Function;
+private onSelectFile: () => void;
 
 /**
  * Flag indicating if the UI is in read-only mode.
@@ -157,18 +156,6 @@ public nodes: Nodes;
   };
 
   /**
-   * Ui statuses:
-   * - empty
-   * - uploading
-   * - filled
-   *
-   * @returns {{EMPTY: string, UPLOADING: string, FILLED: string}}
-   */
-  static get status(): typeof UiState {
-    return UiState;
-  }
-
-  /**
    * Renders tool UI
    *
    * @param {ImageToolData} toolData - saved tool data
@@ -176,9 +163,9 @@ public nodes: Nodes;
    */
   render(toolData: ImageToolData): HTMLElement  {
     if (!toolData.file || Object.keys(toolData.file).length === 0) {
-      this.toggleStatus(Ui.status.EMPTY);
+      this.toggleStatus(UiState.Empty);
     } else {
-      this.toggleStatus(Ui.status.UPLOADING);
+      this.toggleStatus(UiState.Uploading);
     }
     return this.nodes.wrapper;
   }
@@ -209,7 +196,7 @@ public nodes: Nodes;
   showPreloader(src: string): void {
     this.nodes.imagePreloader.style.backgroundImage = `url(${src})`;
 
-    this.toggleStatus(Ui.status.UPLOADING);
+    this.toggleStatus(UiState.Uploading);
   }
 
   /**
@@ -219,7 +206,7 @@ public nodes: Nodes;
    */
   hidePreloader(): void {
     this.nodes.imagePreloader.style.backgroundImage = '';
-    this.toggleStatus(Ui.status.EMPTY);
+    this.toggleStatus(UiState.Empty);
   }
 
   /**
@@ -280,7 +267,7 @@ public nodes: Nodes;
      * Add load event listener
      */
     this.nodes.imageEl.addEventListener(eventName, () => {
-      this.toggleStatus(Ui.status.FILLED);
+      this.toggleStatus(UiState.Filled);
 
       /**
        * Preloader does not exists on first rendering with presaved data
@@ -312,9 +299,9 @@ public nodes: Nodes;
    * @returns {void}
    */
   toggleStatus(status: UiState): void {
-    for (const statusType in Ui.status) {
-      if (Object.prototype.hasOwnProperty.call(Ui.status, statusType)) {
-          this.nodes.wrapper.classList.toggle(`${this.CSS.wrapper}--${Ui.status[statusType as keyof typeof UiState]}`, status === Ui.status[statusType as keyof typeof UiState]);
+    for (const statusType in UiState) {
+      if (Object.prototype.hasOwnProperty.call(UiState, statusType)) {
+          this.nodes.wrapper.classList.toggle(`${this.CSS.wrapper}--${UiState[statusType as keyof typeof UiState]}`, status === UiState[statusType as keyof typeof UiState]);
       }
     }
   }

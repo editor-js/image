@@ -7,9 +7,9 @@
  *
  * To developers.
  * To simplify Tool structure, we split it to 4 parts:
- *  1) index.js — main Tool's interface, public API and methods for working with data
- *  2) uploader.js — module that has methods for sending files via AJAX: from device, by URL or File pasting
- *  3) ui.js — module for UI manipulations: render, showing preloader, etc
+ *  1) index.ts — main Tool's interface, public API and methods for working with data
+ *  2) uploader.ts — module that has methods for sending files via AJAX: from device, by URL or File pasting
+ *  3) ui.ts — module for UI manipulations: render, showing preloader, etc
  *  4) tunes.js — working with Block Tunes: render buttons, handle clicks
  *
  * For debug purposes there is a testing server
@@ -31,155 +31,19 @@
  */
 
 import type { TunesMenuConfig } from "@editorjs/editorjs/types/tools";
-import type { API, ToolboxConfig, PasteConfig, BaseTool } from '@editorjs/editorjs';
+import type { API, ToolboxConfig, PasteConfig, BlockToolConstructorOptions, BlockTool } from '@editorjs/editorjs';
 import './index.css';
 
 import Ui from './ui';
 import Uploader from './uploader';
 
 import { IconAddBorder, IconStretch, IconAddBackground, IconPicture } from '@codexteam/icons';
-import { TunesConfig } from './types/types';
+import { ActionConfig, UploadResponseFormat, ImageToolData, ImageToolConfig } from './types/types';
 
-/**
- * ImageToolData interface representing the input and output data format for the image tool.
- */
-export interface ImageToolData {
-  /**
-   * Caption for the image.
-   */
-  caption: string;
-  /**
-   * Flag indicating whether the image has a border.
-   */
-  withBorder: boolean;
-  /**
-   * Flag indicating whether the image has a background.
-   */
-  withBackground: boolean;
-  /**
-   * Flag indicating whether the image is stretched.
-   */
-  stretched: boolean;
-  /**
-   * Object containing the URL of the image file.
-   */
-  file: {
-    url: string;
-  };
-}
 
-/**
- *
- * @description Config supported by Tool
- */
-export interface ImageToolConfig {
-  /**
-   * Endpoints for upload, whether using file or URL.
-   */
-  endpoints: {
-    /**
-     * Endpoint for file upload.
-     */
-    byFile?: string;
-    /**
-     * Endpoints for URL upload.
-     */
-    byUrl?: string;
-  };
-  /**
-   * Field name for the uploaded image.
-   */
-  field?: string;
-  /**
-   * Allowed mime-types for the uploaded image.
-   */
-  types?: string;
-  /**
-   * Placeholder text for the caption field.
-   */
-  captionPlaceholder?: string;
-  /**
-   * Additional data to send with requests.
-   */
-  additionalRequestData?: object;
-  /**
-   * Additional headers to send with requests.
-   */
-  additionalRequestHeaders?: object;
-  /**
-   * Custom content for the select file button.
-   */
-  buttonContent?: string;
-  /**
-   * Optional custom uploader.
-   */
-  uploader?: {
-    /**
-     * Method to upload an image by file.
-     */
-    uploadByFile?: (file: Blob) => Promise<UploadResponseFormat>;
-    /**
-     * Method to upload an image by URL.
-     */
-    uploadByUrl?: (url: string) => Promise<UploadResponseFormat>;
-  };
-  /**
-   * Additional actions for the tool.
-   */
-  actions?: Array<TunesConfig>;
-}
+type ImageToolConstructorOptions = BlockToolConstructorOptions<ImageToolData, ImageToolConfig>
 
-/**
- * @typedef {object} UploadResponseFormat
- * @description This format expected from backend on file uploading
- * @property {number} success - 1 for successful uploading, 0 for failure
- * @property {object} file - Object with file data.
- *                           'url' is required,
- *                           also can contain any additional data that will be saved and passed back
- * @property {string} file.url - [Required] image source URL
- */
-interface UploadResponseFormat {
-  /**
-   * success - 1 for successful uploading, 0 for failure 
-   */
-  success: number;
-  /**
-   * Object with file data.
-   *             'url' is required,
-   *             also can contain any additional data that will be saved and passed back
-   */
-  file: {
-    /**
-     * The URL of the uploaded image.
-     */
-    url: string;
-  };
-}
-
-interface BlockToolConstructorOptions {
-  /**
-   * Previously saved data as ImageTool data.
-   */
-  data: ImageToolData;
-  /**
-   * User config for Tool.
-   */
-  config: ImageToolConfig;
-  /**
-   * Editor.js API.
-   */
-  api: API;
-  /**
-   * Flag indicating read-only mode.
-   */
-  readOnly: boolean;
-  /**
-   * Current Block API.
-   */
-  block: any;
-}
-
-export default class ImageTool implements BaseTool{
+export default class ImageTool implements BlockTool {
   /** 
    * Editor.js API instance 
    */
@@ -205,7 +69,7 @@ export default class ImageTool implements BaseTool{
    */
   private ui: Ui;
   /** 
-   * Partial data for the ImageTool 
+   * Stores current block data internally
    */
   private _data: ImageToolData;
 
@@ -217,7 +81,7 @@ export default class ImageTool implements BaseTool{
    * @param {boolean} tool.readOnly - read-only mode flag
    * @param {BlockAPI|{}} tool.block - current Block API
    */
-  constructor({ data, config, api, readOnly, block }: BlockToolConstructorOptions) {
+  constructor({ data, config, api, readOnly, block }: ImageToolConstructorOptions) {
     this.api = api;
     this.readOnly = readOnly;
     this.block = block;
@@ -226,15 +90,15 @@ export default class ImageTool implements BaseTool{
      * Tool's initial config
      */
     this.config = {
-      endpoints: config.endpoints || '',
-      additionalRequestData: config.additionalRequestData || {},
-      additionalRequestHeaders: config.additionalRequestHeaders || {},
-      field: config.field || 'image',
-      types: config.types || 'image/*',
-      captionPlaceholder: this.api.i18n.t(config.captionPlaceholder || 'Caption'),
-      buttonContent: config.buttonContent || '',
-      uploader: config.uploader || undefined,
-      actions: config.actions || [],
+      endpoints: config? config.endpoints : {},
+      additionalRequestData: config? config.additionalRequestData: {},
+      additionalRequestHeaders: config? config.additionalRequestHeaders: {},
+      field: config? config.field: 'image',
+      types: config? config.types: 'image/*',
+      captionPlaceholder: this.api.i18n.t(config && config.captionPlaceholder? config.captionPlaceholder: 'Caption'),
+      buttonContent: config? config.buttonContent : '',
+      uploader: config? config.uploader : undefined,
+      actions: config? config.actions: [],
     };
 
     /**
@@ -304,7 +168,7 @@ export default class ImageTool implements BaseTool{
    *
    * @returns {Array}
    */
-  static get tunes(): Array<TunesConfig> {
+  static get tunes(): Array<ActionConfig> {
     return [
       {
         name: 'withBorder',
@@ -346,7 +210,7 @@ export default class ImageTool implements BaseTool{
    * @public
    */
   validate(savedData: ImageToolData): boolean {
-    return savedData.file?.url !== undefined;
+    return !!savedData.file.url;
   }
 
   /**
@@ -369,9 +233,9 @@ export default class ImageTool implements BaseTool{
    *
    * @public
    *
-   * @returns {Array}
+   * @returns HTMLElement | TunesMenuConfig
    */
-  renderSettings(): Array<TunesMenuConfig> {
+  renderSettings(): HTMLElement | TunesMenuConfig {
     // Merge default tunes with the ones that might be added by user
     // @see https://github.com/editor-js/image/pull/49
     const tunes = ImageTool.tunes.concat(this.config.actions || []);

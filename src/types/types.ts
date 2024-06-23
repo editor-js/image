@@ -8,14 +8,114 @@ export interface UploadOptions  {
 /** 
  * User configuration of Image block tunes. Allows to add custom tunes through the config
 */
-export type TunesConfig = { name: string; icon: string; title: string; toggle: boolean, action?: Function };
+export interface ActionConfig { name: string; icon: string; title: string; toggle: boolean, action?: Function };
 
 /**
  * UploadResponseFormat interface representing the response format expected from the backend on file uploading.
  */
 export interface UploadResponseFormat {
+  /**
+   * success - 1 for successful uploading, 0 for failure 
+   */
   success: number;
+  /**
+   * Object with file data.
+   *             'url' is required,
+   *             also can contain any additional data that will be saved and passed back
+   */
+  file: {
+    /**
+     * The URL of the uploaded image.
+     */
+    url: string;
+  };
+}
+
+/**
+ * ImageToolData interface representing the input and output data format for the image tool.
+ */
+export interface ImageToolData {
+  /**
+   * Caption for the image.
+   */
+  caption: string;
+  /**
+   * Flag indicating whether the image has a border.
+   */
+  withBorder: boolean;
+  /**
+   * Flag indicating whether the image has a background.
+   */
+  withBackground: boolean;
+  /**
+   * Flag indicating whether the image is stretched.
+   */
+  stretched: boolean;
+  /**
+   * Object containing the URL of the image file.
+   */
   file: {
     url: string;
   };
+}
+
+/**
+ *
+ * @description Config supported by Tool
+ */
+export interface ImageToolConfig {
+  /**
+   * Endpoints for upload, whether using file or URL.
+   */
+  endpoints: {
+    /**
+     * Endpoint for file upload.
+     */
+    byFile?: string;
+    /**
+     * Endpoints for URL upload.
+     */
+    byUrl?: string;
+  };
+  /**
+   * Field name for the uploaded image.
+   */
+  field?: string;
+  /**
+   * Allowed mime-types for the uploaded image.
+   */
+  types?: string;
+  /**
+   * Placeholder text for the caption field.
+   */
+  captionPlaceholder?: string;
+  /**
+   * Additional data to send with requests.
+   */
+  additionalRequestData?: object;
+  /**
+   * Additional headers to send with requests.
+   */
+  additionalRequestHeaders?: object;
+  /**
+   * Custom content for the select file button.
+   */
+  buttonContent?: string;
+  /**
+   * Optional custom uploader.
+   */
+  uploader?: {
+    /**
+     * Method to upload an image by file.
+     */
+    uploadByFile?: (file: Blob) => Promise<UploadResponseFormat>;
+    /**
+     * Method to upload an image by URL.
+     */
+    uploadByUrl?: (url: string) => Promise<UploadResponseFormat>;
+  };
+  /**
+   * Additional actions for the tool.
+   */
+  actions?: ActionConfig[];
 }
