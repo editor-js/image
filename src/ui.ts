@@ -1,11 +1,25 @@
 import { IconPicture } from '@codexteam/icons';
 import { make } from './utils/dom';
 import type { API } from '@editorjs/editorjs';
-import { ImageToolData, ImageToolConfig } from './types/types';
+import { ImageToolData, ImageConfig } from './types/types';
 
+/**
+ * Enumeration representing the different states of the UI.
+ */
 enum UiState {
+  /**
+   * The UI is in an empty state, with no image loaded or being uploaded.
+   */
   Empty = "EMPTY",
+
+  /**
+   * The UI is in an uploading state, indicating an image is currently being uploaded.
+   */
   Uploading = "UPLOADING", 
+
+  /**
+   * The UI is in a filled state, with an image successfully loaded.
+   */
   Filled = "FILLED"
 };
 
@@ -17,22 +31,27 @@ interface Nodes {
    * Wrapper element in the UI.
    */
   wrapper: HTMLElement;
+
   /**
    * Container for the image element in the UI.
    */
   imageContainer: HTMLElement;
+
   /**
    * Button for selecting files.
    */
   fileButton: HTMLElement;
+
   /**
    * Represents the image element in the UI, if one is present; otherwise, it's undefined.
    */
   imageEl?: HTMLElement;
+
   /**
    * Preloader element for the image.
    */
   imagePreloader: HTMLElement;
+  
   /**
    * Caption element for the image.
    */
@@ -50,7 +69,7 @@ interface ConstructorParams {
   /**
    * Configuration for the image.
    */
-  config: ImageToolConfig;
+  config: ImageConfig;
   /**
    * Callback function for selecting a file.
    */
@@ -76,7 +95,7 @@ private api: API;
 /**
  * Configuration for the image tool.
  */
-private config: ImageToolConfig;
+private config: ImageConfig;
 
 /**
  * Callback function for selecting a file.
@@ -95,7 +114,7 @@ public nodes: Nodes;
   /**
    * @param {object} ui - image tool Ui module
    * @param {object} ui.api - Editor.js API
-   * @param {ImageToolConfig} ui.config - user config
+   * @param {ImageConfig} ui.config - user config
    * @param {Function} ui.onSelectFile - callback for clicks on Select file button
    * @param {boolean} ui.readOnly - read-only mode flag
    */

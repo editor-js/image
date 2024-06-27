@@ -1,7 +1,7 @@
 import ajax from '@codexteam/ajax';
 import isPromise from './utils/isPromise';
 import { UploadOptions } from './types/types';
-import { UploadResponseFormat, ImageToolConfig } from './types/types';
+import { UploadResponseFormat, ImageConfig } from './types/types';
 
 /**
  * Params interface for Uploader constructor
@@ -10,7 +10,7 @@ interface UploaderParams {
   /**
    * Configuration for the uploader
    */
-  config: ImageToolConfig;
+  config: ImageConfig;
   /**
    * 
    * @param response: Callback function for successful upload
@@ -32,12 +32,12 @@ interface UploaderParams {
  *  3. Upload by pasting file from Clipboard or by Drag'n'Drop
  */
 export default class Uploader {
-  private config: ImageToolConfig;
+  private config: ImageConfig;
   private onUpload: (response: UploadResponseFormat) => void;
   private onError: (error: any) => void;
   /**
    * @param {object} params - uploader module params
-   * @param {ImageToolConfig} params.config - image tool config
+   * @param {ImageConfig} params.config - image tool config
    * @param {Function} params.onUpload - one callback for all uploading (file, url, d-n-d, pasting)
    * @param {Function} params.onError - callback for uploading errors
    */
@@ -71,10 +71,11 @@ export default class Uploader {
 
     // custom uploading
     if (this.config.uploader && typeof this.config.uploader.uploadByFile === 'function') {
+      const uploadByFile = this.config.uploader.uploadByFile;
       upload = ajax.selectFiles({ accept: this.config.types || ''}).then((files: File[]) => {
         preparePreview(files[0]);
 
-        const customUpload = this.config.uploader && this.config.uploader.uploadByFile && this.config.uploader.uploadByFile(files[0]);
+        const customUpload = uploadByFile(files[0]);
 
         if (!isPromise(customUpload)) {
           console.warn('Custom uploader method uploadByFile should return a Promise');
@@ -84,9 +85,9 @@ export default class Uploader {
       });
 
     // default uploading
-    } else {
+    } else if (this.config.endpoints.byFile) {
       upload = ajax.transport({
-        url: this.config.endpoints.byFile!,
+        url: this.config.endpoints.byFile,
         data: this.config.additionalRequestData,
         accept: this.config.types,
         headers: this.config.additionalRequestHeaders as Record<string, string>,
@@ -95,6 +96,9 @@ export default class Uploader {
         },
         fieldName: this.config.field,
       }).then((response: any) => response.body);
+    } else {
+      this.onError('No valid upload configuration provided.');
+      return ;
     }
 
     upload.then((response) => {
@@ -174,7 +178,7 @@ export default class Uploader {
       if (!isPromise(upload)) {
         console.warn('Custom uploader method uploadByFile should return a Promise');
       }
-    } else {
+    } else if (this.config.endpoints.byFile) {
       /**
        * Default uploading
        */
@@ -189,11 +193,14 @@ export default class Uploader {
       }
 
       upload = ajax.post({
-        url: this.config.endpoints.byFile!,
+        url: this.config.endpoints.byFile,
         data: formData,
         type: ajax.contentType.JSON,
         headers: this.config.additionalRequestHeaders as Record<string, string>,
       }).then((response: any) => response.body);
+    } else {
+      this.onError('No valid upload configuration provided.');
+      return ;
     }
 
     upload.then((response) => {

@@ -31,43 +31,49 @@
  */
 
 import type { TunesMenuConfig } from "@editorjs/editorjs/types/tools";
-import type { API, ToolboxConfig, PasteConfig, BlockToolConstructorOptions, BlockTool } from '@editorjs/editorjs';
+import type { API, ToolboxConfig, PasteConfig, BlockToolConstructorOptions, BlockTool, BlockAPI } from '@editorjs/editorjs';
 import './index.css';
 
 import Ui from './ui';
 import Uploader from './uploader';
 
 import { IconAddBorder, IconStretch, IconAddBackground, IconPicture } from '@codexteam/icons';
-import { ActionConfig, UploadResponseFormat, ImageToolData, ImageToolConfig } from './types/types';
+import { ActionConfig, UploadResponseFormat, ImageToolData, ImageConfig } from './types/types';
 
 
-type ImageToolConstructorOptions = BlockToolConstructorOptions<ImageToolData, ImageToolConfig>
+type ImageToolConstructorOptions = BlockToolConstructorOptions<ImageToolData, ImageConfig>
 
 export default class ImageTool implements BlockTool {
   /** 
    * Editor.js API instance 
    */
   private api: API;
+
   /** 
    * Flag indicating read-only mode 
    */
   private readOnly: boolean;
+
   /** 
    * Current Block API instance
    */
-  private block: any;
+  private block: BlockAPI;
+
   /** 
    * Configuration for the ImageTool
    */
-  private config: ImageToolConfig;
+  private config: ImageConfig;
+
   /** 
    * Uploader module instance 
    */
   private uploader: Uploader;
+
   /** 
    * UI module instance
    */
   private ui: Ui;
+
   /** 
    * Stores current block data internally
    */
@@ -84,21 +90,21 @@ export default class ImageTool implements BlockTool {
   constructor({ data, config, api, readOnly, block }: ImageToolConstructorOptions) {
     this.api = api;
     this.readOnly = readOnly;
-    this.block = block;
+    this.block = block ? block : {} as BlockAPI;
 
     /**
      * Tool's initial config
      */
     this.config = {
-      endpoints: config? config.endpoints : {},
-      additionalRequestData: config? config.additionalRequestData: {},
-      additionalRequestHeaders: config? config.additionalRequestHeaders: {},
-      field: config? config.field: 'image',
-      types: config? config.types: 'image/*',
-      captionPlaceholder: this.api.i18n.t(config && config.captionPlaceholder? config.captionPlaceholder: 'Caption'),
-      buttonContent: config? config.buttonContent : '',
-      uploader: config? config.uploader : undefined,
-      actions: config? config.actions: [],
+      endpoints: config ? config.endpoints : {},
+      additionalRequestData: config ? config.additionalRequestData: {},
+      additionalRequestHeaders: config ? config.additionalRequestHeaders: {},
+      field: config ? config.field: 'image',
+      types: config ? config.types: 'image/*',
+      captionPlaceholder: this.api.i18n.t(config && config.captionPlaceholder ? config.captionPlaceholder: 'Caption'),
+      buttonContent: config ? config.buttonContent : '',
+      uploader: config ? config.uploader : undefined,
+      actions: config ? config.actions: [],
     };
 
     /**
@@ -233,9 +239,9 @@ export default class ImageTool implements BlockTool {
    *
    * @public
    *
-   * @returns HTMLElement | TunesMenuConfig
+   * @returns TunesMenuConfig
    */
-  renderSettings(): HTMLElement | TunesMenuConfig {
+  renderSettings(): TunesMenuConfig {
     // Merge default tunes with the ones that might be added by user
     // @see https://github.com/editor-js/image/pull/49
     const tunes = ImageTool.tunes.concat(this.config.actions || []);
@@ -253,7 +259,7 @@ export default class ImageTool implements BlockTool {
 
           return;
         }
-        this.tuneToggled(tune.name);
+        this.tuneToggled(tune.name as keyof ImageToolData);
       },
     }));
   }
@@ -363,7 +369,7 @@ export default class ImageTool implements BlockTool {
     ImageTool.tunes.forEach(({ name: tune }) => {
       const value = typeof data[tune as keyof ImageToolData] !== 'undefined' ? data[tune as keyof ImageToolData] === true || data[tune as keyof ImageToolData] === 'true' : false;
 
-      this.setTune(tune, value);
+      this.setTune(tune as keyof ImageToolData, value);
     });
   }
 
@@ -375,7 +381,7 @@ export default class ImageTool implements BlockTool {
    * @returns {ImageToolData}
    */
   get data(): ImageToolData {
-    return this._data as ImageToolData;
+    return this._data;
   }
 
   /**
@@ -385,8 +391,8 @@ export default class ImageTool implements BlockTool {
    *
    * @param {object} file - uploaded file data
    */
-  set image(file:{ url: string }) {
-    this._data.file = file || {};
+  set image(file: { url: string } | undefined) {
+    this._data.file = file || {url: ''};
 
     if (file && file.url) {
       this.ui.fillImage(file.url);
@@ -401,7 +407,7 @@ export default class ImageTool implements BlockTool {
    * @param {UploadResponseFormat} response - uploading server response
    * @returns {void}
    */
-  onUpload(response: UploadResponseFormat):void {
+  onUpload(response: UploadResponseFormat): void {
     if (response.success && response.file) {
       this.image = response.file;
     } else {
@@ -434,7 +440,7 @@ export default class ImageTool implements BlockTool {
    * @param {string} tuneName - tune that has been clicked
    * @returns {void}
    */
-  tuneToggled(tuneName: string): void {
+  tuneToggled(tuneName: keyof ImageToolData): void {
     // inverse tune state
     this.setTune(tuneName, !this._data[tuneName as keyof ImageToolData]);
   }
@@ -446,8 +452,8 @@ export default class ImageTool implements BlockTool {
    * @param {boolean} value - tune state
    * @returns {void}
    */
-  setTune(tuneName: string, value: boolean): void {
-    (this._data[tuneName as keyof ImageToolData] as boolean) = value;
+  setTune(tuneName: keyof ImageToolData, value: boolean): void {
+    (this._data[tuneName] as boolean) = value;
 
     this.ui.applyTune(tuneName, value);
     if (tuneName === 'stretched') {

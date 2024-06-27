@@ -8,7 +8,32 @@ export interface UploadOptions  {
 /** 
  * User configuration of Image block tunes. Allows to add custom tunes through the config
 */
-export interface ActionConfig { name: string; icon: string; title: string; toggle: boolean, action?: Function };
+export interface ActionConfig { 
+  /**
+   * The name of the tune.
+   */
+  name: string;
+  
+  /**
+   * The icon for the tune. Should be an SVG string.
+   */
+  icon: string;
+  
+  /**
+   * The title of the tune. This will be displayed in the UI.
+   */
+  title: string;
+  
+  /**
+   * A flag indicating whether the tune is a toggle (true) or not (false).
+   */
+  toggle: boolean;
+  
+  /**
+   * An optional action function to be executed when the tune is activated.
+   */
+  action?: Function;
+};
 
 /**
  * UploadResponseFormat interface representing the response format expected from the backend on file uploading.
@@ -18,6 +43,7 @@ export interface UploadResponseFormat {
    * success - 1 for successful uploading, 0 for failure 
    */
   success: number;
+
   /**
    * Object with file data.
    *             'url' is required,
@@ -39,81 +65,102 @@ export interface ImageToolData {
    * Caption for the image.
    */
   caption: string;
+
   /**
    * Flag indicating whether the image has a border.
    */
   withBorder: boolean;
+
   /**
    * Flag indicating whether the image has a background.
    */
   withBackground: boolean;
+
   /**
    * Flag indicating whether the image is stretched.
    */
   stretched: boolean;
+
   /**
    * Object containing the URL of the image file.
    */
   file: {
     url: string;
   };
+
+  /**
+   * Additional actions for the tool.
+   */
+  actions?: ActionConfig[];
 }
 
 /**
  *
  * @description Config supported by Tool
  */
-export interface ImageToolConfig {
+export interface ImageConfig {
   /**
    * Endpoints for upload, whether using file or URL.
    */
   endpoints: {
+
     /**
      * Endpoint for file upload.
      */
     byFile?: string;
+
     /**
      * Endpoints for URL upload.
      */
     byUrl?: string;
   };
+
   /**
    * Field name for the uploaded image.
    */
   field?: string;
+
   /**
    * Allowed mime-types for the uploaded image.
    */
   types?: string;
+
   /**
    * Placeholder text for the caption field.
    */
   captionPlaceholder?: string;
+
   /**
    * Additional data to send with requests.
    */
   additionalRequestData?: object;
+
   /**
    * Additional headers to send with requests.
    */
   additionalRequestHeaders?: object;
+
   /**
    * Custom content for the select file button.
    */
   buttonContent?: string;
+
   /**
    * Optional custom uploader.
    */
   uploader?: {
+
     /**
      * Method to upload an image by file.
      */
     uploadByFile?: (file: Blob) => Promise<UploadResponseFormat>;
+
     /**
      * Method to upload an image by URL.
      */
     uploadByUrl?: (url: string) => Promise<UploadResponseFormat>;
   };
+
   /**
    * Additional actions for the tool.
    */
