@@ -64,7 +64,7 @@ export default class ImageTool {
       field: config.field || 'image',
       types: config.types || 'image/*',
       captionPlaceholder: this.api.i18n.t(config.captionPlaceholder || 'Caption'),
-      numberInputPlaceholder: this.api.i18n.t(config.numberInputPlaceholder || 'Image Height (pt)'),
+      numberInputPlaceholder: this.api.i18n.t(config.numberInputPlaceholder || 'Image Height (px) - Default 100px'),
       buttonContent: config.buttonContent || '',
       uploader: config.uploader || undefined,
       actions: config.actions || [],

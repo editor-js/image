@@ -1,5 +1,5 @@
 {
-  "name": "@editorjs/image",
+  "name": "@blade47/editorjs-image",
   "version": "2.9.0",
   "keywords": [
     "codex editor",
@@ -9,7 +9,7 @@
   ],
   "description": "Image Tool for Editor.js",
   "license": "MIT",
-  "repository": "https://github.com/editor-js/image",
+  "repository": "https://github.com/blade47/image",
   "files": [
     "dist"
   ],
