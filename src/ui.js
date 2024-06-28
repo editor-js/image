@@ -22,13 +22,16 @@ export default class Ui {
     this.readOnly = readOnly;
     this.nodes = {
       wrapper: make('div', [this.CSS.baseClass, this.CSS.wrapper]),
-      imageContainer: make('div', [ this.CSS.imageContainer ]),
+      imageContainer: make('div', [this.CSS.imageContainer]),
       fileButton: this.createFileButton(),
       imageEl: undefined,
       imagePreloader: make('div', this.CSS.imagePreloader),
       caption: make('div', [this.CSS.input, this.CSS.caption], {
         contentEditable: !this.readOnly,
       }),
+      numberInput: make('div', [this.CSS.input, this.CSS.caption], {
+        contentEditable: !this.readOnly,
+      }) // Add number input field
     };
 
     /**
@@ -38,14 +41,18 @@ export default class Ui {
      *      <image-preloader />
      *    </image-container>
      *    <caption />
+     *    <number-input />
      *    <select-file-button />
      *  </wrapper>
      */
     this.nodes.caption.dataset.placeholder = this.config.captionPlaceholder;
+    this.nodes.numberInput.dataset.placeholder = this.config.numberInputPlaceholder || 'Enter height';
     this.nodes.imageContainer.appendChild(this.nodes.imagePreloader);
     this.nodes.wrapper.appendChild(this.nodes.imageContainer);
     this.nodes.wrapper.appendChild(this.nodes.caption);
+    this.nodes.wrapper.appendChild(this.nodes.numberInput); // Append number input field
     this.nodes.wrapper.appendChild(this.nodes.fileButton);
+    this.addNumericInputValidation();
   }
 
   /**
@@ -68,6 +75,7 @@ export default class Ui {
       imagePreloader: 'image-tool__image-preloader',
       imageEl: 'image-tool__image-picture',
       caption: 'image-tool__caption',
+      numberInput: 'image-tool__number-input', // CSS class for number input field
     };
   };
 
@@ -226,6 +234,18 @@ export default class Ui {
   }
 
   /**
+   * Fills the height input
+   *
+   * @param {string} height - image height
+   * @returns {void}
+   */
+  fillHeight(height) {
+    if (this.nodes.numberInput) {
+      this.nodes.numberInput.innerHTML = height;
+    }
+  }
+
+  /**
    * Changes UI status
    *
    * @param {string} status - see {@link Ui.status} constants
@@ -249,5 +269,29 @@ export default class Ui {
   applyTune(tuneName, status) {
     this.nodes.wrapper.classList.toggle(`${this.CSS.wrapper}--${tuneName}`, status);
   }
-}
 
+addNumericInputValidation() {
+    this.nodes.numberInput.addEventListener('input', (event) => {
+      const inputValue = event.target.textContent;
+      const numericValue = inputValue.replace(/[^0-9]/g, '');
+      if (inputValue !== numericValue) {
+        event.target.textContent = numericValue;
+        this.setEndOfContentEditable(event.target);
+      }
+    });}
+  /**
+   * Set cursor position to the end of the content in a contentEditable element
+   *
+   * @param {HTMLElement} element - contentEditable element
+   * @returns {void}
+   */
+  setEndOfContentEditable(element) {
+    const range = document.createRange();
+    const selection = window.getSelection();
+    range.selectNodeContents(element);
+    range.collapse(false);
+    selection.removeAllRanges();
+    selection.addRange(range);
+  }
+
+}
