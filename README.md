@@ -210,7 +210,7 @@ Response of your uploader should be at the same format as described at «[Upload
 Your backend will accept file as FormData object in field name, specified by `config.field` (by default, «`image`»).
 You should save it and return the same response format as described above.
 
-## Providing custom uploading methods
+## Providing custom image url resolving methods
 
 As mentioned at the Config Params section, you have an ability to provide own custom uploading methods.
 It is a quite simple: implement `uploadByFile` and `uploadByUrl` methods and pass them via `uploader` config param.
