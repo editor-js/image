@@ -5,7 +5,7 @@ import isPromise from './utils/isPromise';
  */
 export default class ImageResolver {
   /**
-   * @param {object} params - downloader module params
+   * @param {object} params - image resolver module params
    * @param {ImageConfig} params.config - image tool config
    * @param {Function} params.onResolve - callback which is called, when file is resolved
    * @param {Function} params.onError - callback for resolving errors
