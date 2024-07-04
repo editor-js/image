@@ -7,7 +7,7 @@ export default class ImageResolver {
   /**
    * @param {object} params - image resolver module params
    * @param {ImageConfig} params.config - image tool config
-   * @param {Function} params.onResolve - callback which is called, when file is resolved
+   * @param {(fileUploadingResponse: any) => string} params.onResolve - callback which is called, when file is resolved
    * @param {Function} params.onError - callback for resolving errors
    */
   constructor({ config, onResolve, onError }) {
