@@ -43,7 +43,6 @@
  */
 
 import ImageResolver from './imageResolver';
-import Downloader from './imageResolver';
 import './index.css';
 
 import Ui from './ui';
