@@ -11,7 +11,7 @@
  *  2) uploader.js — module that has methods for sending files via AJAX: from device, by URL or File pasting
  *  3) ui.js — module for UI manipulations: render, showing preloader, etc
  *  4) tunes.js — working with Block Tunes: render buttons, handle clicks
- *  5) downloader.js - module, which helps to use custom downloader using stored file data key
+ *  5) imageResolver.js - module, which helps to use custom image resolver via stored file data key
  *
  * For debug purposes there is a testing server
  * that can save uploaded files and return a Response {@link UploadResponseFormat}
@@ -42,7 +42,8 @@
  * @property {string} file.url — image URL
  */
 
-import Downloader from './downloader';
+import ImageResolver from './imageResolver';
+import Downloader from './imageResolver';
 import './index.css';
 
 import Ui from './ui';
@@ -65,8 +66,8 @@ import { IconAddBorder, IconStretch, IconAddBackground, IconPicture } from '@cod
  * @property {object} [uploader] - optional custom uploader
  * @property {function(File): Promise.<UploadResponseFormat>} [uploader.uploadByFile] - method that upload image by File
  * @property {function(string): Promise.<UploadResponseFormat>} [uploader.uploadByUrl] - method that upload image by URL
- * @property {object} [downloader] - optional custom downloader
- * @property {function(string): Promise.<string>} [downloader.download] - method that download image by data key
+ * @property {object} [imageResolver] - optional custom image data resolver
+ * @property {function(string): Promise.<string>} [imageResolver.resolveUrlByFileData] - method that resolves image by file data
  */
 
 /**
@@ -76,7 +77,7 @@ import { IconAddBorder, IconStretch, IconAddBackground, IconPicture } from '@cod
  * @property {object} file - Object with file data.
  *                           'url' is required,
  *                           also can contain any additional data that will be saved and passed back
- * @property {string} file.url - [Required] image source URL or file data key to load it via custom downloader
+ * @property {string} file.url - [Required] image source URL or file data key to resolve it via custom image resolver
  */
 export default class ImageTool {
   /**
@@ -156,11 +157,11 @@ export default class ImageTool {
       buttonContent: config.buttonContent || '',
       uploader: config.uploader || undefined,
       actions: config.actions || [],
-      downloader: config.downloader || undefined,
+      imageResolver: config.imageResolver || undefined,
     };
 
     /**
-     * Module for file uploading
+     * Module for image uploading
      */
     this.uploader = new Uploader({
       config: this.config,
@@ -185,12 +186,12 @@ export default class ImageTool {
     });
 
     /**
-     * Module for file downloading
+     * Module for image resolving
      */
-    this.downloader = new Downloader({
+    this.imageResolver = new ImageResolver({
       config: this.config,
-      onDownload: (url) => this.onDownload(url),
-      onError: this.downloadingFileError,
+      onResolve: (url) => this.onResolve(url),
+      onError: this.resolvingFileError,
     });
 
     /**
@@ -397,7 +398,7 @@ export default class ImageTool {
     this._data.file = file || {};
 
     if (file && file.url) {
-      this.downloader.download(file.url);
+      this.imageResolver.resolveUrlByFileData(file.url);
     }
   }
 
@@ -435,27 +436,27 @@ export default class ImageTool {
   }
 
   /**
-   * Handle downloader errors
+   * Handle image resolver errors
    *
    * @private
-   * @param {string} errorText - downloading error text
+   * @param {string} errorText - resolving error text
    * @returns {void}
    */
-  downloadingFileError(errorText) {
-    console.log('Image Tool: downloading failed because of', errorText);
+  resolvingFileError(errorText) {
+    console.log('Image Tool: resolving failed because of', errorText);
 
     this.api.notifier.show({
-      message: this.api.i18n.t('Couldn’t download image. Please try another.'),
+      message: this.api.i18n.t('Couldn’t resolve image. Please try another.'),
       style: 'error',
     });
   }
 
   /**
-   * File downloading callback, fills file data into image
+   * Image resolving callback, fills file data into image
    *
-   * @param {*} url - file url after downloading
+   * @param {*} url - file url after resolving
    */
-  onDownload(url) {
+  onResolve(url) {
     this.ui.fillImage(url);
   }
 
