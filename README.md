@@ -287,12 +287,12 @@ var editor = EditorJS({
 
 As mentioned at the Config Params section, you have an ability to provide own custom image resolving method.
 It is a quite simple: implement `resolveUrlByFileData` method and pass it via `imageResolver` config param.
-Method must return a Promise that resolves with url, which we can pass to the element and show it
+Method must return a Promise that resolves with url, which we can pass to the image element and show it
 
 
 | Method         | Arguments | Return value | Description |
 | -------------- | --------- | ------------- | ------------|
-| resolveUrlByFileData       | `fileData`| `{Promise.<string>}` | Resolve image url by file data |
+| resolveUrlByFileData       | `fileData`| `Promise.<string>` | Resolve image url by file data |
 
 Example:
 
