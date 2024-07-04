@@ -3,7 +3,7 @@ import isPromise from './utils/isPromise';
 /**
  * Module for file downloading. Handle case, when you have to use custom downloading method
  */
-export default class Downloader {
+export default class ImageResolver {
   /**
    * @param {object} params - downloader module params
    * @param {ImageConfig} params.config - image tool config
@@ -21,7 +21,7 @@ export default class Downloader {
    *
    * @param {string} fileData - may be some key for custom downloading or url
    */
-  download(fileData) {
+  resolveUrlByFileData(fileData) {
     /**
      * Check that custom downloader passed
      */
