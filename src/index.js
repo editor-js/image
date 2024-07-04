@@ -160,7 +160,7 @@ export default class ImageTool {
     };
 
     /**
-     * Module for image uploading
+     * Module for file uploading
      */
     this.uploader = new Uploader({
       config: this.config,
