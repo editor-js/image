@@ -12,7 +12,7 @@ export default class Downloader {
    */
   constructor({ config, onDownload, onError }) {
     this.config = config;
-    this.onDownload = onDownload
+    this.onDownload = onDownload;
     this.onError = onError;
   }
 
