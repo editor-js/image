@@ -11,6 +11,7 @@
  *  2) uploader.js — module that has methods for sending files via AJAX: from device, by URL or File pasting
  *  3) ui.js — module for UI manipulations: render, showing preloader, etc
  *  4) tunes.js — working with Block Tunes: render buttons, handle clicks
+ *  5) downloader.js - module, which helps to use custom downloader using stored file data key
  *
  * For debug purposes there is a testing server
  * that can save uploaded files and return a Response {@link UploadResponseFormat}
@@ -41,6 +42,7 @@
  * @property {string} file.url — image URL
  */
 
+import Downloader from './downloader';
 import './index.css';
 
 import Ui from './ui';
@@ -61,6 +63,7 @@ import { IconAddBorder, IconStretch, IconAddBackground, IconPicture } from '@cod
  * @property {object} additionalRequestHeaders - allows to pass custom headers with Request
  * @property {string} buttonContent - overrides for Select File button
  * @property {object} [uploader] - optional custom uploader
+ * @property {object} [downloader] - optional custom downloader
  * @property {function(File): Promise.<UploadResponseFormat>} [uploader.uploadByFile] - method that upload image by File
  * @property {function(string): Promise.<UploadResponseFormat>} [uploader.uploadByUrl] - method that upload image by URL
  */
@@ -72,7 +75,7 @@ import { IconAddBorder, IconStretch, IconAddBackground, IconPicture } from '@cod
  * @property {object} file - Object with file data.
  *                           'url' is required,
  *                           also can contain any additional data that will be saved and passed back
- * @property {string} file.url - [Required] image source URL
+ * @property {string} file.url - [Required] image source URL or file data key to load it via custom downloader
  */
 export default class ImageTool {
   /**
@@ -152,6 +155,7 @@ export default class ImageTool {
       buttonContent: config.buttonContent || '',
       uploader: config.uploader || undefined,
       actions: config.actions || [],
+      downloader: config.downloader || undefined
     };
 
     /**
@@ -178,6 +182,15 @@ export default class ImageTool {
       },
       readOnly,
     });
+
+    /**
+     * Module for file downloading
+     */
+    this.downloader = new Downloader({
+      config: this.config,
+      onDownload: (url) => this.onDownload(url),
+      onError: this.downloadingFileError,
+    })
 
     /**
      * Set saved state
@@ -383,7 +396,7 @@ export default class ImageTool {
     this._data.file = file || {};
 
     if (file && file.url) {
-      this.ui.fillImage(file.url);
+      this.downloader.download(file.url)
     }
   }
 
@@ -418,6 +431,31 @@ export default class ImageTool {
       style: 'error',
     });
     this.ui.hidePreloader();
+  }
+
+  /**
+   * Handle downloader errors
+   *
+   * @private
+   * @param {string} errorText - downloading error text
+   * @returns {void}
+   */
+  downloadingFileError(errorText) {
+    console.log('Image Tool: downloading failed because of', errorText);
+
+    this.api.notifier.show({
+      message: this.api.i18n.t('Couldn’t download image. Please try another.'),
+      style: 'error',
+    });
+  }
+
+  /**
+   * File downloading callback, fills file data into image
+   * 
+   * @param {*} url - file url after downloading
+   */
+  onDownload(url) {
+    this.ui.fillImage(url)
   }
 
   /**

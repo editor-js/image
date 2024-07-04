@@ -188,7 +188,6 @@ export default class Ui {
        */
       eventName = 'loadeddata';
     }
-
     /**
      * Compose tag with defined attributes
      *

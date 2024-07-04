@@ -82,6 +82,7 @@ Image Tool supports these configuration parameters:
 | captionPlaceholder | `string` | (default: `Caption`) Placeholder for Caption input |
 | buttonContent | `string` | Allows to override HTML content of «Select file» button |
 | uploader | `{{uploadByFile: function, uploadByUrl: function}}` | Optional custom uploading methods. See details below. |
+| downloader | `{{download: function}}` | Optional custom downloading method. See details below. |
 | actions | `array` | Array with custom actions to show in the tool's settings menu. See details below. |
 
 Note that if you don't implement your custom uploader methods, the `endpoints` param is required.
@@ -178,7 +179,7 @@ The response of your uploader **should**  cover the following format:
 
 **success** - uploading status. 1 for successful, 0 for failed
 
-**file** - uploaded file data. **Must** contain an `url` field with full public path to the uploaded image.
+**file** - uploaded file data. **Must** contain an `url` field with full public path to the uploaded image or data key for using it in custom downloader.
 Also, can contain any additional fields you want to store. For example, width, height, id etc.
 All additional fields will be saved at the `file` object of output data.
 
@@ -271,6 +272,55 @@ var editor = EditorJS({
                   // any other image data you want to store, such as width, height, color, extension, etc
                 }
               }
+            })
+          }
+        }
+      }
+    }
+  }
+
+  ...
+});
+```
+
+## Providing custom downloading method
+
+As mentioned at the Config Params section, you have an ability to provide own custom downloading method.
+It is a quite simple: implement `download` method and pass it via `downloader` config param.
+Method must return a Promise that resolves with url, which we can pass to the element and show it
+
+
+| Method         | Arguments | Return value | Description |
+| -------------- | --------- | ------------- | ------------|
+| download       | `fileData`| `{Promise.<string>}` | Download file by file data convert it and return valid file url |
+
+Example:
+
+```js
+import ImageTool from '@editorjs/image';
+
+var editor = EditorJS({
+  ...
+
+  tools: {
+    ...
+    image: {
+      class: ImageTool,
+      config: {
+        /**
+         * Custom downloader
+         */
+        downloader: {
+          /**
+           * Download file from the server using file data.
+           * @param {string} fileData - data required for downloading
+           * @return {Promise.<string>} - valid url
+           */
+          uploadByU
+          download(fileData) {
+            // your ajax request for downloading
+            return MyAjax.download(fileData).then((data) => {
+              return URL.createObjectURL(data);
             })
           }
         }
