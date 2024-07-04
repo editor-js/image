@@ -19,7 +19,7 @@ export default class ImageResolver {
   /**
    * Try to resolve image url by file data and fill it using stored data
    *
-   * @param {string} fileData - file data from custom image resolving
+   * @param {string} fileData - file data, from which file url need to be resolved
    */
   resolveUrlByFileData(fileData) {
     /**
