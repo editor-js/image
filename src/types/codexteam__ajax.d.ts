@@ -1,9 +1,9 @@
 declare module '@codexteam/ajax' {
     export interface AjaxOptions {
-      url: string;
+      url?: string;
       data?: any;
       accept?: string;
-      headers?: Record<string, string>;
+      headers?: Headers;
       beforeSend?: (files: File[]) => void;
       fieldName?: string;
       type?: string;

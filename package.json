@@ -26,8 +26,8 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint src/ --ext .ts",
-    "lint:errors": "eslint src/ --ext .ts --quiet",
-    "lint:fix": "eslint src/ --ext .ts --fix"
+    "lint:errors": "eslint src/ --quiet",
+    "lint:fix": "eslint src/ --fix"
   },
   "author": {
     "name": "CodeX",
@@ -35,10 +35,10 @@
   },
   "devDependencies": {
     "@codexteam/ajax": "^4.2.0",
-    "@editorjs/editorjs": "^2.29.1",
+    "@editorjs/editorjs": "2.30.0-rc.12",
     "@typescript-eslint/eslint-plugin": "^7.13.1",
     "@typescript-eslint/parser": "^7.13.1",
-    "eslint": "^9.5.0",
+    "eslint": "^7.22.0",
     "eslint-config-codex": "^2.0.1",
     "eslint-loader": "^4.0.2",
     "formidable": "^3.5.1",

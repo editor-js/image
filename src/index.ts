@@ -90,21 +90,21 @@ export default class ImageTool implements BlockTool {
   constructor({ data, config, api, readOnly, block }: ImageToolConstructorOptions) {
     this.api = api;
     this.readOnly = readOnly;
-    this.block = block ? block : {} as BlockAPI;
+    this.block = block;
 
     /**
      * Tool's initial config
      */
     this.config = {
-      endpoints: config ? config.endpoints : {},
-      additionalRequestData: config ? config.additionalRequestData: {},
-      additionalRequestHeaders: config ? config.additionalRequestHeaders: {},
-      field: config ? config.field: 'image',
-      types: config ? config.types: 'image/*',
-      captionPlaceholder: this.api.i18n.t(config && config.captionPlaceholder ? config.captionPlaceholder: 'Caption'),
-      buttonContent: config ? config.buttonContent : '',
-      uploader: config ? config.uploader : undefined,
-      actions: config ? config.actions: [],
+      endpoints: config.endpoints,
+      additionalRequestData: config.additionalRequestData,
+      additionalRequestHeaders: config.additionalRequestHeaders,
+      field: config.field,
+      types: config.types,
+      captionPlaceholder: this.api.i18n.t(config.captionPlaceholder ? config.captionPlaceholder: 'Caption'),
+      buttonContent: config.buttonContent,
+      uploader: config.uploader,
+      actions: config.actions,
     };
 
     /**

@@ -25,9 +25,9 @@ export interface ActionConfig {
   title: string;
   
   /**
-   * A flag indicating whether the tune is a toggle (true) or not (false).
+   * An optional flag indicating whether the tune is a toggle (true) or not (false).
    */
-  toggle: boolean;
+  toggle?: boolean;
   
   /**
    * An optional action function to be executed when the tune is activated.
@@ -58,9 +58,9 @@ export interface UploadResponseFormat {
 }
 
 /**
- * ImageToolData interface representing the input and output data format for the image tool.
+ * ImageToolData type representing the input and output data format for the image tool, including optional custome actions.
  */
-export interface ImageToolData {
+export type ImageToolData<Actions = {}> = {
   /**
    * Caption for the image.
    */
@@ -87,12 +87,7 @@ export interface ImageToolData {
   file: {
     url: string;
   };
-
-  /**
-   * Additional actions for the tool.
-   */
-  actions?: ActionConfig[];
-}
+} & (Actions extends Record<string, boolean> ? Actions : {});
 
 /**
  *

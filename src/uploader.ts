@@ -85,20 +85,17 @@ export default class Uploader {
       });
 
     // default uploading
-    } else if (this.config.endpoints.byFile) {
+    } else {
       upload = ajax.transport({
         url: this.config.endpoints.byFile,
         data: this.config.additionalRequestData,
         accept: this.config.types,
-        headers: this.config.additionalRequestHeaders as Record<string, string>,
+        headers: new Headers(this.config.additionalRequestHeaders as Record<string, string>),
         beforeSend: (files: File[]) => {
           preparePreview(files[0]);
         },
         fieldName: this.config.field,
       }).then((response: any) => response.body);
-    } else {
-      this.onError('No valid upload configuration provided.');
-      return ;
     }
 
     upload.then((response) => {
@@ -131,12 +128,12 @@ export default class Uploader {
        * Default uploading
        */
       upload = ajax.post({
-        url: this.config.endpoints.byUrl!,
+        url: this.config.endpoints.byUrl,
         data: Object.assign({
           url: url,
         }, this.config.additionalRequestData),
         type: ajax.contentType.JSON,
-        headers: this.config.additionalRequestHeaders as Record<string, string>,
+        headers: new Headers(this.config.additionalRequestHeaders as Record<string, string>),
       }).then((response: any) => response.body);
     }
 
@@ -178,7 +175,7 @@ export default class Uploader {
       if (!isPromise(upload)) {
         console.warn('Custom uploader method uploadByFile should return a Promise');
       }
-    } else if (this.config.endpoints.byFile) {
+    } else {
       /**
        * Default uploading
        */
@@ -196,11 +193,8 @@ export default class Uploader {
         url: this.config.endpoints.byFile,
         data: formData,
         type: ajax.contentType.JSON,
-        headers: this.config.additionalRequestHeaders as Record<string, string>,
+        headers: new Headers(this.config.additionalRequestHeaders as Record<string, string>),
       }).then((response: any) => response.body);
-    } else {
-      this.onError('No valid upload configuration provided.');
-      return ;
     }
 
     upload.then((response) => {

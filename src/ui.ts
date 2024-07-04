@@ -10,17 +10,17 @@ enum UiState {
   /**
    * The UI is in an empty state, with no image loaded or being uploaded.
    */
-  Empty = "EMPTY",
+  Empty = "empty",
 
   /**
    * The UI is in an uploading state, indicating an image is currently being uploaded.
    */
-  Uploading = "UPLOADING", 
+  Uploading = "uploading", 
 
   /**
    * The UI is in a filled state, with an image successfully loaded.
    */
-  Filled = "FILLED"
+  Filled = "filled"
 };
 
 /**
