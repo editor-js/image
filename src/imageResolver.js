@@ -23,7 +23,7 @@ export default class ImageResolver {
    */
   resolveUrlByFileData(fileData) {
     /**
-     * Check that custom downloader passed
+     * Check that custom url resolver passed
      */
     if (this.config.imageResolver && typeof this.config.imageResolver.resolveUrlByFileData === 'function') {
       const resolveFileData = this.config.imageResolver.resolveUrlByFileData(fileData);
