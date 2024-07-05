@@ -1,8 +1,5 @@
 {
-  "globals": {
-    "HTMLOListElement": true,
-    "HTMLUListElement": true
-  },
+  "globals": {},
   "parserOptions": {
     "sourceType": "module",
     "ecmaVersion": 2020

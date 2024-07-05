@@ -19,7 +19,8 @@
   "exports": {
     ".": {
       "import": "./dist/image.mjs",
-      "require": "./dist/image.umd.js"
+      "require": "./dist/image.umd.js",
+      "types": "./dist/index.d.ts"
     }
   },
   "scripts": {
