@@ -179,7 +179,8 @@ The response of your uploader **should**  cover the following format:
 
 **success** - uploading status. 1 for successful, 0 for failed
 
-**file** - uploaded file data. **Must** contain an `url` field with full public path to the uploaded image or data key for using it in custom image resolver.
+**file** - uploaded file data. **Must** contain an `url` field with full public path to the uploaded image or data key for using it in custom image resolver, or you
+can use additional fields for custom resolving.
 Also, can contain any additional fields you want to store. For example, width, height, id etc.
 All additional fields will be saved at the `file` object of output data.
 
@@ -294,6 +295,8 @@ Method must return a Promise that resolves with url, which we can pass to the im
 | -------------- | --------- | ------------- | ------------|
 | resolveUrlByFileData       | `fileData`| `Promise.<string>` | Resolve image url by file data |
 
+`fileData` - any data, which is needed for resolving url
+
 Example:
 
 ```js
@@ -313,7 +316,7 @@ var editor = EditorJS({
         imageResolver: {
           /**
            * Resolve image url by file data.
-           * @param {string} fileData - data required for image url resolving
+           * @param {any} fileData - data required for image url resolving
            * @return {Promise.<string>} - valid url
            */
           resolveUrlByFileData(fileData) {
