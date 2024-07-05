@@ -295,7 +295,7 @@ Method must return a Promise that resolves with url, which we can pass to the im
 | -------------- | --------- | ------------- | ------------|
 | resolveUrlByFileData       | `fileData`| `Promise.<string>` | Resolve image url by file data |
 
-`fileData` - any data, which is needed for resolving url
+`fileData` - any data, which your server returns after uploading image.
 
 Example:
 
