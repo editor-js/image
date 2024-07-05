@@ -188,7 +188,6 @@ export default class Ui {
        */
       eventName = 'loadeddata';
     }
-
     /**
      * Compose tag with defined attributes
      *
@@ -250,4 +249,3 @@ export default class Ui {
     this.nodes.wrapper.classList.toggle(`${this.CSS.wrapper}--${tuneName}`, status);
   }
 }
-

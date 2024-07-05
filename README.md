@@ -82,6 +82,7 @@ Image Tool supports these configuration parameters:
 | captionPlaceholder | `string` | (default: `Caption`) Placeholder for Caption input |
 | buttonContent | `string` | Allows to override HTML content of «Select file» button |
 | uploader | `{{uploadByFile: function, uploadByUrl: function}}` | Optional custom uploading methods. See details below. |
+| imageResolver | `{{resolveUrlByFileData: function}}` | Optional custom image resolving method. See details below. |
 | actions | `array` | Array with custom actions to show in the tool's settings menu. See details below. |
 
 Note that if you don't implement your custom uploader methods, the `endpoints` param is required.
@@ -178,7 +179,8 @@ The response of your uploader **should**  cover the following format:
 
 **success** - uploading status. 1 for successful, 0 for failed
 
-**file** - uploaded file data. **Must** contain an `url` field with full public path to the uploaded image.
+**file** - uploaded file data. **Must** contain an `url` field with full public path to the uploaded image or data key for using it in custom image resolver, or you
+can use additional fields for custom resolving.
 Also, can contain any additional fields you want to store. For example, width, height, id etc.
 All additional fields will be saved at the `file` object of output data.
 
@@ -271,6 +273,56 @@ var editor = EditorJS({
                   // any other image data you want to store, such as width, height, color, extension, etc
                 }
               }
+            })
+          }
+        }
+      }
+    }
+  }
+
+  ...
+});
+```
+
+## Providing custom image url resolving methods
+
+As mentioned at the Config Params section, you have an ability to provide own custom image resolving method.
+It is a quite simple: implement `resolveUrlByFileData` method and pass it via `imageResolver` config param.
+Method must return a Promise that resolves with url, which we can pass to the image element and show it
+
+
+| Method         | Arguments | Return value | Description |
+| -------------- | --------- | ------------- | ------------|
+| resolveUrlByFileData       | `fileData`| `Promise.<string>` | Resolve image url by file data |
+
+`fileData` - any data, which your server returns after uploading image.
+
+Example:
+
+```js
+import ImageTool from '@editorjs/image';
+
+var editor = EditorJS({
+  ...
+
+  tools: {
+    ...
+    image: {
+      class: ImageTool,
+      config: {
+        /**
+         * Custom image resolver
+         */
+        imageResolver: {
+          /**
+           * Resolve image url by file data.
+           * @param {any} fileData - data required for image url resolving
+           * @return {Promise.<string>} - valid url
+           */
+          resolveUrlByFileData(fileData) {
+            // your ajax request for image url resolving
+            return MyAjax.download(fileData).then((data) => {
+              return URL.createObjectURL(data);
             })
           }
         }

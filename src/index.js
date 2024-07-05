@@ -11,6 +11,7 @@
  *  2) uploader.js — module that has methods for sending files via AJAX: from device, by URL or File pasting
  *  3) ui.js — module for UI manipulations: render, showing preloader, etc
  *  4) tunes.js — working with Block Tunes: render buttons, handle clicks
+ *  5) imageResolver.js - module, which helps to use custom image resolver via stored file data key
  *
  * For debug purposes there is a testing server
  * that can save uploaded files and return a Response {@link UploadResponseFormat}
@@ -41,6 +42,7 @@
  * @property {string} file.url — image URL
  */
 
+import ImageResolver from './imageResolver';
 import './index.css';
 
 import Ui from './ui';
@@ -63,6 +65,8 @@ import { IconAddBorder, IconStretch, IconAddBackground, IconPicture } from '@cod
  * @property {object} [uploader] - optional custom uploader
  * @property {function(File): Promise.<UploadResponseFormat>} [uploader.uploadByFile] - method that upload image by File
  * @property {function(string): Promise.<UploadResponseFormat>} [uploader.uploadByUrl] - method that upload image by URL
+ * @property {object} [imageResolver] - optional custom image data resolver
+ * @property {function(any): Promise.<string>} [imageResolver.resolveUrlByFileData] - method that resolves image url by file data
  */
 
 /**
@@ -70,9 +74,11 @@ import { IconAddBorder, IconStretch, IconAddBackground, IconPicture } from '@cod
  * @description This format expected from backend on file uploading
  * @property {number} success - 1 for successful uploading, 0 for failure
  * @property {object} file - Object with file data.
- *                           'url' is required,
+ *                           'url' contains image url
+ *                           or you can store file data in additional fields for custom resolver
  *                           also can contain any additional data that will be saved and passed back
- * @property {string} file.url - [Required] image source URL
+ *                           this data can be used for custom downloading
+ * @property {string} file.url - image source URL
  */
 export default class ImageTool {
   /**
@@ -152,7 +158,16 @@ export default class ImageTool {
       buttonContent: config.buttonContent || '',
       uploader: config.uploader || undefined,
       actions: config.actions || [],
+      imageResolver: config.imageResolver || undefined,
     };
+
+    /**
+     * Module for image resolving
+     */
+    this.imageResolver = new ImageResolver({
+      config: this.config,
+      onError: this.resolvingFileError,
+    });
 
     /**
      * Module for file uploading
@@ -205,7 +220,7 @@ export default class ImageTool {
    * @public
    */
   validate(savedData) {
-    return savedData.file && savedData.file.url;
+    return savedData.file;
   }
 
   /**
@@ -382,8 +397,8 @@ export default class ImageTool {
   set image(file) {
     this._data.file = file || {};
 
-    if (file && file.url) {
-      this.ui.fillImage(file.url);
+    if (file) {
+      this.imageResolver.resolveUrlByFileData(file).then(url => this.ui.fillImage(url));
     }
   }
 
@@ -418,6 +433,22 @@ export default class ImageTool {
       style: 'error',
     });
     this.ui.hidePreloader();
+  }
+
+  /**
+   * Handle image resolver errors
+   *
+   * @private
+   * @param {string} errorText - resolving error text
+   * @returns {void}
+   */
+  resolvingFileError(errorText) {
+    console.log('Image Tool: resolving failed because of', errorText);
+
+    this.api.notifier.show({
+      message: this.api.i18n.t('Couldn’t resolve image. Please try another.'),
+      style: 'error',
+    });
   }
 
   /**
