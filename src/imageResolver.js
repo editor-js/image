@@ -7,21 +7,19 @@ export default class ImageResolver {
   /**
    * @param {object} params - image resolver module params
    * @param {ImageConfig} params.config - image tool config
-   * @param {(fileUploadingResponse: any) => string} params.onResolve - callback which is called, when file is resolved
    * @param {Function} params.onError - callback for resolving errors
    */
   constructor({ config, onResolve, onError }) {
     this.config = config;
-    this.onResolve = onResolve;
     this.onError = onError;
   }
 
   /**
    * Try to resolve image url by file data and fill it using stored data
    *
-   * @param {string} fileData - file data, from which file url need to be resolved
+   * @param {any} fileData - file data, from which file url need to be resolved
    */
-  resolveUrlByFileData(fileData) {
+  async resolveUrlByFileData(fileData) {
     /**
      * Check that custom url resolver passed
      */
@@ -32,20 +30,23 @@ export default class ImageResolver {
         console.warn('Custom downloader method download should return a Promise');
       }
 
-      resolveFileData.then((response) => {
+      try {
         /**
-         * Call callback for successful resolving with url
+         * Return resolver url
          */
-        this.onResolve(response);
-      }).catch((error) => {
+        return await resolveFileData;
+      } catch (error) {
         this.onError(error);
-      });
+      }
     } else {
       /**
-       * If there is no custom resolve method, fileData is correct url
-       * We only need to call callback
+       * If there is no custom resolve method, fileData must have correct url property, which have no need in resolving
        */
-      this.onResolve(fileData);
+      if (!fileData.url) {
+        this.onError('Incorrect data: file data should contain url');
+      }
+
+      return fileData.url;
     }
   }
 }

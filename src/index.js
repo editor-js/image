@@ -66,7 +66,7 @@ import { IconAddBorder, IconStretch, IconAddBackground, IconPicture } from '@cod
  * @property {function(File): Promise.<UploadResponseFormat>} [uploader.uploadByFile] - method that upload image by File
  * @property {function(string): Promise.<UploadResponseFormat>} [uploader.uploadByUrl] - method that upload image by URL
  * @property {object} [imageResolver] - optional custom image data resolver
- * @property {function(string): Promise.<string>} [imageResolver.resolveUrlByFileData] - method that resolves image by file data
+ * @property {function(any): Promise.<string>} [imageResolver.resolveUrlByFileData] - method that resolves image url by file data
  */
 
 /**
@@ -74,9 +74,10 @@ import { IconAddBorder, IconStretch, IconAddBackground, IconPicture } from '@cod
  * @description This format expected from backend on file uploading
  * @property {number} success - 1 for successful uploading, 0 for failure
  * @property {object} file - Object with file data.
- *                           'url' is required,
+ *                           'url' exists image url
  *                           also can contain any additional data that will be saved and passed back
- * @property {string} file.url - [Required] image source URL or file data key to resolve it via custom image resolver
+ *                           this data can be used for custom downloading
+ * @property {string} file.url - image source URL
  */
 export default class ImageTool {
   /**
@@ -160,6 +161,14 @@ export default class ImageTool {
     };
 
     /**
+     * Module for image resolving
+     */
+    this.imageResolver = new ImageResolver({
+      config: this.config,
+      onError: this.resolvingFileError,
+    });
+
+    /**
      * Module for file uploading
      */
     this.uploader = new Uploader({
@@ -182,15 +191,6 @@ export default class ImageTool {
         });
       },
       readOnly,
-    });
-
-    /**
-     * Module for image resolving
-     */
-    this.imageResolver = new ImageResolver({
-      config: this.config,
-      onResolve: (url) => this.onResolve(url),
-      onError: this.resolvingFileError,
     });
 
     /**
@@ -219,7 +219,7 @@ export default class ImageTool {
    * @public
    */
   validate(savedData) {
-    return savedData.file && savedData.file.url;
+    return savedData.file;
   }
 
   /**
@@ -396,10 +396,8 @@ export default class ImageTool {
   set image(file) {
     this._data.file = file || {};
 
-    if (file && file.url) {
-      const url = await this.imageResolver.resolveUrlByFileData(file);
-      
-      this.ui.fillImage(url)
+    if (file) {
+      this.imageResolver.resolveUrlByFileData(file).then(url => this.ui.fillImage(url));
     }
   }
 
@@ -450,15 +448,6 @@ export default class ImageTool {
       message: this.api.i18n.t('Couldn’t resolve image. Please try another.'),
       style: 'error',
     });
-  }
-
-  /**
-   * Image resolving callback, fills file data into image
-   *
-   * @param {*} url - file url after resolving
-   */
-  onResolve(url) {
-    this.ui.fillImage(url);
   }
 
   /**
