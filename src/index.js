@@ -74,7 +74,8 @@ import { IconAddBorder, IconStretch, IconAddBackground, IconPicture } from '@cod
  * @description This format expected from backend on file uploading
  * @property {number} success - 1 for successful uploading, 0 for failure
  * @property {object} file - Object with file data.
- *                           'url' exists image url
+ *                           'url' contains image url
+ *                           or you can store file data in additional fields for custom resolver
  *                           also can contain any additional data that will be saved and passed back
  *                           this data can be used for custom downloading
  * @property {string} file.url - image source URL
