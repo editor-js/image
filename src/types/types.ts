@@ -54,7 +54,7 @@ export interface UploadResponseFormat {
      * The URL of the uploaded image.
      */
     url: string;
-  };
+  } & Record<string, any>;
 }
 
 /**
@@ -83,10 +83,14 @@ export type ImageToolData<Actions = {}> = {
 
   /**
    * Object containing the URL of the image file.
+   * Also can contain any additional data.
    */
   file: {
+    /**
+     * The URL of the image.
+     */
     url: string;
-  };
+  } & Record<string, any>;
 } & (Actions extends Record<string, boolean> ? Actions : {});
 
 /**
