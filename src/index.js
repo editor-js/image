@@ -3,7 +3,7 @@ import './index.css';
 import Ui from './ui';
 import Uploader from './uploader';
 
-import { IconAddBorder, IconStretch, IconAddBackground, IconPicture } from '@codexteam/icons';
+import { IconPicture } from '@codexteam/icons';
 
 /**
  * @typedef {object} ImageToolData
@@ -27,29 +27,6 @@ export default class ImageTool {
       icon: IconPicture,
       title: 'Image',
     };
-  }
-
-  static get tunes() {
-    return [
-      {
-        name: 'withBorder',
-        icon: IconAddBorder,
-        title: 'With border',
-        toggle: true,
-      },
-      {
-        name: 'stretched',
-        icon: IconStretch,
-        title: 'Stretch image',
-        toggle: true,
-      },
-      {
-        name: 'withBackground',
-        icon: IconAddBackground,
-        title: 'With background',
-        toggle: true,
-      },
-    ];
   }
 
   constructor({ data, config, api, readOnly, block }) {
@@ -111,25 +88,6 @@ export default class ImageTool {
     return this.data;
   }
 
-  renderSettings() {
-    const tunes = ImageTool.tunes.concat(this.config.actions);
-
-    return tunes.map(tune => ({
-      icon: tune.icon,
-      label: this.api.i18n.t(tune.title),
-      name: tune.name,
-      toggle: tune.toggle,
-      isActive: this.data[tune.name],
-      onActivate: () => {
-        if (typeof tune.action === 'function') {
-          tune.action(tune.name);
-          return;
-        }
-        this.tuneToggled(tune.name);
-      },
-    }));
-  }
-
   appendCallback() {
     this.ui.nodes.fileButton.click();
   }
@@ -188,12 +146,6 @@ export default class ImageTool {
     this._data.height = data.height || '';
     this.ui.fillCaption(this._data.caption);
     this.ui.fillHeight(this._data.height);
-
-    ImageTool.tunes.forEach(({ name: tune }) => {
-      const value = typeof data[tune] !== 'undefined' ? data[tune] === true || data[tune] === 'true' : false;
-
-      this.setTune(tune, value);
-    });
   }
 
   get data() {
@@ -224,25 +176,6 @@ export default class ImageTool {
       style: 'error',
     });
     this.ui.hidePreloader();
-  }
-
-  tuneToggled(tuneName) {
-    this.setTune(tuneName, !this._data[tuneName]);
-  }
-
-  setTune(tuneName, value) {
-    this._data[tuneName] = value;
-
-    this.ui.applyTune(tuneName, value);
-
-    if (tuneName === 'stretched') {
-      Promise.resolve().then(() => {
-        this.block.stretched = value;
-      })
-        .catch(err => {
-          console.error(err);
-        });
-    }
   }
 
   uploadFile(file) {
