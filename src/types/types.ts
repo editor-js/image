@@ -5,6 +5,16 @@ export interface UploadOptions  {
   onPreview: (src: string) => void 
 };
 
+/**
+ * Represents the format of a file object data with the additional data.
+ */
+export type FileObjectData<AdditionalData = {}> = {
+  /**
+   * The URL of the file.
+   */
+  url: string;
+} & AdditionalData;
+
 /** 
  * User configuration of Image block tunes. Allows to add custom tunes through the config
 */

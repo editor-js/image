@@ -38,12 +38,12 @@ import Ui from './ui';
 import Uploader from './uploader';
 
 import { IconAddBorder, IconStretch, IconAddBackground, IconPicture } from '@codexteam/icons';
-import { ActionConfig, UploadResponseFormat, ImageToolData, ImageConfig } from './types/types';
+import { ActionConfig, UploadResponseFormat, ImageToolData, ImageConfig, FileObjectData } from './types/types';
 
 
-type ImageToolConstructorOptions = BlockToolConstructorOptions<ImageToolData, ImageConfig>
+type ImageToolConstructorOptions< CustomActions = {},AdditionalUploadResponse = {}> = BlockToolConstructorOptions<ImageToolData<CustomActions, AdditionalUploadResponse>, ImageConfig>
 
-export default class ImageTool implements BlockTool {
+export default class ImageTool<CustomActions = {} ,AdditionalUploadResponse = {}> implements BlockTool {
   /** 
    * Editor.js API instance 
    */
@@ -67,17 +67,17 @@ export default class ImageTool implements BlockTool {
   /** 
    * Uploader module instance 
    */
-  private uploader: Uploader;
+  private uploader: Uploader<AdditionalUploadResponse>;
 
   /** 
    * UI module instance
    */
-  private ui: Ui;
+  private ui: Ui<CustomActions, AdditionalUploadResponse>;
 
   /** 
    * Stores current block data internally
    */
-  private _data: ImageToolData;
+  private _data: ImageToolData<CustomActions, AdditionalUploadResponse>;
 
   /**
    * @param {object} tool - tool properties got from editor.js
@@ -87,7 +87,7 @@ export default class ImageTool implements BlockTool {
    * @param {boolean} tool.readOnly - read-only mode flag
    * @param {BlockAPI|{}} tool.block - current Block API
    */
-  constructor({ data, config, api, readOnly, block }: ImageToolConstructorOptions) {
+  constructor({ data, config, api, readOnly, block }: ImageToolConstructorOptions<CustomActions, AdditionalUploadResponse>) {
     this.api = api;
     this.readOnly = readOnly;
     this.block = block;
@@ -110,16 +110,16 @@ export default class ImageTool implements BlockTool {
     /**
      * Module for file uploading
      */
-    this.uploader = new Uploader({
+    this.uploader = new Uploader<AdditionalUploadResponse>({
       config: this.config,
-      onUpload: (response) => this.onUpload(response),
+      onUpload: (response: UploadResponseFormat<AdditionalUploadResponse>) => this.onUpload(response),
       onError: (error) => this.uploadingFailed(error),
     });
 
     /**
      * Module for working with UI
      */
-    this.ui = new Ui({
+    this.ui = new Ui<CustomActions, AdditionalUploadResponse>({
       api,
       config: this.config,
       onSelectFile: () => {
@@ -143,7 +143,7 @@ export default class ImageTool implements BlockTool {
       file: {
         url: '',
       },
-    };
+    } as ImageToolData<CustomActions, AdditionalUploadResponse>;
     this.data = data;
   }
   /**
@@ -215,7 +215,7 @@ export default class ImageTool implements BlockTool {
    * @returns {boolean} false if saved data is not correct, otherwise true
    * @public
    */
-  validate(savedData: ImageToolData): boolean {
+  validate(savedData: ImageToolData<CustomActions, AdditionalUploadResponse>): boolean {
     return !!savedData.file.url;
   }
 
@@ -226,7 +226,7 @@ export default class ImageTool implements BlockTool {
    *
    * @returns {ImageToolData}
    */
-  save(): ImageToolData {
+  save(): ImageToolData<CustomActions, AdditionalUploadResponse> {
     const caption = this.ui.nodes.caption;
 
     this._data.caption = caption.innerHTML;
@@ -251,7 +251,7 @@ export default class ImageTool implements BlockTool {
       label: this.api.i18n.t(tune.title),
       name: tune.name,
       toggle: tune.toggle,
-      isActive: this.data[tune.name as keyof ImageToolData] as boolean,
+      isActive: this.data[tune.name as keyof ImageToolData<CustomActions, AdditionalUploadResponse>] as boolean,
       onActivate: () => {
         /**If it'a user defined tune, execute it's callback stored in action property */
         if (typeof tune.action === 'function') {
@@ -259,7 +259,7 @@ export default class ImageTool implements BlockTool {
 
           return;
         }
-        this.tuneToggled(tune.name as keyof ImageToolData);
+        this.tuneToggled(tune.name as keyof ImageToolData<CustomActions, AdditionalUploadResponse>);
       },
     }));
   }
@@ -360,16 +360,16 @@ export default class ImageTool implements BlockTool {
    *
    * @param {ImageToolData} data - data in Image Tool format
    */
-  set data(data: ImageToolData) {
+  set data(data: ImageToolData<CustomActions, AdditionalUploadResponse>) {
     this.image = data.file;
 
     this._data.caption = data.caption || '';
     this.ui.fillCaption(this._data.caption);
 
     ImageTool.tunes.forEach(({ name: tune }) => {
-      const value = typeof data[tune as keyof ImageToolData] !== 'undefined' ? data[tune as keyof ImageToolData] === true || data[tune as keyof ImageToolData] === 'true' : false;
+      const value = typeof data[tune as keyof ImageToolData<CustomActions, AdditionalUploadResponse>] !== 'undefined' ? data[tune as keyof ImageToolData<CustomActions, AdditionalUploadResponse>] === true || data[tune as keyof ImageToolData<CustomActions, AdditionalUploadResponse>] === 'true' : false;
 
-      this.setTune(tune as keyof ImageToolData, value);
+      this.setTune(tune as keyof ImageToolData<CustomActions, AdditionalUploadResponse>, value);
     });
   }
 
@@ -380,7 +380,7 @@ export default class ImageTool implements BlockTool {
    *
    * @returns {ImageToolData}
    */
-  get data(): ImageToolData {
+  get data(): ImageToolData<CustomActions, AdditionalUploadResponse> {
     return this._data;
   }
 
@@ -391,8 +391,8 @@ export default class ImageTool implements BlockTool {
    *
    * @param {object} file - uploaded file data
    */
-  set image(file: { url: string } | undefined) {
-    this._data.file = file || {url: ''};
+  set image(file: FileObjectData<AdditionalUploadResponse> | undefined) {
+    this._data.file = file || ({url: ''} as FileObjectData<AdditionalUploadResponse>);
 
     if (file && file.url) {
       this.ui.fillImage(file.url);
@@ -407,7 +407,7 @@ export default class ImageTool implements BlockTool {
    * @param {UploadResponseFormat} response - uploading server response
    * @returns {void}
    */
-  onUpload(response: UploadResponseFormat): void {
+  onUpload(response: UploadResponseFormat<AdditionalUploadResponse>): void {
     if (response.success && response.file) {
       this.image = response.file;
     } else {
@@ -440,9 +440,9 @@ export default class ImageTool implements BlockTool {
    * @param {string} tuneName - tune that has been clicked
    * @returns {void}
    */
-  tuneToggled(tuneName: keyof ImageToolData): void {
+  tuneToggled(tuneName: keyof ImageToolData<CustomActions, AdditionalUploadResponse>): void {
     // inverse tune state
-    this.setTune(tuneName, !this._data[tuneName as keyof ImageToolData]);
+    this.setTune(tuneName, !this._data[tuneName as keyof ImageToolData<CustomActions, AdditionalUploadResponse>]);
   }
 
   /**
@@ -452,10 +452,10 @@ export default class ImageTool implements BlockTool {
    * @param {boolean} value - tune state
    * @returns {void}
    */
-  setTune(tuneName: keyof ImageToolData, value: boolean): void {
+  setTune(tuneName: keyof ImageToolData<CustomActions, AdditionalUploadResponse>, value: boolean): void {
     (this._data[tuneName] as boolean) = value;
 
-    this.ui.applyTune(tuneName, value);
+    this.ui.applyTune(String(tuneName), value);
     if (tuneName === 'stretched') {
       /**
        * Wait until the API is ready

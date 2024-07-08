@@ -6,7 +6,7 @@ import { UploadResponseFormat, ImageConfig } from './types/types';
 /**
  * Params interface for Uploader constructor
  */
-interface UploaderParams {
+interface UploaderParams<AdditionalUploadResponse = {}> {
   /**
    * Configuration for the uploader
    */
@@ -16,7 +16,7 @@ interface UploaderParams {
    * @param response: Callback function for successful upload
    * @returns void
    */
-  onUpload: (response: UploadResponseFormat) => void;
+  onUpload: (response: UploadResponseFormat<AdditionalUploadResponse>) => void;
   /**
    * 
    * @param error : error type
@@ -31,9 +31,9 @@ interface UploaderParams {
  *  2. Upload by pasting URL
  *  3. Upload by pasting file from Clipboard or by Drag'n'Drop
  */
-export default class Uploader {
+export default class Uploader<AdditionalUploadResponse = {}> {
   private config: ImageConfig;
-  private onUpload: (response: UploadResponseFormat) => void;
+  private onUpload: (response: UploadResponseFormat<AdditionalUploadResponse>) => void;
   private onError: (error: any) => void;
   /**
    * @param {object} params - uploader module params
@@ -41,7 +41,7 @@ export default class Uploader {
    * @param {Function} params.onUpload - one callback for all uploading (file, url, d-n-d, pasting)
    * @param {Function} params.onError - callback for uploading errors
    */
-  constructor({ config, onUpload, onError }: UploaderParams) {
+  constructor({ config, onUpload, onError }: UploaderParams<AdditionalUploadResponse>) {
     this.config = config;
     this.onUpload = onUpload;
     this.onError = onError;
@@ -67,7 +67,7 @@ export default class Uploader {
      * Custom uploading
      * or default uploading
      */
-    let upload: Promise<UploadResponseFormat>;
+    let upload: Promise<UploadResponseFormat<AdditionalUploadResponse>>;
 
     // custom uploading
     if (this.config.uploader && typeof this.config.uploader.uploadByFile === 'function') {
@@ -81,7 +81,7 @@ export default class Uploader {
           console.warn('Custom uploader method uploadByFile should return a Promise');
         }
 
-        return customUpload as Promise<UploadResponseFormat>;
+        return customUpload as Promise<UploadResponseFormat<AdditionalUploadResponse>>;
       });
 
     // default uploading
@@ -99,7 +99,7 @@ export default class Uploader {
     }
 
     upload.then((response) => {
-      this.onUpload(response);
+      this.onUpload(response as UploadResponseFormat<AdditionalUploadResponse>);
     }).catch((error) => {
       this.onError(error);
     });
@@ -137,7 +137,7 @@ export default class Uploader {
       }).then((response: any) => response.body);
     }
 
-    upload.then((response: UploadResponseFormat) => {
+    upload.then((response: UploadResponseFormat<AdditionalUploadResponse>) => {
       this.onUpload(response);
     }).catch((error: any) => {
       this.onError(error);
@@ -198,7 +198,7 @@ export default class Uploader {
     }
 
     upload.then((response) => {
-      this.onUpload(response);
+      this.onUpload(response as UploadResponseFormat<AdditionalUploadResponse>);
     }).catch((error) => {
       this.onError(error);
     });

@@ -86,7 +86,7 @@ interface ConstructorParams {
  *  - show/hide preview
  *  - apply tune view
  */
-export default class Ui {
+export default class Ui<CustomActions = {}, AdditionalUploadResponse = {}> {
 /**
  * API instance for Editor.js.
  */
@@ -180,7 +180,7 @@ public nodes: Nodes;
    * @param {ImageToolData} toolData - saved tool data
    * @returns {Element}
    */
-  render(toolData: ImageToolData): HTMLElement  {
+  render(toolData: ImageToolData<CustomActions, AdditionalUploadResponse>): HTMLElement  {
     if (!toolData.file || Object.keys(toolData.file).length === 0) {
       this.toggleStatus(UiState.Empty);
     } else {
