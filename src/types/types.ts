@@ -38,7 +38,7 @@ export interface ActionConfig {
 /**
  * UploadResponseFormat interface representing the response format expected from the backend on file uploading.
  */
-export interface UploadResponseFormat<AdditionalData = {}> {
+export interface UploadResponseFormat<AdditionalFileData = {}> {
   /**
    * success - 1 for successful uploading, 0 for failure 
    */
@@ -54,13 +54,13 @@ export interface UploadResponseFormat<AdditionalData = {}> {
      * The URL of the uploaded image.
      */
     url: string;
-  } & AdditionalData;
+  } & AdditionalFileData;
 }
 
 /**
  * ImageToolData type representing the input and output data format for the image tool, including optional custome actions.
  */
-export type ImageToolData<Actions = {}, AdditionalData = {}> = {
+export type ImageToolData<Actions = {}, AdditionalFileData = {}> = {
   /**
    * Caption for the image.
    */
@@ -90,7 +90,7 @@ export type ImageToolData<Actions = {}, AdditionalData = {}> = {
      * The URL of the image.
      */
     url: string;
-  } & AdditionalData;
+  } & AdditionalFileData;
 } & (Actions extends Record<string, boolean> ? Actions : {});
 
 /**
