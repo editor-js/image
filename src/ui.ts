@@ -1,5 +1,84 @@
 import { IconPicture } from '@codexteam/icons';
 import { make } from './utils/dom';
+import type { API } from '@editorjs/editorjs';
+import { ImageToolData, ImageConfig } from './types/types';
+
+/**
+ * Enumeration representing the different states of the UI.
+ */
+enum UiState {
+  /**
+   * The UI is in an empty state, with no image loaded or being uploaded.
+   */
+  Empty = "empty",
+
+  /**
+   * The UI is in an uploading state, indicating an image is currently being uploaded.
+   */
+  Uploading = "uploading", 
+
+  /**
+   * The UI is in a filled state, with an image successfully loaded.
+   */
+  Filled = "filled"
+};
+
+/**
+ * Nodes interface representing various elements in the UI.
+ */
+interface Nodes {
+  /**
+   * Wrapper element in the UI.
+   */
+  wrapper: HTMLElement;
+
+  /**
+   * Container for the image element in the UI.
+   */
+  imageContainer: HTMLElement;
+
+  /**
+   * Button for selecting files.
+   */
+  fileButton: HTMLElement;
+
+  /**
+   * Represents the image element in the UI, if one is present; otherwise, it's undefined.
+   */
+  imageEl?: HTMLElement;
+
+  /**
+   * Preloader element for the image.
+   */
+  imagePreloader: HTMLElement;
+  
+  /**
+   * Caption element for the image.
+   */
+  caption: HTMLElement;
+}
+
+/**
+ * ConstructorParams interface representing parameters for the Ui class constructor.
+ */
+interface ConstructorParams {
+  /**
+   * Editor.js API.
+   */
+  api: API;
+  /**
+   * Configuration for the image.
+   */
+  config: ImageConfig;
+  /**
+   * Callback function for selecting a file.
+   */
+  onSelectFile: () => void;
+  /**
+   * Flag indicating if the UI is in read-only mode.
+   */
+  readOnly: boolean;
+}
 
 /**
  * Class for working with UI:
@@ -8,6 +87,30 @@ import { make } from './utils/dom';
  *  - apply tune view
  */
 export default class Ui {
+/**
+ * API instance for Editor.js.
+ */
+private api: API;
+
+/**
+ * Configuration for the image tool.
+ */
+private config: ImageConfig;
+
+/**
+ * Callback function for selecting a file.
+ */
+private onSelectFile: () => void;
+
+/**
+ * Flag indicating if the UI is in read-only mode.
+ */
+private readOnly: boolean;
+
+/**
+ * Nodes representing various elements in the UI.
+ */
+public nodes: Nodes;
   /**
    * @param {object} ui - image tool Ui module
    * @param {object} ui.api - Editor.js API
@@ -15,7 +118,7 @@ export default class Ui {
    * @param {Function} ui.onSelectFile - callback for clicks on Select file button
    * @param {boolean} ui.readOnly - read-only mode flag
    */
-  constructor({ api, config, onSelectFile, readOnly }) {
+  constructor({ api, config, onSelectFile, readOnly }: ConstructorParams) {
     this.api = api;
     this.config = config;
     this.onSelectFile = onSelectFile;
@@ -53,7 +156,7 @@ export default class Ui {
    *
    * @returns {object}
    */
-  get CSS() {
+  get CSS(): Record<string, string> {
     return {
       baseClass: this.api.styles.block,
       loading: this.api.styles.loader,
@@ -72,34 +175,17 @@ export default class Ui {
   };
 
   /**
-   * Ui statuses:
-   * - empty
-   * - uploading
-   * - filled
-   *
-   * @returns {{EMPTY: string, UPLOADING: string, FILLED: string}}
-   */
-  static get status() {
-    return {
-      EMPTY: 'empty',
-      UPLOADING: 'loading',
-      FILLED: 'filled',
-    };
-  }
-
-  /**
    * Renders tool UI
    *
    * @param {ImageToolData} toolData - saved tool data
    * @returns {Element}
    */
-  render(toolData) {
+  render(toolData: ImageToolData): HTMLElement  {
     if (!toolData.file || Object.keys(toolData.file).length === 0) {
-      this.toggleStatus(Ui.status.EMPTY);
+      this.toggleStatus(UiState.Empty);
     } else {
-      this.toggleStatus(Ui.status.UPLOADING);
+      this.toggleStatus(UiState.Uploading);
     }
-
     return this.nodes.wrapper;
   }
 
@@ -108,7 +194,7 @@ export default class Ui {
    *
    * @returns {Element}
    */
-  createFileButton() {
+  createFileButton(): HTMLElement {
     const button = make('div', [ this.CSS.button ]);
 
     button.innerHTML = this.config.buttonContent || `${IconPicture} ${this.api.i18n.t('Select an Image')}`;
@@ -126,10 +212,10 @@ export default class Ui {
    * @param {string} src - preview source
    * @returns {void}
    */
-  showPreloader(src) {
+  showPreloader(src: string): void {
     this.nodes.imagePreloader.style.backgroundImage = `url(${src})`;
 
-    this.toggleStatus(Ui.status.UPLOADING);
+    this.toggleStatus(UiState.Uploading);
   }
 
   /**
@@ -137,9 +223,9 @@ export default class Ui {
    *
    * @returns {void}
    */
-  hidePreloader() {
+  hidePreloader(): void {
     this.nodes.imagePreloader.style.backgroundImage = '';
-    this.toggleStatus(Ui.status.EMPTY);
+    this.toggleStatus(UiState.Empty);
   }
 
   /**
@@ -148,13 +234,13 @@ export default class Ui {
    * @param {string} url - image source
    * @returns {void}
    */
-  fillImage(url) {
+  fillImage(url: string): void {
     /**
      * Check for a source extension to compose element correctly: video tag for mp4, img — for others
      */
     const tag = /\.mp4$/.test(url) ? 'VIDEO' : 'IMG';
 
-    const attributes = {
+    const attributes: { [key: string]: any} = {
       src: url,
     };
 
@@ -200,7 +286,7 @@ export default class Ui {
      * Add load event listener
      */
     this.nodes.imageEl.addEventListener(eventName, () => {
-      this.toggleStatus(Ui.status.FILLED);
+      this.toggleStatus(UiState.Filled);
 
       /**
        * Preloader does not exists on first rendering with presaved data
@@ -219,7 +305,7 @@ export default class Ui {
    * @param {string} text - caption text
    * @returns {void}
    */
-  fillCaption(text) {
+  fillCaption(text: string): void {
     if (this.nodes.caption) {
       this.nodes.caption.innerHTML = text;
     }
@@ -231,10 +317,10 @@ export default class Ui {
    * @param {string} status - see {@link Ui.status} constants
    * @returns {void}
    */
-  toggleStatus(status) {
-    for (const statusType in Ui.status) {
-      if (Object.prototype.hasOwnProperty.call(Ui.status, statusType)) {
-        this.nodes.wrapper.classList.toggle(`${this.CSS.wrapper}--${Ui.status[statusType]}`, status === Ui.status[statusType]);
+  toggleStatus(status: UiState): void {
+    for (const statusType in UiState) {
+      if (Object.prototype.hasOwnProperty.call(UiState, statusType)) {
+          this.nodes.wrapper.classList.toggle(`${this.CSS.wrapper}--${UiState[statusType as keyof typeof UiState]}`, status === UiState[statusType as keyof typeof UiState]);
       }
     }
   }
@@ -246,7 +332,7 @@ export default class Ui {
    * @param {boolean} status - true for enable, false for disable
    * @returns {void}
    */
-  applyTune(tuneName, status) {
+  applyTune(tuneName: string, status: boolean): void {
     this.nodes.wrapper.classList.toggle(`${this.CSS.wrapper}--${tuneName}`, status);
   }
 }
