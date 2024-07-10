@@ -90,7 +90,7 @@ export default class Uploader<AdditionalUploadResponse = {}> {
         url: this.config.endpoints.byFile,
         data: this.config.additionalRequestData,
         accept: this.config.types,
-        headers: new Headers(this.config.additionalRequestHeaders as Record<string, string>),
+        headers: this.config.additionalRequestHeaders as Record<string, string>,
         beforeSend: (files: File[]) => {
           preparePreview(files[0]);
         },
@@ -98,7 +98,7 @@ export default class Uploader<AdditionalUploadResponse = {}> {
       }).then((response: any) => response.body);
     }
 
-    upload.then((response) => {
+      upload.then((response) => {
       this.onUpload(response as UploadResponseFormat<AdditionalUploadResponse>);
     }).catch((error) => {
       this.onError(error);
@@ -133,7 +133,7 @@ export default class Uploader<AdditionalUploadResponse = {}> {
           url: url,
         }, this.config.additionalRequestData),
         type: ajax.contentType.JSON,
-        headers: new Headers(this.config.additionalRequestHeaders as Record<string, string>),
+        headers: this.config.additionalRequestHeaders as Record<string, string>,
       }).then((response: any) => response.body);
     }
 
@@ -193,7 +193,7 @@ export default class Uploader<AdditionalUploadResponse = {}> {
         url: this.config.endpoints.byFile,
         data: formData,
         type: ajax.contentType.JSON,
-        headers: new Headers(this.config.additionalRequestHeaders as Record<string, string>),
+        headers: this.config.additionalRequestHeaders as Record<string, string>,
       }).then((response: any) => response.body);
     }
 

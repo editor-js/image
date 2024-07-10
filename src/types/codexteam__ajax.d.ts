@@ -3,7 +3,7 @@ declare module '@codexteam/ajax' {
       url?: string;
       data?: any;
       accept?: string;
-      headers?: Headers;
+      headers?: Record<string, string> | Headers;
       beforeSend?: (files: File[]) => void;
       fieldName?: string;
       type?: string;
