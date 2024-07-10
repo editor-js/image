@@ -8,12 +8,12 @@ export interface UploadOptions  {
 /**
  * Represents the format of a file object data with the additional data.
  */
-export type FileObjectData<AdditionalData = {}> = {
+export type FileObjectData<AdditionalFileData = {}> = {
   /**
    * The URL of the file.
    */
   url: string;
-} & AdditionalData;
+} & AdditionalFileData;
 
 /** 
  * User configuration of Image block tunes. Allows to add custom tunes through the config
@@ -59,12 +59,7 @@ export interface UploadResponseFormat<AdditionalFileData = {}> {
    *             'url' is required,
    *             also can contain any additional data that will be saved and passed back
    */
-  file: {
-    /**
-     * The URL of the uploaded image.
-     */
-    url: string;
-  } & AdditionalFileData;
+  file: FileObjectData<AdditionalFileData>;
 }
 
 /**
@@ -95,12 +90,7 @@ export type ImageToolData<Actions = {}, AdditionalFileData = {}> = {
    * Object containing the URL of the image file.
    * Also can contain any additional data.
    */
-  file: {
-    /**
-     * The URL of the image.
-     */
-    url: string;
-  } & AdditionalFileData;
+  file: FileObjectData<AdditionalFileData>;
 } & (Actions extends Record<string, boolean> ? Actions : {});
 
 /**
