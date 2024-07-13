@@ -91,7 +91,7 @@ export type ImageToolData<Actions = {}, AdditionalFileData = {}> = {
    * Also can contain any additional data.
    */
   file: FileObjectData<AdditionalFileData>;
-} & (Actions extends Record<string, boolean> ? Actions : {});
+} & Actions;
 
 /**
  *

@@ -1,7 +1,7 @@
 import { IconPicture } from '@codexteam/icons';
 import { make } from './utils/dom';
 import type { API } from '@editorjs/editorjs';
-import { ImageToolData, ImageConfig } from './types/types';
+import { ImageConfig, ImageToolData } from './types/types';
 
 /**
  * Enumeration representing the different states of the UI.
@@ -86,7 +86,7 @@ interface ConstructorParams {
  *  - show/hide preview
  *  - apply tune view
  */
-export default class Ui<CustomActions = {}, AdditionalUploadResponse = {}> {
+export default class Ui<ImageToolDataType extends ImageToolData = ImageToolData > {
 /**
  * API instance for Editor.js.
  */
@@ -180,7 +180,7 @@ public nodes: Nodes;
    * @param {ImageToolData} toolData - saved tool data
    * @returns {Element}
    */
-  render(toolData: ImageToolData<CustomActions, AdditionalUploadResponse>): HTMLElement  {
+  render(toolData: ImageToolDataType): HTMLElement  {
     if (!toolData.file || Object.keys(toolData.file).length === 0) {
       this.toggleStatus(UiState.Empty);
     } else {

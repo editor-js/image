@@ -41,9 +41,9 @@ import { IconAddBorder, IconStretch, IconAddBackground, IconPicture } from '@cod
 import { ActionConfig, UploadResponseFormat, ImageToolData, ImageConfig, FileObjectData } from './types/types';
 
 
-type ImageToolConstructorOptions< CustomActions = {},AdditionalUploadResponse = {}> = BlockToolConstructorOptions<ImageToolData<CustomActions, AdditionalUploadResponse>, ImageConfig>
+type ImageToolConstructorOptions<CustomActions = {}, AdditionalUploadResponse = {}> = BlockToolConstructorOptions<ImageToolData<CustomActions, AdditionalUploadResponse>, ImageConfig>
 
-export default class ImageTool<CustomActions = {} ,AdditionalUploadResponse = {}> implements BlockTool {
+export default class ImageTool<CustomActions = {}, AdditionalUploadResponse = {}> implements BlockTool {
   /** 
    * Editor.js API instance 
    */
@@ -72,7 +72,7 @@ export default class ImageTool<CustomActions = {} ,AdditionalUploadResponse = {}
   /** 
    * UI module instance
    */
-  private ui: Ui<CustomActions, AdditionalUploadResponse>;
+  private ui: Ui<ImageToolData<CustomActions, AdditionalUploadResponse>>;
 
   /** 
    * Stores current block data internally
@@ -119,7 +119,7 @@ export default class ImageTool<CustomActions = {} ,AdditionalUploadResponse = {}
     /**
      * Module for working with UI
      */
-    this.ui = new Ui<CustomActions, AdditionalUploadResponse>({
+    this.ui = new Ui<ImageToolData<CustomActions, AdditionalUploadResponse>>({
       api,
       config: this.config,
       onSelectFile: () => {
@@ -367,8 +367,12 @@ export default class ImageTool<CustomActions = {} ,AdditionalUploadResponse = {}
     this.ui.fillCaption(this._data.caption);
 
     ImageTool.tunes.forEach(({ name: tune }) => {
-      const value = typeof data[tune as keyof ImageToolData<CustomActions, AdditionalUploadResponse>] !== 'undefined' ? data[tune as keyof ImageToolData<CustomActions, AdditionalUploadResponse>] === true || data[tune as keyof ImageToolData<CustomActions, AdditionalUploadResponse>] === 'true' : false;
-
+      const tuneKey = tune as keyof ImageToolData<CustomActions, AdditionalUploadResponse>;
+      const tuneValue = data[tuneKey];
+      
+      const value = typeof tuneValue !== 'undefined' 
+        ? tuneValue === true || tuneValue === 'true' : false;
+      
       this.setTune(tune as keyof ImageToolData<CustomActions, AdditionalUploadResponse>, value);
     });
   }
