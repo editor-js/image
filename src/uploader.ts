@@ -89,12 +89,12 @@ export default class Uploader {
       upload = ajax.transport({
         url: this.config.endpoints.byFile,
         data: this.config.additionalRequestData,
-        accept: this.config.types,
-        headers: new Headers(this.config.additionalRequestHeaders as Record<string, string>),
+        accept: this.config.types || 'image/*',
+        headers: this.config.additionalRequestHeaders as Record<string, string>,
         beforeSend: (files: File[]) => {
           preparePreview(files[0]);
         },
-        fieldName: this.config.field,
+        fieldName: this.config.field || 'image',
       }).then((response: any) => response.body);
     }
 
@@ -133,7 +133,7 @@ export default class Uploader {
           url: url,
         }, this.config.additionalRequestData),
         type: ajax.contentType.JSON,
-        headers: new Headers(this.config.additionalRequestHeaders as Record<string, string>),
+        headers: this.config.additionalRequestHeaders as Record<string, string>,
       }).then((response: any) => response.body);
     }
 
@@ -193,7 +193,7 @@ export default class Uploader {
         url: this.config.endpoints.byFile,
         data: formData,
         type: ajax.contentType.JSON,
-        headers: new Headers(this.config.additionalRequestHeaders as Record<string, string>),
+        headers: this.config.additionalRequestHeaders as Record<string, string>,
       }).then((response: any) => response.body);
     }
 
