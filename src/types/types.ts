@@ -117,12 +117,12 @@ export interface ImageConfig {
   /**
    * Field name for the uploaded image.
    */
-  field?: string;
+  field: string;
 
   /**
    * Allowed mime-types for the uploaded image.
    */
-  types?: string;
+  types: string;
 
   /**
    * Placeholder text for the caption field.

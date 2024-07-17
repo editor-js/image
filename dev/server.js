@@ -90,7 +90,7 @@ class ServerExample {
 
         responseJson.success = 1;
         responseJson.file = {
-          url: image.filepath,
+          url: 'file://' + image.filepath,
           name: image.newFilename,
           size: image.size
         };
