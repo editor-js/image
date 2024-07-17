@@ -72,7 +72,7 @@ export default class Uploader {
     // custom uploading
     if (this.config.uploader && typeof this.config.uploader.uploadByFile === 'function') {
       const uploadByFile = this.config.uploader.uploadByFile;
-      upload = ajax.selectFiles({ accept: this.config.types}).then((files: File[]) => {
+      upload = ajax.selectFiles({ accept: this.config.types || 'image/*'}).then((files: File[]) => {
         preparePreview(files[0]);
 
         const customUpload = uploadByFile(files[0]);
@@ -89,12 +89,12 @@ export default class Uploader {
       upload = ajax.transport({
         url: this.config.endpoints.byFile,
         data: this.config.additionalRequestData,
-        accept: this.config.types,
+        accept: this.config.types || 'image/*',
         headers: new Headers(this.config.additionalRequestHeaders as Record<string, string>),
         beforeSend: (files: File[]) => {
           preparePreview(files[0]);
         },
-        fieldName: this.config.field,
+        fieldName: this.config.field || 'image',
       }).then((response: any) => response.body);
     }
 
@@ -181,7 +181,7 @@ export default class Uploader {
        */
       const formData = new FormData();
 
-      formData.append(this.config.field, file);
+      formData.append(this.config.field || 'image', file);
 
       if (this.config.additionalRequestData && Object.keys(this.config.additionalRequestData).length) {
         Object.entries(this.config.additionalRequestData).forEach(([name, value]: [string, any]) => {
