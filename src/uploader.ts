@@ -1,7 +1,7 @@
 import ajax from '@codexteam/ajax';
 import isPromise from './utils/isPromise';
-import { UploadOptions } from './types/types';
-import { UploadResponseFormat, ImageConfig } from './types/types';
+import type { UploadOptions } from './types/types';
+import type { UploadResponseFormat, ImageConfig } from './types/types';
 
 /**
  * Params interface for Uploader constructor
@@ -12,13 +12,13 @@ interface UploaderParams {
    */
   config: ImageConfig;
   /**
-   * 
+   *
    * @param response: Callback function for successful upload
    * @returns void
    */
   onUpload: (response: UploadResponseFormat) => void;
   /**
-   * 
+   *
    * @param error : error type
    * @returns void
    */
@@ -36,10 +36,10 @@ export default class Uploader {
   private onUpload: (response: UploadResponseFormat) => void;
   private onError: (error: any) => void;
   /**
-   * @param {object} params - uploader module params
-   * @param {ImageConfig} params.config - image tool config
-   * @param {Function} params.onUpload - one callback for all uploading (file, url, d-n-d, pasting)
-   * @param {Function} params.onError - callback for uploading errors
+   * @param params - uploader module params
+   * @param params.config - image tool config
+   * @param params.onUpload - one callback for all uploading (file, url, d-n-d, pasting)
+   * @param params.onError - callback for uploading errors
    */
   constructor({ config, onUpload, onError }: UploaderParams) {
     this.config = config;
@@ -50,8 +50,7 @@ export default class Uploader {
   /**
    * Handle clicks on the upload file button
    * Fires ajax.transport()
-   *
-   * @param {Function} onPreview - callback fired when preview is ready
+   * @param onPreview - callback fired when preview is ready
    */
   uploadSelectedFile({ onPreview }: UploadOptions) {
     const preparePreview = function (file: File) {
@@ -72,7 +71,8 @@ export default class Uploader {
     // custom uploading
     if (this.config.uploader && typeof this.config.uploader.uploadByFile === 'function') {
       const uploadByFile = this.config.uploader.uploadByFile;
-      upload = ajax.selectFiles({ accept: this.config.types || 'image/*'}).then((files: File[]) => {
+
+      upload = ajax.selectFiles({ accept: this.config.types || 'image/*' }).then((files: File[]) => {
         preparePreview(files[0]);
 
         const customUpload = uploadByFile(files[0]);
@@ -81,7 +81,7 @@ export default class Uploader {
           console.warn('Custom uploader method uploadByFile should return a Promise');
         }
 
-        return customUpload as Promise<UploadResponseFormat>;
+        return customUpload;
       });
 
     // default uploading
@@ -108,8 +108,7 @@ export default class Uploader {
   /**
    * Handle clicks on the upload file button
    * Fires ajax.post()
-   *
-   * @param {string} url - image source url
+   * @param url - image source url
    */
   uploadByUrl(url: string) {
     let upload;
@@ -147,15 +146,12 @@ export default class Uploader {
   /**
    * Handle clicks on the upload file button
    * Fires ajax.post()
-   *
-   * @param {File} file - file pasted by drag-n-drop
-   * @param {Function} onPreview - file pasted by drag-n-drop
+   * @param file - file pasted by drag-n-drop
+   * @param onPreview - file pasted by drag-n-drop
    */
   uploadByFile(file: Blob, { onPreview }: UploadOptions) {
     /**
      * Load file for preview
-     *
-     * @type {FileReader}
      */
     const reader = new FileReader();
 
@@ -204,4 +200,3 @@ export default class Uploader {
     });
   }
 }
-

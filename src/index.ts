@@ -1,6 +1,5 @@
 /**
  * Image Tool for the Editor.js
- *
  * @author CodeX <team@codex.so>
  * @license MIT
  * @see {@link https://github.com/editor-js/image}
@@ -30,7 +29,7 @@
  * },
  */
 
-import type { TunesMenuConfig } from "@editorjs/editorjs/types/tools";
+import type { TunesMenuConfig } from '@editorjs/editorjs/types/tools';
 import type { API, ToolboxConfig, PasteConfig, BlockToolConstructorOptions, BlockTool, BlockAPI } from '@editorjs/editorjs';
 import './index.css';
 
@@ -38,54 +37,56 @@ import Ui from './ui';
 import Uploader from './uploader';
 
 import { IconAddBorder, IconStretch, IconAddBackground, IconPicture } from '@codexteam/icons';
-import { ActionConfig, UploadResponseFormat, ImageToolData, ImageConfig } from './types/types';
+import type { ActionConfig, UploadResponseFormat, ImageToolData, ImageConfig } from './types/types';
 
+type ImageToolConstructorOptions = BlockToolConstructorOptions<ImageToolData, ImageConfig>;
 
-type ImageToolConstructorOptions = BlockToolConstructorOptions<ImageToolData, ImageConfig>
-
+/**
+ * Implementation of ImageTool class
+ */
 export default class ImageTool implements BlockTool {
-  /** 
-   * Editor.js API instance 
+  /**
+   * Editor.js API instance
    */
   private api: API;
 
-  /** 
-   * Flag indicating read-only mode 
+  /**
+   * Flag indicating read-only mode
    */
   private readOnly: boolean;
 
-  /** 
+  /**
    * Current Block API instance
    */
   private block: BlockAPI;
 
-  /** 
+  /**
    * Configuration for the ImageTool
    */
   private config: ImageConfig;
 
-  /** 
-   * Uploader module instance 
+  /**
+   * Uploader module instance
    */
   private uploader: Uploader;
 
-  /** 
+  /**
    * UI module instance
    */
   private ui: Ui;
 
-  /** 
+  /**
    * Stores current block data internally
    */
   private _data: ImageToolData;
 
   /**
-   * @param {object} tool - tool properties got from editor.js
-   * @param {ImageToolData} tool.data - previously saved data
-   * @param {ImageConfig} tool.config - user config for Tool
-   * @param {object} tool.api - Editor.js API
-   * @param {boolean} tool.readOnly - read-only mode flag
-   * @param {BlockAPI|{}} tool.block - current Block API
+   * @param tool - tool properties got from editor.js
+   * @param tool.data - previously saved data
+   * @param tool.config - user config for Tool
+   * @param tool.api - Editor.js API
+   * @param tool.readOnly - read-only mode flag
+   * @param tool.block - current Block API
    */
   constructor({ data, config, api, readOnly, block }: ImageToolConstructorOptions) {
     this.api = api;
@@ -101,7 +102,7 @@ export default class ImageTool implements BlockTool {
       additionalRequestHeaders: config.additionalRequestHeaders,
       field: config.field,
       types: config.types,
-      captionPlaceholder: this.api.i18n.t(config.captionPlaceholder ? config.captionPlaceholder: 'Caption'),
+      captionPlaceholder: this.api.i18n.t(config.captionPlaceholder != undefined ? config.captionPlaceholder : 'Caption'),
       buttonContent: config.buttonContent,
       uploader: config.uploader,
       actions: config.actions,
@@ -112,8 +113,8 @@ export default class ImageTool implements BlockTool {
      */
     this.uploader = new Uploader({
       config: this.config,
-      onUpload: (response) => this.onUpload(response),
-      onError: (error) => this.uploadingFailed(error),
+      onUpload: (response: UploadResponseFormat<object>) => this.onUpload(response),
+      onError: (error: string) => this.uploadingFailed(error),
     });
 
     /**
@@ -146,12 +147,12 @@ export default class ImageTool implements BlockTool {
     };
     this.data = data;
   }
+
   /**
    * Notify core that read-only mode is supported
-   *
-   * @returns {boolean}
+   * @returns { boolean }
    */
-  static get isReadOnlySupported(): boolean {
+  public static get isReadOnlySupported(): boolean {
     return true;
   }
 
@@ -159,10 +160,9 @@ export default class ImageTool implements BlockTool {
    * Get Tool toolbox settings
    * icon - Tool icon's SVG
    * title - title to show in toolbox
-   *
    * @returns {{icon: string, title: string}}
    */
-  static get toolbox(): ToolboxConfig {
+  public static get toolbox(): ToolboxConfig {
     return {
       icon: IconPicture,
       title: 'Image',
@@ -171,10 +171,9 @@ export default class ImageTool implements BlockTool {
 
   /**
    * Available image tools
-   *
    * @returns {Array}
    */
-  static get tunes(): Array<ActionConfig> {
+  public static get tunes(): Array<ActionConfig> {
     return [
       {
         name: 'withBorder',
@@ -199,34 +198,29 @@ export default class ImageTool implements BlockTool {
 
   /**
    * Renders Block content
-   *
    * @public
-   *
    * @returns {HTMLDivElement}
    */
-  render(): HTMLDivElement  {
+  public render(): HTMLDivElement {
     return this.ui.render(this.data) as HTMLDivElement;
   }
 
   /**
    * Validate data: check if Image exists
-   *
    * @param {ImageToolData} savedData — data received after saving
    * @returns {boolean} false if saved data is not correct, otherwise true
    * @public
    */
-  validate(savedData: ImageToolData): boolean {
+  public validate(savedData: ImageToolData): boolean {
     return !!savedData.file.url;
   }
 
   /**
    * Return Block data
-   *
    * @public
-   *
    * @returns {ImageToolData}
    */
-  save(): ImageToolData {
+  public save(): ImageToolData {
     const caption = this.ui.nodes.caption;
 
     this._data.caption = caption.innerHTML;
@@ -236,12 +230,10 @@ export default class ImageTool implements BlockTool {
 
   /**
    * Returns configuration for block tunes: add background, add border, stretch image
-   *
    * @public
-   *
    * @returns TunesMenuConfig
    */
-  renderSettings(): TunesMenuConfig {
+  public renderSettings(): TunesMenuConfig {
     // Merge default tunes with the ones that might be added by user
     // @see https://github.com/editor-js/image/pull/49
     const tunes = ImageTool.tunes.concat(this.config.actions || []);
@@ -253,7 +245,7 @@ export default class ImageTool implements BlockTool {
       toggle: tune.toggle,
       isActive: this.data[tune.name as keyof ImageToolData] as boolean,
       onActivate: () => {
-        /**If it'a user defined tune, execute it's callback stored in action property */
+        /** If it'a user defined tune, execute it's callback stored in action property */
         if (typeof tune.action === 'function') {
           tune.action(tune.name);
 
@@ -267,20 +259,18 @@ export default class ImageTool implements BlockTool {
   /**
    * Fires after clicks on the Toolbox Image Icon
    * Initiates click on the Select File button
-   *
    * @public
    */
-  appendCallback() {
+  public appendCallback(): void {
     this.ui.nodes.fileButton.click();
   }
 
   /**
    * Specify paste substitutes
-   *
    * @see {@link https://github.com/codex-team/editor.js/blob/master/docs/tools.md#paste-handling}
-   * @returns {{tags: string[], patterns: object<string, RegExp>, files: {extensions: string[], mimeTypes: string[]}}}
+   * @returns { PasteConfig }
    */
-  static get pasteConfig(): PasteConfig {
+  public static get pasteConfig(): PasteConfig {
     return {
       /**
        * Paste HTML into Editor
@@ -301,24 +291,23 @@ export default class ImageTool implements BlockTool {
        * Drag n drop file from into the Editor
        */
       files: {
-        mimeTypes: [ 'image/*' ],
+        mimeTypes: ['image/*'],
       },
     };
   }
 
   /**
    * Specify paste handlers
-   *
    * @public
    * @see {@link https://github.com/codex-team/editor.js/blob/master/docs/tools.md#paste-handling}
-   * @param {CustomEvent} event - editor.js custom paste event
+   * @param event - editor.js custom paste event
    *                              {@link https://github.com/codex-team/editor.js/blob/master/types/tools/paste-events.d.ts}
    * @returns {void}
    */
-  async onPaste(event: CustomEvent): Promise<void> {
+  public async onPaste(event: CustomEvent): Promise<void> {
     switch (event.type) {
       case 'tag': {
-        const image = event.detail.data;
+        const image: { src: string } = event.detail.data;
 
         /** Images from PDF */
         if (/^blob:/.test(image.src)) {
@@ -334,13 +323,13 @@ export default class ImageTool implements BlockTool {
         break;
       }
       case 'pattern': {
-        const url = event.detail.data;
+        const url: string = event.detail.data;
 
         this.uploadUrl(url);
         break;
       }
       case 'file': {
-        const file = event.detail.file;
+        const file: Blob = event.detail.file;
 
         this.uploadFile(file);
         break;
@@ -355,12 +344,10 @@ export default class ImageTool implements BlockTool {
 
   /**
    * Stores all Tool's data
-   *
    * @private
-   *
    * @param {ImageToolData} data - data in Image Tool format
    */
-  set data(data: ImageToolData) {
+  private set data(data: ImageToolData) {
     this.image = data.file;
 
     this._data.caption = data.caption || '';
@@ -375,24 +362,20 @@ export default class ImageTool implements BlockTool {
 
   /**
    * Return Tool data
-   *
    * @private
-   *
    * @returns {ImageToolData}
    */
-  get data(): ImageToolData {
+  private get data(): ImageToolData {
     return this._data;
   }
 
   /**
    * Set new image file
-   *
    * @private
-   *
    * @param {object} file - uploaded file data
    */
-  set image(file: { url: string } | undefined) {
-    this._data.file = file || {url: ''};
+  private set image(file: { url: string } | undefined) {
+    this._data.file = file || { url: '' };
 
     if (file && file.url) {
       this.ui.fillImage(file.url);
@@ -401,13 +384,11 @@ export default class ImageTool implements BlockTool {
 
   /**
    * File uploading callback
-   *
    * @private
-   *
    * @param {UploadResponseFormat} response - uploading server response
    * @returns {void}
    */
-  onUpload(response: UploadResponseFormat): void {
+  private onUpload(response: UploadResponseFormat): void {
     if (response.success && response.file) {
       this.image = response.file;
     } else {
@@ -417,12 +398,11 @@ export default class ImageTool implements BlockTool {
 
   /**
    * Handle uploader errors
-   *
    * @private
    * @param {string} errorText - uploading error text
    * @returns {void}
    */
-  uploadingFailed(errorText: string): void {
+  private uploadingFailed(errorText: string): void {
     console.log('Image Tool: uploading failed because of', errorText);
 
     this.api.notifier.show({
@@ -434,25 +414,22 @@ export default class ImageTool implements BlockTool {
 
   /**
    * Callback fired when Block Tune is activated
-   *
    * @private
-   *
    * @param {string} tuneName - tune that has been clicked
    * @returns {void}
    */
-  tuneToggled(tuneName: keyof ImageToolData): void {
+  private tuneToggled(tuneName: keyof ImageToolData): void {
     // inverse tune state
-    this.setTune(tuneName, !this._data[tuneName as keyof ImageToolData]);
+    this.setTune(tuneName, !this._data[tuneName]);
   }
 
   /**
    * Set one tune
-   *
    * @param {string} tuneName - {@link Tunes.tunes}
    * @param {boolean} value - tune state
    * @returns {void}
    */
-  setTune(tuneName: keyof ImageToolData, value: boolean): void {
+  private setTune(tuneName: keyof ImageToolData, value: boolean): void {
     (this._data[tuneName] as boolean) = value;
 
     this.ui.applyTune(tuneName, value);
@@ -463,7 +440,7 @@ export default class ImageTool implements BlockTool {
       Promise.resolve().then(() => {
         this.block.stretched = value;
       })
-        .catch(err => {
+        .catch((err) => {
           console.error(err);
         });
     }
@@ -471,11 +448,10 @@ export default class ImageTool implements BlockTool {
 
   /**
    * Show preloader and upload image file
-   *
    * @param {File} file - file that is currently uploading (from paste)
    * @returns {void}
    */
-  uploadFile(file: Blob): void {
+  private uploadFile(file: Blob): void {
     this.uploader.uploadByFile(file, {
       onPreview: (src: string) => {
         this.ui.showPreloader(src);
@@ -485,11 +461,10 @@ export default class ImageTool implements BlockTool {
 
   /**
    * Show preloader and upload image by target url
-   *
    * @param {string} url - url pasted
    * @returns {void}
    */
-  uploadUrl(url: string): void {
+  private uploadUrl(url: string): void {
     this.ui.showPreloader(url);
     this.uploader.uploadByUrl(url);
   }

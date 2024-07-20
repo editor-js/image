@@ -1,10 +1,9 @@
 /**
  * Helper for making Elements with attributes
- *
- * @param  {string} tagName           - new Element tag name
- * @param  {Array|string} classNames  - list or name of CSS class
- * @param  {object} attributes        - any attributes
- * @returns {Element}
+ * @param tagName           - new Element tag name
+ * @param classNames  - list or name of CSS class
+ * @param attributes        - any attributes
+ * @returns
  */
 export function make(tagName: string, classNames: string[] | string | null = null, attributes: { [key: string]: any } = {}): HTMLElement {
   const el = document.createElement(tagName);

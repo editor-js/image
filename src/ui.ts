@@ -1,7 +1,7 @@
 import { IconPicture } from '@codexteam/icons';
 import { make } from './utils/dom';
 import type { API } from '@editorjs/editorjs';
-import { ImageToolData, ImageConfig } from './types/types';
+import type { ImageToolData, ImageConfig } from './types/types';
 
 /**
  * Enumeration representing the different states of the UI.
@@ -10,17 +10,17 @@ enum UiState {
   /**
    * The UI is in an empty state, with no image loaded or being uploaded.
    */
-  Empty = "empty",
+  Empty = 'empty',
 
   /**
    * The UI is in an uploading state, indicating an image is currently being uploaded.
    */
-  Uploading = "uploading", 
+  Uploading = 'uploading',
 
   /**
    * The UI is in a filled state, with an image successfully loaded.
    */
-  Filled = "filled"
+  Filled = 'filled'
 };
 
 /**
@@ -51,7 +51,7 @@ interface Nodes {
    * Preloader element for the image.
    */
   imagePreloader: HTMLElement;
-  
+
   /**
    * Caption element for the image.
    */
@@ -90,33 +90,33 @@ export default class Ui {
 /**
  * API instance for Editor.js.
  */
-private api: API;
+  private api: API;
 
-/**
- * Configuration for the image tool.
- */
-private config: ImageConfig;
-
-/**
- * Callback function for selecting a file.
- */
-private onSelectFile: () => void;
-
-/**
- * Flag indicating if the UI is in read-only mode.
- */
-private readOnly: boolean;
-
-/**
- * Nodes representing various elements in the UI.
- */
-public nodes: Nodes;
   /**
-   * @param {object} ui - image tool Ui module
-   * @param {object} ui.api - Editor.js API
-   * @param {ImageConfig} ui.config - user config
-   * @param {Function} ui.onSelectFile - callback for clicks on Select file button
-   * @param {boolean} ui.readOnly - read-only mode flag
+   * Configuration for the image tool.
+   */
+  private config: ImageConfig;
+
+  /**
+   * Callback function for selecting a file.
+   */
+  private onSelectFile: () => void;
+
+  /**
+   * Flag indicating if the UI is in read-only mode.
+   */
+  private readOnly: boolean;
+
+  /**
+   * Nodes representing various elements in the UI.
+   */
+  public nodes: Nodes;
+  /**
+   * @param ui - image tool Ui module
+   * @param ui.api - Editor.js API
+   * @param ui.config - user config
+   * @param ui.onSelectFile - callback for clicks on Select file button
+   * @param ui.readOnly - read-only mode flag
    */
   constructor({ api, config, onSelectFile, readOnly }: ConstructorParams) {
     this.api = api;
@@ -125,7 +125,7 @@ public nodes: Nodes;
     this.readOnly = readOnly;
     this.nodes = {
       wrapper: make('div', [this.CSS.baseClass, this.CSS.wrapper]),
-      imageContainer: make('div', [ this.CSS.imageContainer ]),
+      imageContainer: make('div', [this.CSS.imageContainer]),
       fileButton: this.createFileButton(),
       imageEl: undefined,
       imagePreloader: make('div', this.CSS.imagePreloader),
@@ -153,8 +153,7 @@ public nodes: Nodes;
 
   /**
    * CSS classes
-   *
-   * @returns {object}
+   * @returns
    */
   get CSS(): Record<string, string> {
     return {
@@ -176,26 +175,25 @@ public nodes: Nodes;
 
   /**
    * Renders tool UI
-   *
-   * @param {ImageToolData} toolData - saved tool data
-   * @returns {Element}
+   * @param toolData - saved tool data
+   * @returns
    */
-  render(toolData: ImageToolData): HTMLElement  {
+  render(toolData: ImageToolData): HTMLElement {
     if (!toolData.file || Object.keys(toolData.file).length === 0) {
       this.toggleStatus(UiState.Empty);
     } else {
       this.toggleStatus(UiState.Uploading);
     }
+
     return this.nodes.wrapper;
   }
 
   /**
    * Creates upload-file button
-   *
-   * @returns {Element}
+   * @returns
    */
   createFileButton(): HTMLElement {
-    const button = make('div', [ this.CSS.button ]);
+    const button = make('div', [this.CSS.button]);
 
     button.innerHTML = this.config.buttonContent || `${IconPicture} ${this.api.i18n.t('Select an Image')}`;
 
@@ -208,9 +206,8 @@ public nodes: Nodes;
 
   /**
    * Shows uploading preloader
-   *
-   * @param {string} src - preview source
-   * @returns {void}
+   * @param src - preview source
+   * @returns
    */
   showPreloader(src: string): void {
     this.nodes.imagePreloader.style.backgroundImage = `url(${src})`;
@@ -220,8 +217,7 @@ public nodes: Nodes;
 
   /**
    * Hide uploading preloader
-   *
-   * @returns {void}
+   * @returns
    */
   hidePreloader(): void {
     this.nodes.imagePreloader.style.backgroundImage = '';
@@ -230,9 +226,8 @@ public nodes: Nodes;
 
   /**
    * Shows an image
-   *
-   * @param {string} url - image source
-   * @returns {void}
+   * @param url - image source
+   * @returns
    */
   fillImage(url: string): void {
     /**
@@ -240,7 +235,7 @@ public nodes: Nodes;
      */
     const tag = /\.mp4$/.test(url) ? 'VIDEO' : 'IMG';
 
-    const attributes: { [key: string]: any} = {
+    const attributes: { [key: string]: any } = {
       src: url,
     };
 
@@ -248,8 +243,6 @@ public nodes: Nodes;
      * We use eventName variable because IMG and VIDEO tags have different event to be called on source load
      * - IMG: load
      * - VIDEO: loadeddata
-     *
-     * @type {string}
      */
     let eventName = 'load';
 
@@ -259,8 +252,6 @@ public nodes: Nodes;
     if (tag === 'VIDEO') {
       /**
        * Add attributes for playing muted mp4 as a gif
-       *
-       * @type {boolean}
        */
       attributes.autoplay = true;
       attributes.loop = true;
@@ -269,16 +260,12 @@ public nodes: Nodes;
 
       /**
        * Change event to be listened
-       *
-       * @type {string}
        */
       eventName = 'loadeddata';
     }
 
     /**
      * Compose tag with defined attributes
-     *
-     * @type {Element}
      */
     this.nodes.imageEl = make(tag, this.CSS.imageEl, attributes);
 
@@ -301,9 +288,8 @@ public nodes: Nodes;
 
   /**
    * Shows caption input
-   *
-   * @param {string} text - caption text
-   * @returns {void}
+   * @param text - caption text
+   * @returns
    */
   fillCaption(text: string): void {
     if (this.nodes.caption) {
@@ -313,27 +299,24 @@ public nodes: Nodes;
 
   /**
    * Changes UI status
-   *
-   * @param {string} status - see {@link Ui.status} constants
-   * @returns {void}
+   * @param status - see {@link Ui.status} constants
+   * @returns
    */
   toggleStatus(status: UiState): void {
     for (const statusType in UiState) {
       if (Object.prototype.hasOwnProperty.call(UiState, statusType)) {
-          this.nodes.wrapper.classList.toggle(`${this.CSS.wrapper}--${UiState[statusType as keyof typeof UiState]}`, status === UiState[statusType as keyof typeof UiState]);
+        this.nodes.wrapper.classList.toggle(`${this.CSS.wrapper}--${UiState[statusType as keyof typeof UiState]}`, status === UiState[statusType as keyof typeof UiState]);
       }
     }
   }
 
   /**
    * Apply visual representation of activated tune
-   *
-   * @param {string} tuneName - one of available tunes {@link Tunes.tunes}
-   * @param {boolean} status - true for enable, false for disable
-   * @returns {void}
+   * @param tuneName - one of available tunes {@link Tunes.tunes}
+   * @param status - true for enable, false for disable
+   * @returns
    */
   applyTune(tuneName: string, status: boolean): void {
     this.nodes.wrapper.classList.toggle(`${this.CSS.wrapper}--${tuneName}`, status);
   }
 }
-
