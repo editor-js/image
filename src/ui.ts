@@ -87,9 +87,14 @@ interface ConstructorParams {
  *  - apply tune view
  */
 export default class Ui {
-/**
- * API instance for Editor.js.
- */
+  /**
+   * Nodes representing various elements in the UI.
+   */
+  public nodes: Nodes;
+
+  /**
+   * API instance for Editor.js.
+   */
   private api: API;
 
   /**
@@ -108,15 +113,11 @@ export default class Ui {
   private readOnly: boolean;
 
   /**
-   * Nodes representing various elements in the UI.
-   */
-  public nodes: Nodes;
-  /**
-   * @param ui - image tool Ui module
-   * @param ui.api - Editor.js API
-   * @param ui.config - user config
-   * @param ui.onSelectFile - callback for clicks on Select file button
-   * @param ui.readOnly - read-only mode flag
+   * @param {object} ui - image tool Ui module
+   * @param {object} ui.api - Editor.js API
+   * @param {ImageConfig} ui.config - user config
+   * @param {Function} ui.onSelectFile - callback for clicks on Select file button
+   * @param {boolean} ui.readOnly - read-only mode flag
    */
   constructor({ api, config, onSelectFile, readOnly }: ConstructorParams) {
     this.api = api;
@@ -153,9 +154,9 @@ export default class Ui {
 
   /**
    * CSS classes
-   * @returns
+   * @returns {object}
    */
-  get CSS(): Record<string, string> {
+  public get CSS(): Record<string, string> {
     return {
       baseClass: this.api.styles.block,
       loading: this.api.styles.loader,
@@ -175,11 +176,11 @@ export default class Ui {
 
   /**
    * Renders tool UI
-   * @param toolData - saved tool data
-   * @returns
+   * @param {ImageToolData} toolData - saved tool data
+   * @returns {Element}
    */
-  render(toolData: ImageToolData): HTMLElement {
-    if (!toolData.file || Object.keys(toolData.file).length === 0) {
+  public render(toolData: ImageToolData): HTMLElement {
+    if (toolData.file == undefined || Object.keys(toolData.file).length === 0) {
       this.toggleStatus(UiState.Empty);
     } else {
       this.toggleStatus(UiState.Uploading);
@@ -190,12 +191,12 @@ export default class Ui {
 
   /**
    * Creates upload-file button
-   * @returns
+   * @returns {Element}
    */
-  createFileButton(): HTMLElement {
+  public createFileButton(): HTMLElement {
     const button = make('div', [this.CSS.button]);
 
-    button.innerHTML = this.config.buttonContent || `${IconPicture} ${this.api.i18n.t('Select an Image')}`;
+    button.innerHTML = this.config.buttonContent != undefined ? this.config.buttonContent : `${IconPicture} ${this.api.i18n.t('Select an Image')}`;
 
     button.addEventListener('click', () => {
       this.onSelectFile();
@@ -206,10 +207,10 @@ export default class Ui {
 
   /**
    * Shows uploading preloader
-   * @param src - preview source
-   * @returns
+   * @param {string} src - preview source
+   * @returns {void}
    */
-  showPreloader(src: string): void {
+  public showPreloader(src: string): void {
     this.nodes.imagePreloader.style.backgroundImage = `url(${src})`;
 
     this.toggleStatus(UiState.Uploading);
@@ -217,19 +218,19 @@ export default class Ui {
 
   /**
    * Hide uploading preloader
-   * @returns
+   * @returns {void}
    */
-  hidePreloader(): void {
+  public hidePreloader(): void {
     this.nodes.imagePreloader.style.backgroundImage = '';
     this.toggleStatus(UiState.Empty);
   }
 
   /**
    * Shows an image
-   * @param url - image source
-   * @returns
+   * @param {string} url - image source
+   * @returns {void}
    */
-  fillImage(url: string): void {
+  public fillImage(url: string): void {
     /**
      * Check for a source extension to compose element correctly: video tag for mp4, img — for others
      */
@@ -243,6 +244,7 @@ export default class Ui {
      * We use eventName variable because IMG and VIDEO tags have different event to be called on source load
      * - IMG: load
      * - VIDEO: loadeddata
+     * @type {string}
      */
     let eventName = 'load';
 
@@ -252,6 +254,7 @@ export default class Ui {
     if (tag === 'VIDEO') {
       /**
        * Add attributes for playing muted mp4 as a gif
+       * @type {boolean}
        */
       attributes.autoplay = true;
       attributes.loop = true;
@@ -260,12 +263,14 @@ export default class Ui {
 
       /**
        * Change event to be listened
+       * @type {string}
        */
       eventName = 'loadeddata';
     }
 
     /**
      * Compose tag with defined attributes
+     * @type {Element}
      */
     this.nodes.imageEl = make(tag, this.CSS.imageEl, attributes);
 
@@ -278,7 +283,7 @@ export default class Ui {
       /**
        * Preloader does not exists on first rendering with presaved data
        */
-      if (this.nodes.imagePreloader) {
+      if (this.nodes.imagePreloader != undefined) {
         this.nodes.imagePreloader.style.backgroundImage = '';
       }
     });
@@ -288,21 +293,21 @@ export default class Ui {
 
   /**
    * Shows caption input
-   * @param text - caption text
-   * @returns
+   * @param {string} text - caption content text
+   * @returns {void}
    */
-  fillCaption(text: string): void {
-    if (this.nodes.caption) {
+  public fillCaption(text: string): void {
+    if (this.nodes.caption != undefined) {
       this.nodes.caption.innerHTML = text;
     }
   }
 
   /**
    * Changes UI status
-   * @param status - see {@link Ui.status} constants
-   * @returns
+   * @param {string} status - see {@link Ui.status} constants
+   * @returns {void}
    */
-  toggleStatus(status: UiState): void {
+  public toggleStatus(status: UiState): void {
     for (const statusType in UiState) {
       if (Object.prototype.hasOwnProperty.call(UiState, statusType)) {
         this.nodes.wrapper.classList.toggle(`${this.CSS.wrapper}--${UiState[statusType as keyof typeof UiState]}`, status === UiState[statusType as keyof typeof UiState]);
@@ -312,11 +317,11 @@ export default class Ui {
 
   /**
    * Apply visual representation of activated tune
-   * @param tuneName - one of available tunes {@link Tunes.tunes}
-   * @param status - true for enable, false for disable
-   * @returns
+   * @param {string} tuneName - one of available tunes {@link Tunes.tunes}
+   * @param {boolean} status - true for enable, false for disable
+   * @returns {void}
    */
-  applyTune(tuneName: string, status: boolean): void {
+  public applyTune(tuneName: string, status: boolean): void {
     this.nodes.wrapper.classList.toggle(`${this.CSS.wrapper}--${tuneName}`, status);
   }
 }

@@ -307,7 +307,7 @@ export default class ImageTool implements BlockTool {
   public async onPaste(event: CustomEvent): Promise<void> {
     switch (event.type) {
       case 'tag': {
-        const image: { src: string } = event.detail.data;
+        const image = event.detail.data as { src: string };
 
         /** Images from PDF */
         if (/^blob:/.test(image.src)) {
@@ -323,13 +323,13 @@ export default class ImageTool implements BlockTool {
         break;
       }
       case 'pattern': {
-        const url: string = event.detail.data;
+        const url = event.detail.data as string;
 
         this.uploadUrl(url);
         break;
       }
       case 'file': {
-        const file: Blob = event.detail.file;
+        const file = event.detail.file as Blob;
 
         this.uploadFile(file);
         break;
@@ -389,7 +389,7 @@ export default class ImageTool implements BlockTool {
    * @returns {void}
    */
   private onUpload(response: UploadResponseFormat): void {
-    if (response.success && response.file) {
+    if (response.success && response.file.url) {
       this.image = response.file;
     } else {
       this.uploadingFailed('incorrect response: ' + JSON.stringify(response));
@@ -399,7 +399,7 @@ export default class ImageTool implements BlockTool {
   /**
    * Handle uploader errors
    * @private
-   * @param {string} errorText - uploading error text
+   * @param {string} errorText - uploading error info
    * @returns {void}
    */
   private uploadingFailed(errorText: string): void {
@@ -420,7 +420,7 @@ export default class ImageTool implements BlockTool {
    */
   private tuneToggled(tuneName: keyof ImageToolData): void {
     // inverse tune state
-    this.setTune(tuneName, !this._data[tuneName]);
+    this.setTune(tuneName, this._data[tuneName] != undefined ? false : true);
   }
 
   /**

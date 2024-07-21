@@ -10,7 +10,7 @@ export function make(tagName: string, classNames: string[] | string | null = nul
 
   if (Array.isArray(classNames)) {
     el.classList.add(...classNames);
-  } else if (classNames) {
+  } else if (classNames != null) {
     el.classList.add(classNames);
   }
 

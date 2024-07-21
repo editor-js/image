@@ -4,5 +4,5 @@
  * @returns
  */
 export default function isPromise(object: any): object is Promise<any> {
-  return object && typeof object.then === 'function';
+  return object != undefined && typeof object.then === 'function';
 }

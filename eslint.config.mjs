@@ -19,7 +19,10 @@ export default [
         'jsdoc/no-types': ['off'],
         'jsdoc/require-returns-description': ['off'],
         'jsdoc/check-tag-names': ['off'],
+        'jsdoc/require-jsdoc': ['off'],
+        '@typescript-eslint/no-unsafe-assignment': ['off'],
         '@typescript-eslint/no-unsafe-member-access': ['off'],
+        '@typescript-eslint/no-explicit-any': ['off'],
         "@typescript-eslint/naming-convention": [
           "error",
           {
@@ -27,6 +30,21 @@ export default [
             "format": ["camelCase"],
             "leadingUnderscore": "allow"
           },
+        ],
+        "@typescript-eslint/ban-types": ["error",
+            {
+                "types": {
+                    "String": true,
+                    "Boolean": true,
+                    "Number": true,
+                    "Symbol": true,
+                    "{}": false,
+                    "Object": true,
+                    "object": false,
+                    "Function": false,
+                },
+                "extendDefaults": true
+            }
         ]
     }
   },
