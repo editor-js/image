@@ -20,9 +20,6 @@ export default [
         'jsdoc/require-returns-description': ['off'],
         'jsdoc/check-tag-names': ['off'],
         'jsdoc/require-jsdoc': ['off'],
-        '@typescript-eslint/no-unsafe-assignment': ['off'],
-        '@typescript-eslint/no-unsafe-member-access': ['off'],
-        '@typescript-eslint/no-explicit-any': ['off'],
         "@typescript-eslint/naming-convention": [
           "error",
           {

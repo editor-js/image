@@ -1,7 +1,7 @@
 declare module '@codexteam/ajax' {
   export interface AjaxOptions {
     url?: string;
-    data?: any;
+    data?: object;
     accept?: string;
     headers?: object;
     beforeSend?: (files: File[]) => void;
@@ -9,7 +9,7 @@ declare module '@codexteam/ajax' {
     type?: string;
   }
 
-  export interface AjaxResponse<T = any> {
+  export interface AjaxResponse<T = object> {
     body: T;
   }
 

@@ -153,26 +153,14 @@ export default class Ui {
   }
 
   /**
-   * CSS classes
-   * @returns {object}
+   * Apply visual representation of activated tune
+   * @param {string} tuneName - one of available tunes {@link Tunes.tunes}
+   * @param {boolean} status - true for enable, false for disable
+   * @returns {void}
    */
-  public get CSS(): Record<string, string> {
-    return {
-      baseClass: this.api.styles.block,
-      loading: this.api.styles.loader,
-      input: this.api.styles.input,
-      button: this.api.styles.button,
-
-      /**
-       * Tool's classes
-       */
-      wrapper: 'image-tool',
-      imageContainer: 'image-tool__image',
-      imagePreloader: 'image-tool__image-preloader',
-      imageEl: 'image-tool__image-picture',
-      caption: 'image-tool__caption',
-    };
-  };
+  public applyTune(tuneName: string, status: boolean): void {
+    this.nodes.wrapper.classList.toggle(`${this.CSS.wrapper}--${tuneName}`, status);
+  }
 
   /**
    * Renders tool UI
@@ -187,22 +175,6 @@ export default class Ui {
     }
 
     return this.nodes.wrapper;
-  }
-
-  /**
-   * Creates upload-file button
-   * @returns {Element}
-   */
-  public createFileButton(): HTMLElement {
-    const button = make('div', [this.CSS.button]);
-
-    button.innerHTML = this.config.buttonContent != undefined ? this.config.buttonContent : `${IconPicture} ${this.api.i18n.t('Select an Image')}`;
-
-    button.addEventListener('click', () => {
-      this.onSelectFile();
-    });
-
-    return button;
   }
 
   /**
@@ -236,7 +208,7 @@ export default class Ui {
      */
     const tag = /\.mp4$/.test(url) ? 'VIDEO' : 'IMG';
 
-    const attributes: { [key: string]: any } = {
+    const attributes: { [key: string]: string | boolean } = {
       src: url,
     };
 
@@ -303,25 +275,53 @@ export default class Ui {
   }
 
   /**
+   * CSS classes
+   * @returns {object}
+   */
+  private get CSS(): Record<string, string> {
+    return {
+      baseClass: this.api.styles.block,
+      loading: this.api.styles.loader,
+      input: this.api.styles.input,
+      button: this.api.styles.button,
+
+      /**
+       * Tool's classes
+       */
+      wrapper: 'image-tool',
+      imageContainer: 'image-tool__image',
+      imagePreloader: 'image-tool__image-preloader',
+      imageEl: 'image-tool__image-picture',
+      caption: 'image-tool__caption',
+    };
+  };
+
+  /**
+   * Creates upload-file button
+   * @returns {Element}
+   */
+  private createFileButton(): HTMLElement {
+    const button = make('div', [this.CSS.button]);
+
+    button.innerHTML = this.config.buttonContent ?? `${IconPicture} ${this.api.i18n.t('Select an Image')}`;
+
+    button.addEventListener('click', () => {
+      this.onSelectFile();
+    });
+
+    return button;
+  }
+
+  /**
    * Changes UI status
    * @param {string} status - see {@link Ui.status} constants
    * @returns {void}
    */
-  public toggleStatus(status: UiState): void {
+  private toggleStatus(status: UiState): void {
     for (const statusType in UiState) {
       if (Object.prototype.hasOwnProperty.call(UiState, statusType)) {
         this.nodes.wrapper.classList.toggle(`${this.CSS.wrapper}--${UiState[statusType as keyof typeof UiState]}`, status === UiState[statusType as keyof typeof UiState]);
       }
     }
-  }
-
-  /**
-   * Apply visual representation of activated tune
-   * @param {string} tuneName - one of available tunes {@link Tunes.tunes}
-   * @param {boolean} status - true for enable, false for disable
-   * @returns {void}
-   */
-  public applyTune(tuneName: string, status: boolean): void {
-    this.nodes.wrapper.classList.toggle(`${this.CSS.wrapper}--${tuneName}`, status);
   }
 }

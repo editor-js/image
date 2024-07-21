@@ -5,7 +5,7 @@
  * @param attributes        - any attributes
  * @returns
  */
-export function make(tagName: string, classNames: string[] | string | null = null, attributes: { [key: string]: any } = {}): HTMLElement {
+export function make(tagName: string, classNames: string[] | string | null = null, attributes: { [key: string]: string | boolean } = {}): HTMLElement {
   const el = document.createElement(tagName);
 
   if (Array.isArray(classNames)) {
@@ -16,7 +16,7 @@ export function make(tagName: string, classNames: string[] | string | null = nul
 
   for (const attrName in attributes) {
     if (attributes.hasOwnProperty(attrName)) {
-      (el as any)[attrName] = attributes[attrName];
+      (el as unknown as { [key: string]: string | boolean })[attrName] = attributes[attrName];
     }
   }
 

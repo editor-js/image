@@ -1,3 +1,5 @@
+import type { HTMLPasteEventDetail } from '@editorjs/editorjs';
+
 /**
  * Represents options for uploading, including a function to handle previewing.
  */
@@ -164,4 +166,20 @@ export interface ImageConfig {
    * Additional actions for the tool.
    */
   actions?: ActionConfig[];
+}
+
+/**
+ * Interface representing the details of a paste event for HTML elements.
+ * Extends the `HTMLPasteEventDetail` interface to include additional data properties.
+ */
+export interface HTMLPasteEventDetailExtended extends HTMLPasteEventDetail {
+  /**
+   * The data property containing the source of the image and HTML element details.
+   */
+  data: {
+    /**
+     * The source URL of the pasted image.
+     */
+    src: string;
+  } & HTMLElement;
 }

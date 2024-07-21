@@ -30,14 +30,14 @@
  */
 
 import type { TunesMenuConfig } from '@editorjs/editorjs/types/tools';
-import type { API, ToolboxConfig, PasteConfig, BlockToolConstructorOptions, BlockTool, BlockAPI } from '@editorjs/editorjs';
+import type { API, ToolboxConfig, PasteConfig, BlockToolConstructorOptions, BlockTool, BlockAPI, PasteEvent, PatternPasteEventDetail, FilePasteEventDetail } from '@editorjs/editorjs';
 import './index.css';
 
 import Ui from './ui';
 import Uploader from './uploader';
 
 import { IconAddBorder, IconStretch, IconAddBackground, IconPicture } from '@codexteam/icons';
-import type { ActionConfig, UploadResponseFormat, ImageToolData, ImageConfig } from './types/types';
+import type { ActionConfig, UploadResponseFormat, ImageToolData, ImageConfig, HTMLPasteEventDetailExtended } from './types/types';
 
 type ImageToolConstructorOptions = BlockToolConstructorOptions<ImageToolData, ImageConfig>;
 
@@ -102,7 +102,7 @@ export default class ImageTool implements BlockTool {
       additionalRequestHeaders: config.additionalRequestHeaders,
       field: config.field,
       types: config.types,
-      captionPlaceholder: this.api.i18n.t(config.captionPlaceholder != undefined ? config.captionPlaceholder : 'Caption'),
+      captionPlaceholder: this.api.i18n.t(config.captionPlaceholder ?? 'Caption'),
       buttonContent: config.buttonContent,
       uploader: config.uploader,
       actions: config.actions,
@@ -304,10 +304,10 @@ export default class ImageTool implements BlockTool {
    *                              {@link https://github.com/codex-team/editor.js/blob/master/types/tools/paste-events.d.ts}
    * @returns {void}
    */
-  public async onPaste(event: CustomEvent): Promise<void> {
+  public async onPaste(event: PasteEvent): Promise<void> {
     switch (event.type) {
       case 'tag': {
-        const image = event.detail.data as { src: string };
+        const image = (event.detail as HTMLPasteEventDetailExtended).data;
 
         /** Images from PDF */
         if (/^blob:/.test(image.src)) {
@@ -323,13 +323,13 @@ export default class ImageTool implements BlockTool {
         break;
       }
       case 'pattern': {
-        const url = event.detail.data as string;
+        const url = (event.detail as PatternPasteEventDetail).data;
 
         this.uploadUrl(url);
         break;
       }
       case 'file': {
-        const file = event.detail.file as Blob;
+        const file = (event.detail as FilePasteEventDetail).file;
 
         this.uploadFile(file);
         break;
