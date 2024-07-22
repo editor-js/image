@@ -113,11 +113,11 @@ export default class Ui {
   private readOnly: boolean;
 
   /**
-   * @param {object} ui - image tool Ui module
-   * @param {object} ui.api - Editor.js API
-   * @param {ImageConfig} ui.config - user config
-   * @param {Function} ui.onSelectFile - callback for clicks on Select file button
-   * @param {boolean} ui.readOnly - read-only mode flag
+   * @param ui - image tool Ui module
+   * @param ui.api - Editor.js API
+   * @param ui.config - user config
+   * @param ui.onSelectFile - callback for clicks on Select file button
+   * @param ui.readOnly - read-only mode flag
    */
   constructor({ api, config, onSelectFile, readOnly }: ConstructorParams) {
     this.api = api;
@@ -154,9 +154,8 @@ export default class Ui {
 
   /**
    * Apply visual representation of activated tune
-   * @param {string} tuneName - one of available tunes {@link Tunes.tunes}
-   * @param {boolean} status - true for enable, false for disable
-   * @returns {void}
+   * @param tuneName - one of available tunes {@link Tunes.tunes}
+   * @param status - true for enable, false for disable
    */
   public applyTune(tuneName: string, status: boolean): void {
     this.nodes.wrapper.classList.toggle(`${this.CSS.wrapper}--${tuneName}`, status);
@@ -164,8 +163,8 @@ export default class Ui {
 
   /**
    * Renders tool UI
-   * @param {ImageToolData} toolData - saved tool data
-   * @returns {Element}
+   * @param toolData - saved tool data
+   * @returns
    */
   public render(toolData: ImageToolData): HTMLElement {
     if (toolData.file == undefined || Object.keys(toolData.file).length === 0) {
@@ -179,8 +178,7 @@ export default class Ui {
 
   /**
    * Shows uploading preloader
-   * @param {string} src - preview source
-   * @returns {void}
+   * @param src - preview source
    */
   public showPreloader(src: string): void {
     this.nodes.imagePreloader.style.backgroundImage = `url(${src})`;
@@ -190,7 +188,6 @@ export default class Ui {
 
   /**
    * Hide uploading preloader
-   * @returns {void}
    */
   public hidePreloader(): void {
     this.nodes.imagePreloader.style.backgroundImage = '';
@@ -199,8 +196,7 @@ export default class Ui {
 
   /**
    * Shows an image
-   * @param {string} url - image source
-   * @returns {void}
+   * @param url - image source
    */
   public fillImage(url: string): void {
     /**
@@ -216,7 +212,6 @@ export default class Ui {
      * We use eventName variable because IMG and VIDEO tags have different event to be called on source load
      * - IMG: load
      * - VIDEO: loadeddata
-     * @type {string}
      */
     let eventName = 'load';
 
@@ -226,7 +221,6 @@ export default class Ui {
     if (tag === 'VIDEO') {
       /**
        * Add attributes for playing muted mp4 as a gif
-       * @type {boolean}
        */
       attributes.autoplay = true;
       attributes.loop = true;
@@ -235,14 +229,12 @@ export default class Ui {
 
       /**
        * Change event to be listened
-       * @type {string}
        */
       eventName = 'loadeddata';
     }
 
     /**
      * Compose tag with defined attributes
-     * @type {Element}
      */
     this.nodes.imageEl = make(tag, this.CSS.imageEl, attributes);
 
@@ -265,8 +257,7 @@ export default class Ui {
 
   /**
    * Shows caption input
-   * @param {string} text - caption content text
-   * @returns {void}
+   * @param text - caption content text
    */
   public fillCaption(text: string): void {
     if (this.nodes.caption != undefined) {
@@ -276,7 +267,6 @@ export default class Ui {
 
   /**
    * CSS classes
-   * @returns {object}
    */
   private get CSS(): Record<string, string> {
     return {
@@ -298,7 +288,7 @@ export default class Ui {
 
   /**
    * Creates upload-file button
-   * @returns {Element}
+   * @returns
    */
   private createFileButton(): HTMLElement {
     const button = make('div', [this.CSS.button]);
@@ -314,8 +304,7 @@ export default class Ui {
 
   /**
    * Changes UI status
-   * @param {string} status - see {@link Ui.status} constants
-   * @returns {void}
+   * @param status - see {@link Ui.status} constants
    */
   private toggleStatus(status: UiState): void {
     for (const statusType in UiState) {

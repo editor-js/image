@@ -39,10 +39,10 @@ export default class Uploader {
   private onUpload: (response: UploadResponseFormat) => void;
   private onError: (error: string) => void;
   /**
-   * @param {object} params - uploader module params
-   * @param {ImageConfig} params.config - image tool config
-   * @param {Function} params.onUpload - one callback for all uploading (file, url, d-n-d, pasting)
-   * @param {Function} params.onError - callback for uploading errors
+   * @param params - uploader module params
+   * @param params.config - image tool config
+   * @param params.onUpload - one callback for all uploading (file, url, d-n-d, pasting)
+   * @param params.onError - callback for uploading errors
    */
   constructor({ config, onUpload, onError }: UploaderParams) {
     this.config = config;
@@ -53,7 +53,7 @@ export default class Uploader {
   /**
    * Handle clicks on the upload file button
    * Fires ajax.transport()
-   * @param {Function} onPreview - callback fired when preview is ready
+   * @param onPreview - callback fired when preview is ready
    */
   public uploadSelectedFile({ onPreview }: UploadOptions): void {
     const preparePreview = function (file: File): void {
@@ -111,7 +111,7 @@ export default class Uploader {
   /**
    * Handle clicks on the upload file button
    * Fires ajax.post()
-   * @param {string} url - image source url
+   * @param url - image source url
    */
   public uploadByUrl(url: string): void {
     let upload;
@@ -149,13 +149,12 @@ export default class Uploader {
   /**
    * Handle clicks on the upload file button
    * Fires ajax.post()
-   * @param {File} file - file pasted by drag-n-drop
-   * @param {Function} onPreview - file pasted by drag-n-drop
+   * @param file - file pasted by drag-n-drop
+   * @param onPreview - file pasted by drag-n-drop
    */
   public uploadByFile(file: Blob, { onPreview }: UploadOptions): void {
     /**
      * Load file for preview
-     * @type {FileReader}
      */
     const reader = new FileReader();
 

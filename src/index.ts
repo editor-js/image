@@ -37,7 +37,7 @@ import Ui from './ui';
 import Uploader from './uploader';
 
 import { IconAddBorder, IconStretch, IconAddBackground, IconPicture } from '@codexteam/icons';
-import type { ActionConfig, UploadResponseFormat, ImageToolData, ImageConfig, HTMLPasteEventDetailExtended } from './types/types';
+import type { ActionConfig, UploadResponseFormat, ImageToolData, ImageConfig, HTMLPasteEventDetailExtended, ImageSetterParam } from './types/types';
 
 type ImageToolConstructorOptions = BlockToolConstructorOptions<ImageToolData, ImageConfig>;
 
@@ -150,7 +150,7 @@ export default class ImageTool implements BlockTool {
 
   /**
    * Notify core that read-only mode is supported
-   * @returns { boolean }
+   * @returns
    */
   public static get isReadOnlySupported(): boolean {
     return true;
@@ -160,7 +160,7 @@ export default class ImageTool implements BlockTool {
    * Get Tool toolbox settings
    * icon - Tool icon's SVG
    * title - title to show in toolbox
-   * @returns {{icon: string, title: string}}
+   * @returns
    */
   public static get toolbox(): ToolboxConfig {
     return {
@@ -171,7 +171,7 @@ export default class ImageTool implements BlockTool {
 
   /**
    * Available image tools
-   * @returns {Array}
+   * @returns
    */
   public static get tunes(): Array<ActionConfig> {
     return [
@@ -198,8 +198,7 @@ export default class ImageTool implements BlockTool {
 
   /**
    * Renders Block content
-   * @public
-   * @returns {HTMLDivElement}
+   * @returns
    */
   public render(): HTMLDivElement {
     return this.ui.render(this.data) as HTMLDivElement;
@@ -207,9 +206,8 @@ export default class ImageTool implements BlockTool {
 
   /**
    * Validate data: check if Image exists
-   * @param {ImageToolData} savedData — data received after saving
-   * @returns {boolean} false if saved data is not correct, otherwise true
-   * @public
+   * @param savedData — data received after saving
+   * @returns false if saved data is not correct, otherwise true
    */
   public validate(savedData: ImageToolData): boolean {
     return !!savedData.file.url;
@@ -217,8 +215,7 @@ export default class ImageTool implements BlockTool {
 
   /**
    * Return Block data
-   * @public
-   * @returns {ImageToolData}
+   * @returns
    */
   public save(): ImageToolData {
     const caption = this.ui.nodes.caption;
@@ -230,7 +227,6 @@ export default class ImageTool implements BlockTool {
 
   /**
    * Returns configuration for block tunes: add background, add border, stretch image
-   * @public
    * @returns TunesMenuConfig
    */
   public renderSettings(): TunesMenuConfig {
@@ -259,7 +255,6 @@ export default class ImageTool implements BlockTool {
   /**
    * Fires after clicks on the Toolbox Image Icon
    * Initiates click on the Select File button
-   * @public
    */
   public appendCallback(): void {
     this.ui.nodes.fileButton.click();
@@ -268,7 +263,7 @@ export default class ImageTool implements BlockTool {
   /**
    * Specify paste substitutes
    * @see {@link https://github.com/codex-team/editor.js/blob/master/docs/tools.md#paste-handling}
-   * @returns { PasteConfig }
+   * @returns
    */
   public static get pasteConfig(): PasteConfig {
     return {
@@ -298,11 +293,10 @@ export default class ImageTool implements BlockTool {
 
   /**
    * Specify paste handlers
-   * @public
    * @see {@link https://github.com/codex-team/editor.js/blob/master/docs/tools.md#paste-handling}
    * @param event - editor.js custom paste event
    *                              {@link https://github.com/codex-team/editor.js/blob/master/types/tools/paste-events.d.ts}
-   * @returns {void}
+   * @returns
    */
   public async onPaste(event: PasteEvent): Promise<void> {
     switch (event.type) {
@@ -344,8 +338,7 @@ export default class ImageTool implements BlockTool {
 
   /**
    * Stores all Tool's data
-   * @private
-   * @param {ImageToolData} data - data in Image Tool format
+   * @param data - data in Image Tool format
    */
   private set data(data: ImageToolData) {
     this.image = data.file;
@@ -362,8 +355,7 @@ export default class ImageTool implements BlockTool {
 
   /**
    * Return Tool data
-   * @private
-   * @returns {ImageToolData}
+   * @returns
    */
   private get data(): ImageToolData {
     return this._data;
@@ -371,10 +363,9 @@ export default class ImageTool implements BlockTool {
 
   /**
    * Set new image file
-   * @private
-   * @param {object} file - uploaded file data
+   * @param file - uploaded file data
    */
-  private set image(file: { url: string } | undefined) {
+  private set image(file: ImageSetterParam | undefined) {
     this._data.file = file || { url: '' };
 
     if (file && file.url) {
@@ -384,9 +375,7 @@ export default class ImageTool implements BlockTool {
 
   /**
    * File uploading callback
-   * @private
-   * @param {UploadResponseFormat} response - uploading server response
-   * @returns {void}
+   * @param response - uploading server response
    */
   private onUpload(response: UploadResponseFormat): void {
     if (response.success && response.file.url) {
@@ -398,9 +387,7 @@ export default class ImageTool implements BlockTool {
 
   /**
    * Handle uploader errors
-   * @private
-   * @param {string} errorText - uploading error info
-   * @returns {void}
+   * @param errorText - uploading error info
    */
   private uploadingFailed(errorText: string): void {
     console.log('Image Tool: uploading failed because of', errorText);
@@ -414,9 +401,7 @@ export default class ImageTool implements BlockTool {
 
   /**
    * Callback fired when Block Tune is activated
-   * @private
-   * @param {string} tuneName - tune that has been clicked
-   * @returns {void}
+   * @param tuneName - tune that has been clicked
    */
   private tuneToggled(tuneName: keyof ImageToolData): void {
     // inverse tune state
@@ -425,9 +410,8 @@ export default class ImageTool implements BlockTool {
 
   /**
    * Set one tune
-   * @param {string} tuneName - {@link Tunes.tunes}
-   * @param {boolean} value - tune state
-   * @returns {void}
+   * @param tuneName - {@link Tunes.tunes}
+   * @param value - tune state
    */
   private setTune(tuneName: keyof ImageToolData, value: boolean): void {
     (this._data[tuneName] as boolean) = value;
@@ -448,8 +432,7 @@ export default class ImageTool implements BlockTool {
 
   /**
    * Show preloader and upload image file
-   * @param {File} file - file that is currently uploading (from paste)
-   * @returns {void}
+   * @param file - file that is currently uploading (from paste)
    */
   private uploadFile(file: Blob): void {
     this.uploader.uploadByFile(file, {
@@ -461,8 +444,7 @@ export default class ImageTool implements BlockTool {
 
   /**
    * Show preloader and upload image by target url
-   * @param {string} url - url pasted
-   * @returns {void}
+   * @param url - url pasted
    */
   private uploadUrl(url: string): void {
     this.ui.showPreloader(url);

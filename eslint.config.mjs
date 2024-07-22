@@ -16,10 +16,7 @@ export default [
     rules: {
         'n/no-missing-import': ['off'],
         'n/no-unsupported-features/node-builtins': ['off'],
-        'jsdoc/no-types': ['off'],
         'jsdoc/require-returns-description': ['off'],
-        'jsdoc/check-tag-names': ['off'],
-        'jsdoc/require-jsdoc': ['off'],
         "@typescript-eslint/naming-convention": [
           "error",
           {

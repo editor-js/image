@@ -4,8 +4,13 @@ import type { HTMLPasteEventDetail } from '@editorjs/editorjs';
  * Represents options for uploading, including a function to handle previewing.
  */
 export interface UploadOptions {
+  /**
+   * Callback function to be called when the preview is ready.
+   * @param src - The source of the preview as a string.
+   * @returns void
+   */
   onPreview: (src: string) => void;
-};
+}
 
 /**
  * User configuration of Image block tunes. Allows to add custom tunes through the config
@@ -183,3 +188,13 @@ export interface HTMLPasteEventDetailExtended extends HTMLPasteEventDetail {
     src: string;
   } & HTMLElement;
 }
+
+/**
+ * Parameter type of Image setter function in ImageTool
+ */
+export type ImageSetterParam = {
+  /**
+   * url path of the image
+   */
+  url: string;
+};
