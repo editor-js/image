@@ -164,10 +164,9 @@ export default class Ui {
   /**
    * Renders tool UI
    * @param toolData - saved tool data
-   * @returns
    */
   public render(toolData: ImageToolData): HTMLElement {
-    if (toolData.file == undefined || Object.keys(toolData.file).length === 0) {
+    if (toolData.file === undefined || Object.keys(toolData.file).length === 0) {
       this.toggleStatus(UiState.Empty);
     } else {
       this.toggleStatus(UiState.Uploading);
@@ -247,7 +246,7 @@ export default class Ui {
       /**
        * Preloader does not exists on first rendering with presaved data
        */
-      if (this.nodes.imagePreloader != undefined) {
+      if (this.nodes.imagePreloader !== undefined) {
         this.nodes.imagePreloader.style.backgroundImage = '';
       }
     });
@@ -260,7 +259,7 @@ export default class Ui {
    * @param text - caption content text
    */
   public fillCaption(text: string): void {
-    if (this.nodes.caption != undefined) {
+    if (this.nodes.caption !== undefined) {
       this.nodes.caption.innerHTML = text;
     }
   }
@@ -288,7 +287,6 @@ export default class Ui {
 
   /**
    * Creates upload-file button
-   * @returns
    */
   private createFileButton(): HTMLElement {
     const button = make('div', [this.CSS.button]);

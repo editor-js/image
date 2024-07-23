@@ -113,7 +113,7 @@ export default class ImageTool implements BlockTool {
      */
     this.uploader = new Uploader({
       config: this.config,
-      onUpload: (response: UploadResponseFormat<object>) => this.onUpload(response),
+      onUpload: (response: UploadResponseFormat) => this.onUpload(response),
       onError: (error: string) => this.uploadingFailed(error),
     });
 
@@ -150,7 +150,6 @@ export default class ImageTool implements BlockTool {
 
   /**
    * Notify core that read-only mode is supported
-   * @returns
    */
   public static get isReadOnlySupported(): boolean {
     return true;
@@ -160,7 +159,6 @@ export default class ImageTool implements BlockTool {
    * Get Tool toolbox settings
    * icon - Tool icon's SVG
    * title - title to show in toolbox
-   * @returns
    */
   public static get toolbox(): ToolboxConfig {
     return {
@@ -171,7 +169,6 @@ export default class ImageTool implements BlockTool {
 
   /**
    * Available image tools
-   * @returns
    */
   public static get tunes(): Array<ActionConfig> {
     return [
@@ -215,7 +212,6 @@ export default class ImageTool implements BlockTool {
 
   /**
    * Return Block data
-   * @returns
    */
   public save(): ImageToolData {
     const caption = this.ui.nodes.caption;
@@ -263,7 +259,6 @@ export default class ImageTool implements BlockTool {
   /**
    * Specify paste substitutes
    * @see {@link https://github.com/codex-team/editor.js/blob/master/docs/tools.md#paste-handling}
-   * @returns
    */
   public static get pasteConfig(): PasteConfig {
     return {
@@ -296,7 +291,6 @@ export default class ImageTool implements BlockTool {
    * @see {@link https://github.com/codex-team/editor.js/blob/master/docs/tools.md#paste-handling}
    * @param event - editor.js custom paste event
    *                              {@link https://github.com/codex-team/editor.js/blob/master/types/tools/paste-events.d.ts}
-   * @returns
    */
   public async onPaste(event: PasteEvent): Promise<void> {
     switch (event.type) {
@@ -405,7 +399,7 @@ export default class ImageTool implements BlockTool {
    */
   private tuneToggled(tuneName: keyof ImageToolData): void {
     // inverse tune state
-    this.setTune(tuneName, this._data[tuneName] != undefined ? false : true);
+    this.setTune(tuneName, this._data[tuneName] !== undefined ? false : true);
   }
 
   /**
