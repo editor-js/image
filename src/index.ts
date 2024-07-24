@@ -397,7 +397,7 @@ export default class ImageTool implements BlockTool {
    */
   private tuneToggled(tuneName: keyof ImageToolData): void {
     // inverse tune state
-    this.setTune(tuneName, this._data[tuneName] !== undefined ? true : false);
+    this.setTune(tuneName, !(this._data[tuneName] as boolean));
   }
 
   /**
