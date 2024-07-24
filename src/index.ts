@@ -195,7 +195,6 @@ export default class ImageTool implements BlockTool {
 
   /**
    * Renders Block content
-   * @returns
    */
   public render(): HTMLDivElement {
     return this.ui.render(this.data) as HTMLDivElement;
@@ -349,7 +348,6 @@ export default class ImageTool implements BlockTool {
 
   /**
    * Return Tool data
-   * @returns
    */
   private get data(): ImageToolData {
     return this._data;
