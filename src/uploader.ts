@@ -1,7 +1,8 @@
 import ajax from '@codexteam/ajax';
+import type { AjaxResponse } from '@codexteam/ajax';
 import isPromise from './utils/isPromise';
-import { UploadOptions } from './types/types';
-import { UploadResponseFormat, ImageConfig } from './types/types';
+import type { UploadOptions } from './types/types';
+import type { UploadResponseFormat, ImageConfig } from './types/types';
 
 /**
  * Params interface for Uploader constructor
@@ -11,18 +12,20 @@ interface UploaderParams {
    * Configuration for the uploader
    */
   config: ImageConfig;
+
   /**
-   * 
-   * @param response: Callback function for successful upload
-   * @returns void
+   * Handles the upload response.
+   * @param {UploadResponseFormat} response - Response format expected from the backend on file uploading.
+   * @returns {void}
    */
   onUpload: (response: UploadResponseFormat) => void;
+
   /**
-   * 
+   *
    * @param error : error type
    * @returns void
    */
-  onError: (error: any) => void;
+  onError: (error: string) => void;
 }
 
 /**
@@ -34,12 +37,12 @@ interface UploaderParams {
 export default class Uploader {
   private config: ImageConfig;
   private onUpload: (response: UploadResponseFormat) => void;
-  private onError: (error: any) => void;
+  private onError: (error: string) => void;
   /**
-   * @param {object} params - uploader module params
-   * @param {ImageConfig} params.config - image tool config
-   * @param {Function} params.onUpload - one callback for all uploading (file, url, d-n-d, pasting)
-   * @param {Function} params.onError - callback for uploading errors
+   * @param params - uploader module params
+   * @param params.config - image tool config
+   * @param params.onUpload - one callback for all uploading (file, url, d-n-d, pasting)
+   * @param params.onError - callback for uploading errors
    */
   constructor({ config, onUpload, onError }: UploaderParams) {
     this.config = config;
@@ -50,11 +53,10 @@ export default class Uploader {
   /**
    * Handle clicks on the upload file button
    * Fires ajax.transport()
-   *
-   * @param {Function} onPreview - callback fired when preview is ready
+   * @param onPreview - callback fired when preview is ready
    */
-  uploadSelectedFile({ onPreview }: UploadOptions) {
-    const preparePreview = function (file: File) {
+  public uploadSelectedFile({ onPreview }: UploadOptions): void {
+    const preparePreview = function (file: File): void {
       const reader = new FileReader();
 
       reader.readAsDataURL(file);
@@ -72,7 +74,8 @@ export default class Uploader {
     // custom uploading
     if (this.config.uploader && typeof this.config.uploader.uploadByFile === 'function') {
       const uploadByFile = this.config.uploader.uploadByFile;
-      upload = ajax.selectFiles({ accept: this.config.types || 'image/*'}).then((files: File[]) => {
+
+      upload = ajax.selectFiles({ accept: this.config.types ?? 'image/*' }).then((files: File[]) => {
         preparePreview(files[0]);
 
         const customUpload = uploadByFile(files[0]);
@@ -81,7 +84,7 @@ export default class Uploader {
           console.warn('Custom uploader method uploadByFile should return a Promise');
         }
 
-        return customUpload as Promise<UploadResponseFormat>;
+        return customUpload;
       });
 
     // default uploading
@@ -89,18 +92,18 @@ export default class Uploader {
       upload = ajax.transport({
         url: this.config.endpoints.byFile,
         data: this.config.additionalRequestData,
-        accept: this.config.types || 'image/*',
+        accept: this.config.types ?? 'image/*',
         headers: this.config.additionalRequestHeaders as Record<string, string>,
         beforeSend: (files: File[]) => {
           preparePreview(files[0]);
         },
-        fieldName: this.config.field || 'image',
-      }).then((response: any) => response.body);
+        fieldName: this.config.field ?? 'image',
+      }).then((response: AjaxResponse) => response.body as UploadResponseFormat);
     }
 
     upload.then((response) => {
       this.onUpload(response);
-    }).catch((error) => {
+    }).catch((error: string) => {
       this.onError(error);
     });
   }
@@ -108,10 +111,9 @@ export default class Uploader {
   /**
    * Handle clicks on the upload file button
    * Fires ajax.post()
-   *
-   * @param {string} url - image source url
+   * @param url - image source url
    */
-  uploadByUrl(url: string) {
+  public uploadByUrl(url: string): void {
     let upload;
 
     /**
@@ -134,12 +136,12 @@ export default class Uploader {
         }, this.config.additionalRequestData),
         type: ajax.contentType.JSON,
         headers: this.config.additionalRequestHeaders as Record<string, string>,
-      }).then((response: any) => response.body);
+      }).then((response: AjaxResponse) => response.body as UploadResponseFormat);
     }
 
     upload.then((response: UploadResponseFormat) => {
       this.onUpload(response);
-    }).catch((error: any) => {
+    }).catch((error: string) => {
       this.onError(error);
     });
   }
@@ -147,15 +149,12 @@ export default class Uploader {
   /**
    * Handle clicks on the upload file button
    * Fires ajax.post()
-   *
-   * @param {File} file - file pasted by drag-n-drop
-   * @param {Function} onPreview - file pasted by drag-n-drop
+   * @param file - file pasted by drag-n-drop
+   * @param onPreview - file pasted by drag-n-drop
    */
-  uploadByFile(file: Blob, { onPreview }: UploadOptions) {
+  public uploadByFile(file: Blob, { onPreview }: UploadOptions): void {
     /**
      * Load file for preview
-     *
-     * @type {FileReader}
      */
     const reader = new FileReader();
 
@@ -181,10 +180,10 @@ export default class Uploader {
        */
       const formData = new FormData();
 
-      formData.append(this.config.field || 'image', file);
+      formData.append(this.config.field ?? 'image', file);
 
       if (this.config.additionalRequestData && Object.keys(this.config.additionalRequestData).length) {
-        Object.entries(this.config.additionalRequestData).forEach(([name, value]: [string, any]) => {
+        Object.entries(this.config.additionalRequestData).forEach(([name, value]: [string, string | Blob]) => {
           formData.append(name, value);
         });
       }
@@ -194,14 +193,13 @@ export default class Uploader {
         data: formData,
         type: ajax.contentType.JSON,
         headers: this.config.additionalRequestHeaders as Record<string, string>,
-      }).then((response: any) => response.body);
+      }).then((response: AjaxResponse) => response.body as UploadResponseFormat);
     }
 
     upload.then((response) => {
       this.onUpload(response);
-    }).catch((error) => {
+    }).catch((error: string) => {
       this.onError(error);
     });
   }
 }
-

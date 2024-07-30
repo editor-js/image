@@ -1,6 +1,6 @@
 {
   "name": "@editorjs/image",
-  "version": "2.9.2",
+  "version": "2.9.3",
   "keywords": [
     "codex editor",
     "image",
@@ -26,9 +26,9 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "lint": "eslint src/ --ext .ts",
-    "lint:errors": "eslint src/ --quiet",
-    "lint:fix": "eslint src/ --fix"
+    "lint": "eslint",
+    "lint:errors": "eslint --quiet",
+    "lint:fix": "eslint --fix"
   },
   "author": {
     "name": "CodeX",
@@ -37,9 +37,9 @@
   "devDependencies": {
     "@codexteam/ajax": "^4.2.0",
     "@editorjs/editorjs": "2.30.0-rc.12",
-    "@typescript-eslint/eslint-plugin": "^7.13.1",
-    "@typescript-eslint/parser": "^7.13.1",
-    "eslint": "^7.22.0",
+    "@typescript-eslint/eslint-plugin": "^7.16.1",
+    "@typescript-eslint/parser": "^7.16.1",
+    "eslint": "^9.7.0",
     "eslint-config-codex": "^2.0.1",
     "eslint-loader": "^4.0.2",
     "formidable": "^3.5.1",
@@ -47,6 +47,7 @@
     "postcss-nested-ancestors": "^3.0.0",
     "request": "^2.88.0",
     "typescript": "^5.4.5",
+    "typescript-eslint": "^7.17.0",
     "vite": "^5.3.1",
     "vite-plugin-css-injected-by-js": "^3.5.1",
     "vite-plugin-dts": "^3.9.1"

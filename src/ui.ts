@@ -1,7 +1,7 @@
 import { IconPicture } from '@codexteam/icons';
 import { make } from './utils/dom';
 import type { API } from '@editorjs/editorjs';
-import { ImageToolData, ImageConfig } from './types/types';
+import type { ImageToolData, ImageConfig } from './types/types';
 
 /**
  * Enumeration representing the different states of the UI.
@@ -10,17 +10,17 @@ enum UiState {
   /**
    * The UI is in an empty state, with no image loaded or being uploaded.
    */
-  Empty = "empty",
+  Empty = 'empty',
 
   /**
    * The UI is in an uploading state, indicating an image is currently being uploaded.
    */
-  Uploading = "uploading", 
+  Uploading = 'uploading',
 
   /**
    * The UI is in a filled state, with an image successfully loaded.
    */
-  Filled = "filled"
+  Filled = 'filled'
 };
 
 /**
@@ -51,7 +51,7 @@ interface Nodes {
    * Preloader element for the image.
    */
   imagePreloader: HTMLElement;
-  
+
   /**
    * Caption element for the image.
    */
@@ -87,36 +87,37 @@ interface ConstructorParams {
  *  - apply tune view
  */
 export default class Ui {
-/**
- * API instance for Editor.js.
- */
-private api: API;
-
-/**
- * Configuration for the image tool.
- */
-private config: ImageConfig;
-
-/**
- * Callback function for selecting a file.
- */
-private onSelectFile: () => void;
-
-/**
- * Flag indicating if the UI is in read-only mode.
- */
-private readOnly: boolean;
-
-/**
- * Nodes representing various elements in the UI.
- */
-public nodes: Nodes;
   /**
-   * @param {object} ui - image tool Ui module
-   * @param {object} ui.api - Editor.js API
-   * @param {ImageConfig} ui.config - user config
-   * @param {Function} ui.onSelectFile - callback for clicks on Select file button
-   * @param {boolean} ui.readOnly - read-only mode flag
+   * Nodes representing various elements in the UI.
+   */
+  public nodes: Nodes;
+
+  /**
+   * API instance for Editor.js.
+   */
+  private api: API;
+
+  /**
+   * Configuration for the image tool.
+   */
+  private config: ImageConfig;
+
+  /**
+   * Callback function for selecting a file.
+   */
+  private onSelectFile: () => void;
+
+  /**
+   * Flag indicating if the UI is in read-only mode.
+   */
+  private readOnly: boolean;
+
+  /**
+   * @param ui - image tool Ui module
+   * @param ui.api - Editor.js API
+   * @param ui.config - user config
+   * @param ui.onSelectFile - callback for clicks on Select file button
+   * @param ui.readOnly - read-only mode flag
    */
   constructor({ api, config, onSelectFile, readOnly }: ConstructorParams) {
     this.api = api;
@@ -125,7 +126,7 @@ public nodes: Nodes;
     this.readOnly = readOnly;
     this.nodes = {
       wrapper: make('div', [this.CSS.baseClass, this.CSS.wrapper]),
-      imageContainer: make('div', [ this.CSS.imageContainer ]),
+      imageContainer: make('div', [this.CSS.imageContainer]),
       fileButton: this.createFileButton(),
       imageEl: undefined,
       imagePreloader: make('div', this.CSS.imagePreloader),
@@ -152,11 +153,121 @@ public nodes: Nodes;
   }
 
   /**
-   * CSS classes
-   *
-   * @returns {object}
+   * Apply visual representation of activated tune
+   * @param tuneName - one of available tunes {@link Tunes.tunes}
+   * @param status - true for enable, false for disable
    */
-  get CSS(): Record<string, string> {
+  public applyTune(tuneName: string, status: boolean): void {
+    this.nodes.wrapper.classList.toggle(`${this.CSS.wrapper}--${tuneName}`, status);
+  }
+
+  /**
+   * Renders tool UI
+   * @param toolData - saved tool data
+   */
+  public render(toolData: ImageToolData): HTMLElement {
+    if (toolData.file === undefined || Object.keys(toolData.file).length === 0) {
+      this.toggleStatus(UiState.Empty);
+    } else {
+      this.toggleStatus(UiState.Uploading);
+    }
+
+    return this.nodes.wrapper;
+  }
+
+  /**
+   * Shows uploading preloader
+   * @param src - preview source
+   */
+  public showPreloader(src: string): void {
+    this.nodes.imagePreloader.style.backgroundImage = `url(${src})`;
+
+    this.toggleStatus(UiState.Uploading);
+  }
+
+  /**
+   * Hide uploading preloader
+   */
+  public hidePreloader(): void {
+    this.nodes.imagePreloader.style.backgroundImage = '';
+    this.toggleStatus(UiState.Empty);
+  }
+
+  /**
+   * Shows an image
+   * @param url - image source
+   */
+  public fillImage(url: string): void {
+    /**
+     * Check for a source extension to compose element correctly: video tag for mp4, img — for others
+     */
+    const tag = /\.mp4$/.test(url) ? 'VIDEO' : 'IMG';
+
+    const attributes: { [key: string]: string | boolean } = {
+      src: url,
+    };
+
+    /**
+     * We use eventName variable because IMG and VIDEO tags have different event to be called on source load
+     * - IMG: load
+     * - VIDEO: loadeddata
+     */
+    let eventName = 'load';
+
+    /**
+     * Update attributes and eventName if source is a mp4 video
+     */
+    if (tag === 'VIDEO') {
+      /**
+       * Add attributes for playing muted mp4 as a gif
+       */
+      attributes.autoplay = true;
+      attributes.loop = true;
+      attributes.muted = true;
+      attributes.playsinline = true;
+
+      /**
+       * Change event to be listened
+       */
+      eventName = 'loadeddata';
+    }
+
+    /**
+     * Compose tag with defined attributes
+     */
+    this.nodes.imageEl = make(tag, this.CSS.imageEl, attributes);
+
+    /**
+     * Add load event listener
+     */
+    this.nodes.imageEl.addEventListener(eventName, () => {
+      this.toggleStatus(UiState.Filled);
+
+      /**
+       * Preloader does not exists on first rendering with presaved data
+       */
+      if (this.nodes.imagePreloader !== undefined) {
+        this.nodes.imagePreloader.style.backgroundImage = '';
+      }
+    });
+
+    this.nodes.imageContainer.appendChild(this.nodes.imageEl);
+  }
+
+  /**
+   * Shows caption input
+   * @param text - caption content text
+   */
+  public fillCaption(text: string): void {
+    if (this.nodes.caption !== undefined) {
+      this.nodes.caption.innerHTML = text;
+    }
+  }
+
+  /**
+   * CSS classes
+   */
+  private get CSS(): Record<string, string> {
     return {
       baseClass: this.api.styles.block,
       loading: this.api.styles.loader,
@@ -175,29 +286,12 @@ public nodes: Nodes;
   };
 
   /**
-   * Renders tool UI
-   *
-   * @param {ImageToolData} toolData - saved tool data
-   * @returns {Element}
-   */
-  render(toolData: ImageToolData): HTMLElement  {
-    if (!toolData.file || Object.keys(toolData.file).length === 0) {
-      this.toggleStatus(UiState.Empty);
-    } else {
-      this.toggleStatus(UiState.Uploading);
-    }
-    return this.nodes.wrapper;
-  }
-
-  /**
    * Creates upload-file button
-   *
-   * @returns {Element}
    */
-  createFileButton(): HTMLElement {
-    const button = make('div', [ this.CSS.button ]);
+  private createFileButton(): HTMLElement {
+    const button = make('div', [this.CSS.button]);
 
-    button.innerHTML = this.config.buttonContent || `${IconPicture} ${this.api.i18n.t('Select an Image')}`;
+    button.innerHTML = this.config.buttonContent ?? `${IconPicture} ${this.api.i18n.t('Select an Image')}`;
 
     button.addEventListener('click', () => {
       this.onSelectFile();
@@ -207,133 +301,14 @@ public nodes: Nodes;
   }
 
   /**
-   * Shows uploading preloader
-   *
-   * @param {string} src - preview source
-   * @returns {void}
-   */
-  showPreloader(src: string): void {
-    this.nodes.imagePreloader.style.backgroundImage = `url(${src})`;
-
-    this.toggleStatus(UiState.Uploading);
-  }
-
-  /**
-   * Hide uploading preloader
-   *
-   * @returns {void}
-   */
-  hidePreloader(): void {
-    this.nodes.imagePreloader.style.backgroundImage = '';
-    this.toggleStatus(UiState.Empty);
-  }
-
-  /**
-   * Shows an image
-   *
-   * @param {string} url - image source
-   * @returns {void}
-   */
-  fillImage(url: string): void {
-    /**
-     * Check for a source extension to compose element correctly: video tag for mp4, img — for others
-     */
-    const tag = /\.mp4$/.test(url) ? 'VIDEO' : 'IMG';
-
-    const attributes: { [key: string]: any} = {
-      src: url,
-    };
-
-    /**
-     * We use eventName variable because IMG and VIDEO tags have different event to be called on source load
-     * - IMG: load
-     * - VIDEO: loadeddata
-     *
-     * @type {string}
-     */
-    let eventName = 'load';
-
-    /**
-     * Update attributes and eventName if source is a mp4 video
-     */
-    if (tag === 'VIDEO') {
-      /**
-       * Add attributes for playing muted mp4 as a gif
-       *
-       * @type {boolean}
-       */
-      attributes.autoplay = true;
-      attributes.loop = true;
-      attributes.muted = true;
-      attributes.playsinline = true;
-
-      /**
-       * Change event to be listened
-       *
-       * @type {string}
-       */
-      eventName = 'loadeddata';
-    }
-
-    /**
-     * Compose tag with defined attributes
-     *
-     * @type {Element}
-     */
-    this.nodes.imageEl = make(tag, this.CSS.imageEl, attributes);
-
-    /**
-     * Add load event listener
-     */
-    this.nodes.imageEl.addEventListener(eventName, () => {
-      this.toggleStatus(UiState.Filled);
-
-      /**
-       * Preloader does not exists on first rendering with presaved data
-       */
-      if (this.nodes.imagePreloader) {
-        this.nodes.imagePreloader.style.backgroundImage = '';
-      }
-    });
-
-    this.nodes.imageContainer.appendChild(this.nodes.imageEl);
-  }
-
-  /**
-   * Shows caption input
-   *
-   * @param {string} text - caption text
-   * @returns {void}
-   */
-  fillCaption(text: string): void {
-    if (this.nodes.caption) {
-      this.nodes.caption.innerHTML = text;
-    }
-  }
-
-  /**
    * Changes UI status
-   *
-   * @param {string} status - see {@link Ui.status} constants
-   * @returns {void}
+   * @param status - see {@link Ui.status} constants
    */
-  toggleStatus(status: UiState): void {
+  private toggleStatus(status: UiState): void {
     for (const statusType in UiState) {
       if (Object.prototype.hasOwnProperty.call(UiState, statusType)) {
-          this.nodes.wrapper.classList.toggle(`${this.CSS.wrapper}--${UiState[statusType as keyof typeof UiState]}`, status === UiState[statusType as keyof typeof UiState]);
+        this.nodes.wrapper.classList.toggle(`${this.CSS.wrapper}--${UiState[statusType as keyof typeof UiState]}`, status === UiState[statusType as keyof typeof UiState]);
       }
     }
   }
-
-  /**
-   * Apply visual representation of activated tune
-   *
-   * @param {string} tuneName - one of available tunes {@link Tunes.tunes}
-   * @param {boolean} status - true for enable, false for disable
-   * @returns {void}
-   */
-  applyTune(tuneName: string, status: boolean): void {
-    this.nodes.wrapper.classList.toggle(`${this.CSS.wrapper}--${tuneName}`, status);
-  }
 }
-

@@ -1,34 +1,41 @@
+import type { HTMLPasteEventDetail } from '@editorjs/editorjs';
+
 /**
  * Represents options for uploading, including a function to handle previewing.
  */
-export interface UploadOptions  { 
-  onPreview: (src: string) => void 
-};
+export interface UploadOptions {
+  /**
+   * Callback function to be called when the preview is ready.
+   * @param src - The source of the preview as a string.
+   * @returns void
+   */
+  onPreview: (src: string) => void;
+}
 
-/** 
+/**
  * User configuration of Image block tunes. Allows to add custom tunes through the config
-*/
-export interface ActionConfig { 
+ */
+export interface ActionConfig {
   /**
    * The name of the tune.
    */
   name: string;
-  
+
   /**
    * The icon for the tune. Should be an SVG string.
    */
   icon: string;
-  
+
   /**
    * The title of the tune. This will be displayed in the UI.
    */
   title: string;
-  
+
   /**
    * An optional flag indicating whether the tune is a toggle (true) or not (false).
    */
   toggle?: boolean;
-  
+
   /**
    * An optional action function to be executed when the tune is activated.
    */
@@ -40,7 +47,7 @@ export interface ActionConfig {
  */
 export interface UploadResponseFormat<AdditionalFileData = {}> {
   /**
-   * success - 1 for successful uploading, 0 for failure 
+   * success - 1 for successful uploading, 0 for failure
    */
   success: number;
 
@@ -165,3 +172,29 @@ export interface ImageConfig {
    */
   actions?: ActionConfig[];
 }
+
+/**
+ * Interface representing the details of a paste event for HTML elements.
+ * Extends the `HTMLPasteEventDetail` interface to include additional data properties.
+ */
+export interface HTMLPasteEventDetailExtended extends HTMLPasteEventDetail {
+  /**
+   * The data property containing the source of the image and HTML element details.
+   */
+  data: {
+    /**
+     * The source URL of the pasted image.
+     */
+    src: string;
+  } & HTMLElement;
+}
+
+/**
+ * Parameter type of Image setter function in ImageTool
+ */
+export type ImageSetterParam = {
+  /**
+   * url path of the image
+   */
+  url: string;
+};
