@@ -194,6 +194,15 @@ export default class Ui {
   }
 
   /**
+   * Shows an image or video
+   * @param url - image or video source
+   */
+  private getTag(url: string): string {
+    const videoFormats = /\.(mp4|ogg|webm|avi|mov|wmv|flv|mkv|m4v)/i;
+    return videoFormats.test(url) ? 'VIDEO' : 'IMG';
+  }
+
+  /**
    * Shows an image
    * @param url - image source
    */
@@ -201,7 +210,7 @@ export default class Ui {
     /**
      * Check for a source extension to compose element correctly: video tag for mp4, img — for others
      */
-    const tag = /\.mp4$/.test(url) ? 'VIDEO' : 'IMG';
+    const tag = this.getTag(url);
 
     const attributes: { [key: string]: string | boolean } = {
       src: url,
@@ -221,10 +230,7 @@ export default class Ui {
       /**
        * Add attributes for playing muted mp4 as a gif
        */
-      attributes.autoplay = true;
-      attributes.loop = true;
-      attributes.muted = true;
-      attributes.playsinline = true;
+      attributes.controls = true;
 
       /**
        * Change event to be listened
