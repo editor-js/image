@@ -13,6 +13,16 @@ export interface UploadOptions {
 }
 
 /**
+ * Represents the format of a file object data with the additional data.
+ */
+export type FileObjectData<AdditionalFileData = {}> = {
+  /**
+   * The URL of the file.
+   */
+  url: string;
+} & AdditionalFileData;
+
+/**
  * User configuration of Image block tunes. Allows to add custom tunes through the config
  */
 export interface ActionConfig {
@@ -56,12 +66,7 @@ export interface UploadResponseFormat<AdditionalFileData = {}> {
    *             'url' is required,
    *             also can contain any additional data that will be saved and passed back
    */
-  file: {
-    /**
-     * The URL of the uploaded image.
-     */
-    url: string;
-  } & AdditionalFileData;
+  file: FileObjectData<AdditionalFileData>;
 }
 
 /**
@@ -92,19 +97,14 @@ export type ImageToolData<Actions = {}, AdditionalFileData = {}> = {
    * Object containing the URL of the image file.
    * Also can contain any additional data.
    */
-  file: {
-    /**
-     * The URL of the image.
-     */
-    url: string;
-  } & AdditionalFileData;
-} & (Actions extends Record<string, boolean> ? Actions : {});
+  file: FileObjectData<AdditionalFileData>;
+} & Actions;
 
 /**
  *
  * @description Config supported by Tool
  */
-export interface ImageConfig {
+export interface ImageConfig<AdditionalUploadResponse = {}> {
   /**
    * Endpoints for upload, whether using file or URL.
    */
@@ -159,12 +159,12 @@ export interface ImageConfig {
     /**
      * Method to upload an image by file.
      */
-    uploadByFile?: (file: Blob) => Promise<UploadResponseFormat>;
+    uploadByFile?: (file: Blob) => Promise<UploadResponseFormat<AdditionalUploadResponse>>;
 
     /**
      * Method to upload an image by URL.
      */
-    uploadByUrl?: (url: string) => Promise<UploadResponseFormat>;
+    uploadByUrl?: (url: string) => Promise<UploadResponseFormat<AdditionalUploadResponse>>;
   };
 
   /**

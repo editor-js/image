@@ -30,21 +30,21 @@
  */
 
 import type { TunesMenuConfig } from '@editorjs/editorjs/types/tools';
-import type { API, ToolboxConfig, PasteConfig, BlockToolConstructorOptions, BlockTool, BlockAPI, PasteEvent, PatternPasteEventDetail, FilePasteEventDetail } from '@editorjs/editorjs';
+import type { API, ToolboxConfig, PasteConfig, BlockToolConstructorOptions, BlockAPI, PasteEvent, PatternPasteEventDetail, FilePasteEventDetail, BlockTool } from '@editorjs/editorjs';
 import './index.css';
 
 import Ui from './ui';
 import Uploader from './uploader';
 
 import { IconAddBorder, IconStretch, IconAddBackground, IconPicture } from '@codexteam/icons';
-import type { ActionConfig, UploadResponseFormat, ImageToolData, ImageConfig, HTMLPasteEventDetailExtended, ImageSetterParam } from './types/types';
+import type { ActionConfig, UploadResponseFormat, ImageToolData, ImageConfig, FileObjectData, HTMLPasteEventDetailExtended } from './types/types';
 
-type ImageToolConstructorOptions = BlockToolConstructorOptions<ImageToolData, ImageConfig>;
+type ImageToolConstructorOptions<CustomActions = {}, AdditionalUploadResponse = {}> = BlockToolConstructorOptions<ImageToolData<CustomActions, AdditionalUploadResponse>, ImageConfig<AdditionalUploadResponse>>;
 
 /**
  * Implementation of ImageTool class
  */
-export default class ImageTool implements BlockTool {
+export default class ImageTool<CustomActions = {}, AdditionalUploadResponse = {}> implements BlockTool {
   /**
    * Editor.js API instance
    */
@@ -63,22 +63,22 @@ export default class ImageTool implements BlockTool {
   /**
    * Configuration for the ImageTool
    */
-  private config: ImageConfig;
+  private config: ImageConfig<AdditionalUploadResponse>;
 
   /**
    * Uploader module instance
    */
-  private uploader: Uploader;
+  private uploader: Uploader<AdditionalUploadResponse>;
 
   /**
    * UI module instance
    */
-  private ui: Ui;
+  private ui: Ui<ImageToolData<CustomActions, AdditionalUploadResponse>, AdditionalUploadResponse>;
 
   /**
    * Stores current block data internally
    */
-  private _data: ImageToolData;
+  private _data: ImageToolData<CustomActions, AdditionalUploadResponse>;
 
   /**
    * @param tool - tool properties got from editor.js
@@ -88,7 +88,7 @@ export default class ImageTool implements BlockTool {
    * @param tool.readOnly - read-only mode flag
    * @param tool.block - current Block API
    */
-  constructor({ data, config, api, readOnly, block }: ImageToolConstructorOptions) {
+  constructor({ data, config, api, readOnly, block }: ImageToolConstructorOptions<CustomActions, AdditionalUploadResponse>) {
     this.api = api;
     this.readOnly = readOnly;
     this.block = block;
@@ -111,16 +111,16 @@ export default class ImageTool implements BlockTool {
     /**
      * Module for file uploading
      */
-    this.uploader = new Uploader({
+    this.uploader = new Uploader<AdditionalUploadResponse>({
       config: this.config,
-      onUpload: (response: UploadResponseFormat) => this.onUpload(response),
+      onUpload: (response: UploadResponseFormat<AdditionalUploadResponse>) => this.onUpload(response),
       onError: (error: string) => this.uploadingFailed(error),
     });
 
     /**
      * Module for working with UI
      */
-    this.ui = new Ui({
+    this.ui = new Ui<ImageToolData<CustomActions, AdditionalUploadResponse>, AdditionalUploadResponse>({
       api,
       config: this.config,
       onSelectFile: () => {
@@ -144,7 +144,7 @@ export default class ImageTool implements BlockTool {
       file: {
         url: '',
       },
-    };
+    } as ImageToolData<CustomActions, AdditionalUploadResponse>;
     this.data = data;
   }
 
@@ -205,14 +205,14 @@ export default class ImageTool implements BlockTool {
    * @param savedData — data received after saving
    * @returns false if saved data is not correct, otherwise true
    */
-  public validate(savedData: ImageToolData): boolean {
+  public validate(savedData: ImageToolData<CustomActions, AdditionalUploadResponse>): boolean {
     return !!savedData.file.url;
   }
 
   /**
    * Return Block data
    */
-  public save(): ImageToolData {
+  public save(): ImageToolData<CustomActions, AdditionalUploadResponse> {
     const caption = this.ui.nodes.caption;
 
     this._data.caption = caption.innerHTML;
@@ -234,7 +234,7 @@ export default class ImageTool implements BlockTool {
       label: this.api.i18n.t(tune.title),
       name: tune.name,
       toggle: tune.toggle,
-      isActive: this.data[tune.name as keyof ImageToolData] as boolean,
+      isActive: this.data[tune.name as keyof ImageToolData<CustomActions, AdditionalUploadResponse>] as boolean,
       onActivate: () => {
         /** If it'a user defined tune, execute it's callback stored in action property */
         if (typeof tune.action === 'function') {
@@ -242,7 +242,7 @@ export default class ImageTool implements BlockTool {
 
           return;
         }
-        this.tuneToggled(tune.name as keyof ImageToolData);
+        this.tuneToggled(tune.name as keyof ImageToolData<CustomActions, AdditionalUploadResponse>);
       },
     }));
   }
@@ -333,23 +333,28 @@ export default class ImageTool implements BlockTool {
    * Stores all Tool's data
    * @param data - data in Image Tool format
    */
-  private set data(data: ImageToolData) {
+  private set data(data: ImageToolData<CustomActions, AdditionalUploadResponse>) {
     this.image = data.file;
 
     this._data.caption = data.caption || '';
     this.ui.fillCaption(this._data.caption);
 
     ImageTool.tunes.forEach(({ name: tune }) => {
-      const value = typeof data[tune as keyof ImageToolData] !== 'undefined' ? data[tune as keyof ImageToolData] === true || data[tune as keyof ImageToolData] === 'true' : false;
+      const tuneKey = tune as keyof ImageToolData<CustomActions, AdditionalUploadResponse>;
+      const tuneValue = data[tuneKey];
 
-      this.setTune(tune as keyof ImageToolData, value);
+      const value = typeof tuneValue !== 'undefined'
+        ? tuneValue === true || tuneValue === 'true'
+        : false;
+
+      this.setTune(tune as keyof ImageToolData<CustomActions, AdditionalUploadResponse>, value);
     });
   }
 
   /**
    * Return Tool data
    */
-  private get data(): ImageToolData {
+  private get data(): ImageToolData<CustomActions, AdditionalUploadResponse> {
     return this._data;
   }
 
@@ -357,8 +362,8 @@ export default class ImageTool implements BlockTool {
    * Set new image file
    * @param file - uploaded file data
    */
-  private set image(file: ImageSetterParam | undefined) {
-    this._data.file = file || { url: '' };
+  private set image(file: FileObjectData<AdditionalUploadResponse> | undefined) {
+    this._data.file = file || ({ url: '' } as FileObjectData<AdditionalUploadResponse>);
 
     if (file && file.url) {
       this.ui.fillImage(file.url);
@@ -369,7 +374,7 @@ export default class ImageTool implements BlockTool {
    * File uploading callback
    * @param response - uploading server response
    */
-  private onUpload(response: UploadResponseFormat): void {
+  private onUpload(response: UploadResponseFormat<AdditionalUploadResponse>): void {
     if (response.success && Boolean(response.file)) {
       this.image = response.file;
     } else {
@@ -395,7 +400,7 @@ export default class ImageTool implements BlockTool {
    * Callback fired when Block Tune is activated
    * @param tuneName - tune that has been clicked
    */
-  private tuneToggled(tuneName: keyof ImageToolData): void {
+  private tuneToggled(tuneName: keyof ImageToolData<CustomActions, AdditionalUploadResponse>): void {
     // inverse tune state
     this.setTune(tuneName, !(this._data[tuneName] as boolean));
   }
@@ -405,10 +410,10 @@ export default class ImageTool implements BlockTool {
    * @param tuneName - {@link Tunes.tunes}
    * @param value - tune state
    */
-  private setTune(tuneName: keyof ImageToolData, value: boolean): void {
+  private setTune(tuneName: keyof ImageToolData<CustomActions, AdditionalUploadResponse>, value: boolean): void {
     (this._data[tuneName] as boolean) = value;
 
-    this.ui.applyTune(tuneName, value);
+    this.ui.applyTune(String(tuneName), value);
     if (tuneName === 'stretched') {
       /**
        * Wait until the API is ready

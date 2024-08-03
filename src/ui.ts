@@ -1,7 +1,7 @@
 import { IconPicture } from '@codexteam/icons';
 import { make } from './utils/dom';
 import type { API } from '@editorjs/editorjs';
-import type { ImageToolData, ImageConfig } from './types/types';
+import type { ImageConfig, ImageToolData } from './types/types';
 
 /**
  * Enumeration representing the different states of the UI.
@@ -61,7 +61,7 @@ interface Nodes {
 /**
  * ConstructorParams interface representing parameters for the Ui class constructor.
  */
-interface ConstructorParams {
+interface ConstructorParams<AdditionalUploadResponse = {}> {
   /**
    * Editor.js API.
    */
@@ -69,7 +69,7 @@ interface ConstructorParams {
   /**
    * Configuration for the image.
    */
-  config: ImageConfig;
+  config: ImageConfig<AdditionalUploadResponse>;
   /**
    * Callback function for selecting a file.
    */
@@ -86,7 +86,7 @@ interface ConstructorParams {
  *  - show/hide preview
  *  - apply tune view
  */
-export default class Ui {
+export default class Ui<ImageToolDataType extends ImageToolData = ImageToolData, AdditionalUploadResponse = {} > {
   /**
    * Nodes representing various elements in the UI.
    */
@@ -100,7 +100,7 @@ export default class Ui {
   /**
    * Configuration for the image tool.
    */
-  private config: ImageConfig;
+  private config: ImageConfig<AdditionalUploadResponse>;
 
   /**
    * Callback function for selecting a file.
@@ -119,7 +119,7 @@ export default class Ui {
    * @param ui.onSelectFile - callback for clicks on Select file button
    * @param ui.readOnly - read-only mode flag
    */
-  constructor({ api, config, onSelectFile, readOnly }: ConstructorParams) {
+  constructor({ api, config, onSelectFile, readOnly }: ConstructorParams<AdditionalUploadResponse>) {
     this.api = api;
     this.config = config;
     this.onSelectFile = onSelectFile;
@@ -165,7 +165,7 @@ export default class Ui {
    * Renders tool UI
    * @param toolData - saved tool data
    */
-  public render(toolData: ImageToolData): HTMLElement {
+  public render(toolData: ImageToolDataType): HTMLElement {
     if (toolData.file === undefined || Object.keys(toolData.file).length === 0) {
       this.toggleStatus(UiState.Empty);
     } else {

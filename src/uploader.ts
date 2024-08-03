@@ -7,19 +7,17 @@ import type { UploadResponseFormat, ImageConfig } from './types/types';
 /**
  * Params interface for Uploader constructor
  */
-interface UploaderParams {
+interface UploaderParams<AdditionalUploadResponse = {}> {
   /**
    * Configuration for the uploader
    */
-  config: ImageConfig;
-
+  config: ImageConfig<AdditionalUploadResponse>;
   /**
    * Handles the upload response.
-   * @param {UploadResponseFormat} response - Response format expected from the backend on file uploading.
+   * @param {UploadResponseFormat<AdditionalUploadResponse>} response - Response format expected from the backend on file uploading.
    * @returns {void}
    */
-  onUpload: (response: UploadResponseFormat) => void;
-
+  onUpload: (response: UploadResponseFormat<AdditionalUploadResponse>) => void;
   /**
    *
    * @param error : error type
@@ -34,9 +32,9 @@ interface UploaderParams {
  *  2. Upload by pasting URL
  *  3. Upload by pasting file from Clipboard or by Drag'n'Drop
  */
-export default class Uploader {
-  private config: ImageConfig;
-  private onUpload: (response: UploadResponseFormat) => void;
+export default class Uploader<AdditionalUploadResponse = {}> {
+  private config: ImageConfig<AdditionalUploadResponse>;
+  private onUpload: (response: UploadResponseFormat<AdditionalUploadResponse>) => void;
   private onError: (error: string) => void;
   /**
    * @param params - uploader module params
@@ -44,7 +42,7 @@ export default class Uploader {
    * @param params.onUpload - one callback for all uploading (file, url, d-n-d, pasting)
    * @param params.onError - callback for uploading errors
    */
-  constructor({ config, onUpload, onError }: UploaderParams) {
+  constructor({ config, onUpload, onError }: UploaderParams<AdditionalUploadResponse>) {
     this.config = config;
     this.onUpload = onUpload;
     this.onError = onError;
@@ -69,7 +67,7 @@ export default class Uploader {
      * Custom uploading
      * or default uploading
      */
-    let upload: Promise<UploadResponseFormat>;
+    let upload: Promise<UploadResponseFormat<AdditionalUploadResponse>>;
 
     // custom uploading
     if (this.config.uploader && typeof this.config.uploader.uploadByFile === 'function') {
@@ -78,9 +76,9 @@ export default class Uploader {
       upload = ajax.selectFiles({ accept: this.config.types ?? 'image/*' }).then((files: File[]) => {
         preparePreview(files[0]);
 
-        const customUpload = uploadByFile(files[0]);
+        const customUpload: Promise<UploadResponseFormat<AdditionalUploadResponse>> = uploadByFile(files[0]);
 
-        if (!isPromise(customUpload)) {
+        if (!isPromise<AdditionalUploadResponse>(customUpload)) {
           console.warn('Custom uploader method uploadByFile should return a Promise');
         }
 
@@ -92,13 +90,13 @@ export default class Uploader {
       upload = ajax.transport({
         url: this.config.endpoints.byFile,
         data: this.config.additionalRequestData,
-        accept: this.config.types ?? 'image/*',
+        accept: this.config.types,
         headers: this.config.additionalRequestHeaders as Record<string, string>,
         beforeSend: (files: File[]) => {
           preparePreview(files[0]);
         },
         fieldName: this.config.field ?? 'image',
-      }).then((response: AjaxResponse) => response.body as UploadResponseFormat);
+      }).then((response: AjaxResponse) => response.body as UploadResponseFormat<AdditionalUploadResponse>);
     }
 
     upload.then((response) => {
@@ -114,7 +112,7 @@ export default class Uploader {
    * @param url - image source url
    */
   public uploadByUrl(url: string): void {
-    let upload;
+    let upload: Promise<UploadResponseFormat<AdditionalUploadResponse>>;
 
     /**
      * Custom uploading
@@ -136,10 +134,10 @@ export default class Uploader {
         }, this.config.additionalRequestData),
         type: ajax.contentType.JSON,
         headers: this.config.additionalRequestHeaders as Record<string, string>,
-      }).then((response: AjaxResponse) => response.body as UploadResponseFormat);
+      }).then((response: AjaxResponse) => response.body as UploadResponseFormat<AdditionalUploadResponse>);
     }
 
-    upload.then((response: UploadResponseFormat) => {
+    upload.then((response: UploadResponseFormat<AdditionalUploadResponse>) => {
       this.onUpload(response);
     }).catch((error: string) => {
       this.onError(error);
@@ -163,7 +161,7 @@ export default class Uploader {
       onPreview((e.target as FileReader).result as string);
     };
 
-    let upload: Promise<UploadResponseFormat>;
+    let upload: Promise<UploadResponseFormat<AdditionalUploadResponse>>;
 
     /**
      * Custom uploading
@@ -193,7 +191,7 @@ export default class Uploader {
         data: formData,
         type: ajax.contentType.JSON,
         headers: this.config.additionalRequestHeaders as Record<string, string>,
-      }).then((response: AjaxResponse) => response.body as UploadResponseFormat);
+      }).then((response: AjaxResponse) => response.body as UploadResponseFormat<AdditionalUploadResponse>);
     }
 
     upload.then((response) => {
