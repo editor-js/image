@@ -12,10 +12,10 @@
   resolved "https://registry.yarnpkg.com/@codexteam/ajax/-/ajax-4.2.0.tgz#f89faecbaf8cd496bfd77ef20a7fe99ee20ca9a3"
   integrity sha512-54r/HZirqBPEV8rM9gZh570RCwG6M/iDAXT9Q9eGuMo9KZU49tw1dEDHjYsResGckfCsaymDqg4GnhfrBtX9JQ==
 
-"@codexteam/icons@^0.3.0":
-  version "0.3.0"
-  resolved "https://registry.yarnpkg.com/@codexteam/icons/-/icons-0.3.0.tgz#62380b4053d487a257de443864b5c72dafab95e6"
-  integrity sha512-fJE9dfFdgq8xU+sbsxjH0Kt8Yeatw9xHBJWb77DhRkEXz3OCoIS6hrRC1ewHEryxzIjxD8IyQrRq2f+Gz3BcmA==
+"@codexteam/icons@^0.3.2":
+  version "0.3.2"
+  resolved "https://registry.yarnpkg.com/@codexteam/icons/-/icons-0.3.2.tgz#b7aed0ba7b344e07953101f5476cded570d4f150"
+  integrity sha512-P1ep2fHoy0tv4wx85eic+uee5plDnZQ1Qa6gDfv7eHPkCXorMtVqJhzMb75o1izogh6G7380PqmFDXV3bW3Pig==
 
 "@editorjs/editorjs@2.30.0-rc.12":
   version "2.30.0-rc.12"

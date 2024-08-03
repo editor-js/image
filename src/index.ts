@@ -30,7 +30,7 @@
  */
 
 import type { TunesMenuConfig } from '@editorjs/editorjs/types/tools';
-import type { API, ToolboxConfig, PasteConfig, BlockToolConstructorOptions, BlockTool, BlockAPI, PasteEvent, PatternPasteEventDetail, FilePasteEventDetail } from '@editorjs/editorjs';
+import type { API, ToolboxConfig, PasteConfig, BlockToolConstructorOptions, BlockAPI, PasteEvent, PatternPasteEventDetail, FilePasteEventDetail, BlockTool } from '@editorjs/editorjs';
 import './index.css';
 
 import Ui from './ui';
