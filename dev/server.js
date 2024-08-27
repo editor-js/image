@@ -86,12 +86,12 @@ class ServerExample {
 
     this.getForm(request)
       .then(({files}) => {
-        let image = files[this.fieldName] || {};
+        let image = files[this.fieldName][0] || {};
 
         responseJson.success = 1;
         responseJson.file = {
-          url: image.path,
-          name: image.name,
+          url: 'file://' + image.filepath,
+          name: image.newFilename,
           size: image.size
         };
       })
@@ -147,10 +147,12 @@ class ServerExample {
    */
   getForm(request) {
     return new Promise((resolve, reject) => {
-      const form = new formidable.IncomingForm();
+      const form = new formidable.IncomingForm({
+        uploadDir: this.uploadDir,
+        keepExtensions: true
+      });
 
-      form.uploadDir = this.uploadDir;
-      form.keepExtensions = true;
+      console.error('the form info:', form);
 
       form.parse(request, (err, fields, files) => {
         if (err) {
