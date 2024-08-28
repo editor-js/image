@@ -12,6 +12,7 @@
       max-width: 100%;
       vertical-align: bottom;
       display: block;
+      margin: 0 auto;
     }
 
     &-preloader {

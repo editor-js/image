@@ -158,8 +158,14 @@ export default class Ui {
     this.nodes.numberInput.dataset.placeholder = this.config.numberInputPlaceholder ?? 'Enter height';
     this.nodes.imageContainer.appendChild(this.nodes.imagePreloader);
     this.nodes.wrapper.appendChild(this.nodes.imageContainer);
-    this.nodes.wrapper.appendChild(this.nodes.caption);
-    this.nodes.wrapper.appendChild(this.nodes.numberInput);
+
+    if (this.config.showCaption ?? true) {
+      this.nodes.wrapper.appendChild(this.nodes.caption);
+    }
+    if (this.config.showHeightInput ?? false) {
+      this.nodes.wrapper.appendChild(this.nodes.numberInput);
+    }
+
     this.nodes.wrapper.appendChild(this.nodes.fileButton);
   }
 

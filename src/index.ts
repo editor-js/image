@@ -107,6 +107,9 @@ export default class ImageTool implements BlockTool {
       buttonContent: config.buttonContent,
       uploader: config.uploader,
       actions: config.actions,
+      showTunes: config.showTunes,
+      showHeightInput: config.showHeightInput,
+      showCaption: !this.readOnly || this.isNotEmpty(data.caption),
     };
 
     /**
@@ -231,7 +234,7 @@ export default class ImageTool implements BlockTool {
   public renderSettings(): TunesMenuConfig {
     // Merge default tunes with the ones that might be added by user
     // @see https://github.com/editor-js/image/pull/49
-    const tunes = ImageTool.tunes.concat(this.config.actions || []);
+    const tunes = (this.config.showTunes ?? true) ? ImageTool.tunes.concat(this.config.actions || []) : [];
 
     return tunes.map(tune => ({
       icon: tune.icon,
@@ -448,5 +451,13 @@ export default class ImageTool implements BlockTool {
   private uploadUrl(url: string): void {
     this.ui.showPreloader(url);
     this.uploader.uploadByUrl(url);
+  }
+
+  /**
+   * Chack if string is empty
+   * @param str - str string
+   */
+  private isNotEmpty(str: string): boolean {
+    return str !== null && str !== undefined && str.trim() !== '';
   }
 }

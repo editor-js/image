@@ -181,6 +181,21 @@ export interface ImageConfig {
    * Additional actions for the tool.
    */
   actions?: ActionConfig[];
+
+  /**
+   * Display tool tunes
+   */
+  showTunes?: boolean;
+
+  /**
+   * Display image height input
+   */
+  showHeightInput?: boolean;
+
+  /**
+   * Display image caption input
+   */
+  showCaption?: boolean;
 }
 
 /**
