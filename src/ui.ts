@@ -135,10 +135,10 @@ export default class Ui {
       fileButton: this.createFileButton(),
       imageEl: undefined,
       imagePreloader: make('div', this.CSS.imagePreloader),
-      caption: make('div', [this.CSS.input, this.CSS.caption], {
+      caption: make('div', [this.CSS.caption], {
         contentEditable: !this.readOnly,
       }),
-      numberInput: make('div', [this.CSS.input, this.CSS.caption], {
+      numberInput: make('div', [this.CSS.input], {
         contentEditable: !this.readOnly,
       }),
     };
@@ -155,13 +155,10 @@ export default class Ui {
      *  </wrapper>
      */
     this.nodes.caption.dataset.placeholder = this.config.captionPlaceholder;
-    this.nodes.numberInput.dataset.placeholder = this.config.numberInputPlaceholder ?? 'Enter height';
+    this.nodes.numberInput.dataset.placeholder = this.config.numberInputPlaceholder;
     this.nodes.imageContainer.appendChild(this.nodes.imagePreloader);
     this.nodes.wrapper.appendChild(this.nodes.imageContainer);
 
-    if (this.config.showCaption ?? true) {
-      this.nodes.wrapper.appendChild(this.nodes.caption);
-    }
     if (this.config.showHeightInput ?? false) {
       this.nodes.wrapper.appendChild(this.nodes.numberInput);
     }
@@ -269,6 +266,10 @@ export default class Ui {
     });
 
     this.nodes.imageContainer.appendChild(this.nodes.imageEl);
+
+    if (this.config.showCaption ?? true) {
+      this.nodes.imageContainer.appendChild(this.nodes.caption);
+    }
   }
 
   /**

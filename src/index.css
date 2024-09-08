@@ -45,6 +45,10 @@
   }
 
   &__caption {
+    color: #707684;
+    font-weight: normal;
+    text-align: center;
+
     &[contentEditable="true"][data-placeholder]::before {
       position: absolute !important;
       content: attr(data-placeholder);

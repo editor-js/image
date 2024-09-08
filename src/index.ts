@@ -102,7 +102,7 @@ export default class ImageTool implements BlockTool {
       additionalRequestHeaders: config.additionalRequestHeaders,
       field: config.field,
       types: config.types,
-      captionPlaceholder: this.api.i18n.t(config.captionPlaceholder ?? 'Caption'),
+      captionPlaceholder: this.api.i18n.t(config.captionPlaceholder ?? 'Enter a caption'),
       numberInputPlaceholder: this.api.i18n.t(config.numberInputPlaceholder ?? 'Image Height (pt)'),
       buttonContent: config.buttonContent,
       uploader: config.uploader,
