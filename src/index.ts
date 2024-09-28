@@ -142,6 +142,7 @@ export default class ImageTool implements BlockTool {
       withBackground: false,
       stretched: false,
       file: {
+        path: '',
         url: '',
       },
     };
@@ -358,7 +359,7 @@ export default class ImageTool implements BlockTool {
    * @param file - uploaded file data
    */
   private set image(file: ImageSetterParam | undefined) {
-    this._data.file = file || { url: '' };
+    this._data.file = file || { path: '', url: '' };
 
     if (file && file.url) {
       this.ui.fillImage(file.url);
