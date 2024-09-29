@@ -239,6 +239,7 @@ export default class Ui {
       attributes.loop = true;
       attributes.muted = true;
       attributes.playsinline = true;
+      attributes.controls = true;
 
       /**
        * Change event to be listened
