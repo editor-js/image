@@ -12,7 +12,7 @@ Image Block for the [Editor.js](https://editorjs.io).
 - Pasting copied content from the web
 - Pasting images by drag-n-drop
 - Pasting files and screenshots from Clipboard
-- Allows adding a border, and a background
+- Allows adding a border, a background and a caption
 - Allows stretching an image to the container's full-width
 
 **Notes**
@@ -96,6 +96,8 @@ Note that if you don't implement your custom uploader methods, the `endpoints` p
 
 3. Add background
 
+4. Add caption
+
 Add extra setting-buttons by adding them to the `actions`-array in the configuration:
 ```js
 actions: [
@@ -120,6 +122,7 @@ This Tool returns `data` with following format
 | Field          | Type      | Description                     |
 | -------------- | --------- | ------------------------------- |
 | file           | `object`  | Uploaded file data. Any data got from backend uploader. Always contain the `url` property |
+| withCaption    | `boolean` | need to enable caption          |
 | caption        | `string`  | image's caption                 |
 | withBorder     | `boolean` | add border to image             |
 | withBackground | `boolean` | need to add background          |
@@ -136,7 +139,8 @@ This Tool returns `data` with following format
         "caption" : "Roadster // tesla.com",
         "withBorder" : false,
         "withBackground" : false,
-        "stretched" : true
+        "stretched" : true,
+        "withCaption" : true,
     }
 }
 ```

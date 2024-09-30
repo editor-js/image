@@ -9,7 +9,6 @@
  *  1) index.ts — main Tool's interface, public API and methods for working with data
  *  2) uploader.ts — module that has methods for sending files via AJAX: from device, by URL or File pasting
  *  3) ui.ts — module for UI manipulations: render, showing preloader, etc
- *  4) tunes.js — working with Block Tunes: render buttons, handle clicks
  *
  * For debug purposes there is a testing server
  * that can save uploaded files and return a Response {@link UploadResponseFormat}
@@ -37,7 +36,7 @@ import Ui from './ui';
 import Uploader from './uploader';
 
 import { IconAddBorder, IconStretch, IconAddBackground, IconPicture } from '@codexteam/icons';
-import type { ActionConfig, UploadResponseFormat, ImageToolData, ImageConfig, HTMLPasteEventDetailExtended, ImageSetterParam } from './types/types';
+import type { ActionConfig, UploadResponseFormat, ImageToolData, ImageConfig, HTMLPasteEventDetailExtended, ImageSetterParam, FeaturesConfig } from './types/types';
 
 type ImageToolConstructorOptions = BlockToolConstructorOptions<ImageToolData, ImageConfig>;
 
@@ -49,11 +48,6 @@ export default class ImageTool implements BlockTool {
    * Editor.js API instance
    */
   private api: API;
-
-  /**
-   * Flag indicating read-only mode
-   */
-  private readOnly: boolean;
 
   /**
    * Current Block API instance
@@ -90,7 +84,6 @@ export default class ImageTool implements BlockTool {
    */
   constructor({ data, config, api, readOnly, block }: ImageToolConstructorOptions) {
     this.api = api;
-    this.readOnly = readOnly;
     this.block = block;
 
     /**
@@ -106,6 +99,7 @@ export default class ImageTool implements BlockTool {
       buttonContent: config.buttonContent,
       uploader: config.uploader,
       actions: config.actions,
+      features: config.features,
     };
 
     /**
@@ -141,6 +135,7 @@ export default class ImageTool implements BlockTool {
       withBorder: false,
       withBackground: false,
       stretched: false,
+      withCaption: false,
       file: {
         url: '',
       },
@@ -190,6 +185,12 @@ export default class ImageTool implements BlockTool {
         title: 'With background',
         toggle: true,
       },
+      {
+        name: 'withCaption',
+        icon: IconAddBackground,
+        title: 'With caption',
+        toggle: true,
+      },
     ];
   }
 
@@ -228,8 +229,12 @@ export default class ImageTool implements BlockTool {
     // Merge default tunes with the ones that might be added by user
     // @see https://github.com/editor-js/image/pull/49
     const tunes = ImageTool.tunes.concat(this.config.actions || []);
+    const enabledTunes = this.config.features || [];
+    const availableTunes = tunes.filter(tune =>
+      enabledTunes.length === 0 || enabledTunes.includes(tune.name as FeaturesConfig)
+    );
 
-    return tunes.map(tune => ({
+    return availableTunes.map(tune => ({
       icon: tune.icon,
       label: this.api.i18n.t(tune.title),
       name: tune.name,

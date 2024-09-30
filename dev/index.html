@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Image Plugin Test | EditorJS</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@editorjs/editorjs@latest/dist/editor.css"
+    />
+  </head>
+  <body>
+    <div id="editorjs"></div>
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/editorjs@latest/dist/editor.js"></script>
+    <script src="../dist/image.umd.js"></script>
+    <script>
+      const editor = new EditorJS({
+        holder: "editorjs",
+        tools: {
+          code: {
+            class: ImageTool,
+            config: {
+              endpoints: {
+                byFile: "http://localhost:8008/uploadFile",
+                byUrl: "http://localhost:8008/fetchUrl",
+              },
+              //features: ["withCaption", "withBorder", "stretched", "withBackground"],
+              features: ["withCaption", "withBorder"],
+            },
+          },
+        },
+      });
+    </script>
+  </body>
+</html>
