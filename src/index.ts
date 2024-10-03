@@ -135,7 +135,6 @@ export default class ImageTool implements BlockTool {
       withBorder: false,
       withBackground: false,
       stretched: false,
-      withCaption: false,
       file: {
         url: '',
       },
@@ -168,7 +167,7 @@ export default class ImageTool implements BlockTool {
   public static get tunes(): Array<ActionConfig> {
     return [
       {
-        name: 'withBorder',
+        name: 'border',
         icon: IconAddBorder,
         title: 'With border',
         toggle: true,
@@ -180,15 +179,9 @@ export default class ImageTool implements BlockTool {
         toggle: true,
       },
       {
-        name: 'withBackground',
+        name: 'background',
         icon: IconAddBackground,
         title: 'With background',
-        toggle: true,
-      },
-      {
-        name: 'withCaption',
-        icon: IconAddBackground,
-        title: 'With caption',
         toggle: true,
       },
     ];
@@ -198,6 +191,10 @@ export default class ImageTool implements BlockTool {
    * Renders Block content
    */
   public render(): HTMLDivElement {
+    if (this.config.features && this.config.features.caption) {
+      this.ui.toggleCaption(true);
+    }
+
     return this.ui.render(this.data) as HTMLDivElement;
   }
 
@@ -229,9 +226,11 @@ export default class ImageTool implements BlockTool {
     // Merge default tunes with the ones that might be added by user
     // @see https://github.com/editor-js/image/pull/49
     const tunes = ImageTool.tunes.concat(this.config.actions || []);
-    const enabledTunes = this.config.features || [];
-    const availableTunes = tunes.filter(tune =>
-      enabledTunes.length === 0 || enabledTunes.includes(tune.name as FeaturesConfig)
+    const availableTunes = tunes.filter((tune) => {
+      if (this.config.features) {
+        return this.config.features[tune.name as keyof FeaturesConfig];
+      }
+    }
     );
 
     return availableTunes.map(tune => ({

@@ -123,13 +123,13 @@
    * ----------------
    */
 
-  &--withBorder {
+  &--border {
     ^&__image {
       border: 1px solid var(--border-color);
     }
   }
 
-  &--withBackground {
+  &--background {
     ^&__image {
       padding: 15px;
       background: var(--bg-color);
@@ -149,7 +149,7 @@
     }
   }
 
-  &--withCaption {
+  &--caption {
     ^&__caption {
       display: block;
     }

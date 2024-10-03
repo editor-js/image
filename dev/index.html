@@ -4,10 +4,6 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Image Plugin Test | EditorJS</title>
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/@editorjs/editorjs@latest/dist/editor.css"
-    />
   </head>
   <body>
     <div id="editorjs"></div>
@@ -24,8 +20,12 @@
                 byFile: "http://localhost:8008/uploadFile",
                 byUrl: "http://localhost:8008/fetchUrl",
               },
-              //features: ["withCaption", "withBorder", "stretched", "withBackground"],
-              features: ["withCaption", "withBorder"],
+              features: {
+                background: true,
+                border: true,
+                caption: true,
+                stretched: true,
+              },
             },
           },
         },

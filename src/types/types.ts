@@ -89,11 +89,6 @@ export type ImageToolData<Actions = {}, AdditionalFileData = {}> = {
   stretched: boolean;
 
   /**
-   * Flag indicating whether the image has caption
-   */
-  withCaption: boolean;
-
-  /**
    * Object containing the URL of the image file.
    * Also can contain any additional data.
    */
@@ -108,7 +103,16 @@ export type ImageToolData<Actions = {}, AdditionalFileData = {}> = {
 /**
  * @description Tunes that would be available on each image block.
  */
-export type FeaturesConfig = 'withCaption' | 'withBorder' | 'withBackground' | 'stretched';
+export type FeaturesConfig = {
+  /** Flag to enable/disable tune - background. */
+  background: boolean;
+  /** Flag to enable/disable tune - border */
+  border: boolean;
+  /** Flag to enable/disable caption */
+  caption: boolean;
+  /** Flag to enable/disable tune - stretched */
+  stretched: boolean;
+};
 
 /**
  *
@@ -185,7 +189,7 @@ export interface ImageConfig {
   /**
    * Tunes to be enabled.
    */
-  features?: FeaturesConfig[];
+  features?: FeaturesConfig;
 }
 
 /**

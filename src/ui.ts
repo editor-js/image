@@ -255,6 +255,14 @@ export default class Ui {
   }
 
   /**
+   * Toggles caption input visibility
+   * @param status - true for enable, false for disable
+   */
+  public toggleCaption(status: boolean): void {
+    this.nodes.wrapper.classList.toggle(`${this.CSS.wrapper}--caption`, status);
+  }
+
+  /**
    * Shows caption input
    * @param text - caption content text
    */
