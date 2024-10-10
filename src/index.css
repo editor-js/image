@@ -44,6 +44,8 @@
   }
 
   &__caption {
+    display: none;
+
     &[contentEditable="true"][data-placeholder]::before {
       position: absolute !important;
       content: attr(data-placeholder);
@@ -86,7 +88,7 @@
       margin: 0 6px 0 0;
     }
   }
-  
+
   &--filled {
     .cdx-button {
       display: none;
@@ -147,12 +149,18 @@
     }
   }
 
+  &--caption {
+    ^&__caption {
+      display: block;
+    }
+  }
 }
 
 @keyframes image-preloader-spin {
   0% {
     transform: rotate(0deg);
   }
+
   100% {
     transform: rotate(360deg);
   }

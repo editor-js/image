@@ -101,6 +101,28 @@ export type ImageToolData<Actions = {}, AdditionalFileData = {}> = {
 } & (Actions extends Record<string, boolean> ? Actions : {});
 
 /**
+ * @description Enable or disable features.
+ */
+export type FeaturesConfig = {
+  /**
+   * Flag to enable/disable tune - background.
+   */
+  background: boolean;
+  /**
+   * Flag to enable/disable tune - border.
+   */
+  border: boolean;
+  /**
+   * Flag to enable/disable caption.
+   */
+  caption: boolean | 'optional';
+  /**
+   * Flag to enable/disable tune - stretched
+   */
+  stretched: boolean;
+};
+
+/**
  *
  * @description Config supported by Tool
  */
@@ -171,6 +193,11 @@ export interface ImageConfig {
    * Additional actions for the tool.
    */
   actions?: ActionConfig[];
+
+  /**
+   * Tunes to be enabled.
+   */
+  features?: FeaturesConfig;
 }
 
 /**
