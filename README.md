@@ -83,7 +83,7 @@ Image Tool supports these configuration parameters:
 | buttonContent | `string` | Allows to override HTML content of «Select file» button |
 | uploader | `{{uploadByFile: function, uploadByUrl: function}}` | Optional custom uploading methods. See details below. |
 | actions | `array` | Array with custom actions to show in the tool's settings menu. See details below. |
-| features | `object` | Allows you to enable/disable tunes along with caption. See details below. |
+| features | `object` | Allows you to enable/disable additional features such as border, background tunes and caption. See details below. |
 
 Note that if you don't implement your custom uploader methods, the `endpoints` param is required.
 
@@ -114,17 +114,17 @@ actions: [
 ]
 ```
 
-Enable required tunes and caption by adding `features`-array in the configuration:
+**_NOTE:_**  return value of `action` callback for settings whether action button should be toggled or not is *deprecated*. Consider using `toggle` option instead.
+
+Enable features such as border, background tunes and caption by adding `features`-array in the configuration:
 ```js
 features: {
-  background: true,
-  border: false,
-  caption: true,
-  stretched: true
+  background: boolean,
+  border: boolean,
+  caption: boolean | 'optional',
+  stretched: boolean
 }
 ```
-
-**_NOTE:_**  return value of `action` callback for settings whether action button should be toggled or not is *deprecated*. Consider using `toggle` option instead.
 
 ## Output data
 
@@ -134,8 +134,8 @@ This Tool returns `data` with following format
 | -------------- | --------- | ------------------------------- |
 | file           | `object`  | Uploaded file data. Any data got from backend uploader. Always contain the `url` property |
 | caption        | `string`  | image's caption                 |
-| border         | `boolean` | add border to image             |
-| background     | `boolean` | need to add background          |
+| withBorder     | `boolean` | add border to image             |
+| withBackground | `boolean` | need to add background          |
 | stretched      | `boolean` | stretch image to screen's width |
 
 
@@ -147,8 +147,8 @@ This Tool returns `data` with following format
             "url" : "https://www.tesla.com/tesla_theme/assets/img/_vehicle_redesign/roadster_and_semi/roadster/hero.jpg"
         },
         "caption" : "Roadster // tesla.com",
-        "border" : false,
-        "background" : false,
+        "withBorder" : false,
+        "withBackground" : false,
         "stretched" : true,
     }
 }

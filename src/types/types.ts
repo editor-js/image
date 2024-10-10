@@ -101,16 +101,24 @@ export type ImageToolData<Actions = {}, AdditionalFileData = {}> = {
 } & (Actions extends Record<string, boolean> ? Actions : {});
 
 /**
- * @description Tunes that would be available on each image block.
+ * @description Enable or disable features.
  */
 export type FeaturesConfig = {
-  /** Flag to enable/disable tune - background. */
+  /**
+   * Flag to enable/disable tune - background.
+   */
   background: boolean;
-  /** Flag to enable/disable tune - border */
+  /**
+   * Flag to enable/disable tune - border.
+   */
   border: boolean;
-  /** Flag to enable/disable caption */
-  caption: boolean;
-  /** Flag to enable/disable tune - stretched */
+  /**
+   * Flag to enable/disable caption.
+   */
+  caption: boolean | 'optional';
+  /**
+   * Flag to enable/disable tune - stretched
+   */
   stretched: boolean;
 };
 

@@ -35,7 +35,7 @@ import './index.css';
 import Ui from './ui';
 import Uploader from './uploader';
 
-import { IconAddBorder, IconStretch, IconAddBackground, IconPicture } from '@codexteam/icons';
+import { IconAddBorder, IconStretch, IconAddBackground, IconPicture, IconText } from '@codexteam/icons';
 import type { ActionConfig, UploadResponseFormat, ImageToolData, ImageConfig, HTMLPasteEventDetailExtended, ImageSetterParam, FeaturesConfig } from './types/types';
 
 type ImageToolConstructorOptions = BlockToolConstructorOptions<ImageToolData, ImageConfig>;
@@ -167,7 +167,7 @@ export default class ImageTool implements BlockTool {
   public static get tunes(): Array<ActionConfig> {
     return [
       {
-        name: 'border',
+        name: 'withBorder',
         icon: IconAddBorder,
         title: 'With border',
         toggle: true,
@@ -179,7 +179,7 @@ export default class ImageTool implements BlockTool {
         toggle: true,
       },
       {
-        name: 'background',
+        name: 'withBackground',
         icon: IconAddBackground,
         title: 'With background',
         toggle: true,
@@ -191,8 +191,8 @@ export default class ImageTool implements BlockTool {
    * Renders Block content
    */
   public render(): HTMLDivElement {
-    if (this.config.features && this.config.features.caption) {
-      this.ui.toggleCaption(true);
+    if (this.config.features && this.config.features.caption === true) {
+      this.ui.applyTune('caption', true);
     }
 
     return this.ui.render(this.data) as HTMLDivElement;
@@ -226,9 +226,27 @@ export default class ImageTool implements BlockTool {
     // Merge default tunes with the ones that might be added by user
     // @see https://github.com/editor-js/image/pull/49
     const tunes = ImageTool.tunes.concat(this.config.actions || []);
+    const featureTuneMap: Record<string, string> = {
+      border: 'withBorder',
+      background: 'withBackground',
+      stretched: 'stretched',
+      caption: 'caption',
+    };
+
+    if (this.config.features?.caption === 'optional') {
+      tunes.push({
+        name: 'caption',
+        icon: IconText,
+        title: 'With caption',
+        toggle: true,
+      });
+    }
+
     const availableTunes = tunes.filter((tune) => {
       if (this.config.features) {
-        return this.config.features[tune.name as keyof FeaturesConfig];
+        const featureKey = Object.keys(featureTuneMap).find(key => featureTuneMap[key] === tune.name);
+
+        return this.config.features[featureKey as keyof FeaturesConfig];
       }
     }
     );

@@ -123,13 +123,13 @@
    * ----------------
    */
 
-  &--border {
+  &--withBorder {
     ^&__image {
       border: 1px solid var(--border-color);
     }
   }
 
-  &--background {
+  &--withBackground {
     ^&__image {
       padding: 15px;
       background: var(--bg-color);
