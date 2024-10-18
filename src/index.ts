@@ -191,7 +191,7 @@ export default class ImageTool implements BlockTool {
    * Renders Block content
    */
   public render(): HTMLDivElement {
-    if (this.config.features && this.config.features.caption === true) {
+    if (this.config.features?.caption === true || (this.config.features?.caption === 'optional' && this.data.caption)) {
       this.ui.applyTune('caption', true);
     }
 
@@ -226,12 +226,12 @@ export default class ImageTool implements BlockTool {
     // Merge default tunes with the ones that might be added by user
     // @see https://github.com/editor-js/image/pull/49
     const tunes = ImageTool.tunes.concat(this.config.actions || []);
-    const featureTuneMap: Record<string, string> = {
-      border: 'withBorder',
-      background: 'withBackground',
-      stretched: 'stretched',
-      caption: 'caption',
-    };
+    const featureTuneMap = new Map<string, string>([
+      ['border', 'withBorder'],
+      ['background', 'withBackground'],
+      ['stretched', 'stretched'],
+      ['caption', 'caption'],
+    ]);
 
     if (this.config.features?.caption === 'optional') {
       tunes.push({
@@ -244,12 +244,19 @@ export default class ImageTool implements BlockTool {
 
     const availableTunes = tunes.filter((tune) => {
       if (this.config.features) {
-        const featureKey = Object.keys(featureTuneMap).find(key => featureTuneMap[key] === tune.name);
+        const featureKey = [...featureTuneMap.entries()].find(
+          ([, value]) => value === tune.name
+        )?.[0];
 
-        return this.config.features[featureKey as keyof FeaturesConfig];
+        if (featureKey != null) {
+          return this.config.features[featureKey as keyof FeaturesConfig];
+        }
+
+        return false;
       }
-    }
-    );
+
+      return false;
+    });
 
     return availableTunes.map(tune => ({
       icon: tune.icon,

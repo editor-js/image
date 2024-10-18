@@ -101,7 +101,7 @@ export type ImageToolData<Actions = {}, AdditionalFileData = {}> = {
 } & (Actions extends Record<string, boolean> ? Actions : {});
 
 /**
- * @description Enable or disable features.
+ * @description Allows to enable or disable features.
  */
 export type FeaturesConfig = {
   /**
@@ -114,6 +114,7 @@ export type FeaturesConfig = {
   border: boolean;
   /**
    * Flag to enable/disable caption.
+   * Can be set to 'optional' to allow users to toggle via block tunes.
    */
   caption: boolean | 'optional';
   /**
