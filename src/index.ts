@@ -221,13 +221,20 @@ export default class ImageTool implements BlockTool {
   }
 
   /**
+   * Returns all tunes (including those defined at config)
+   */
+  public getTunes(): ActionConfig[] {
+    return ImageTool.tunes.concat(this.config.actions || []);
+  }
+
+  /**
    * Returns configuration for block tunes: add background, add border, stretch image
    * @returns TunesMenuConfig
    */
   public renderSettings(): TunesMenuConfig {
     // Merge default tunes with the ones that might be added by user
     // @see https://github.com/editor-js/image/pull/49
-    const tunes = ImageTool.tunes.concat(this.config.actions || []);
+    const tunes = this.getTunes();
 
     return tunes.map(tune => ({
       icon: tune.icon,
@@ -333,13 +340,15 @@ export default class ImageTool implements BlockTool {
    * Stores all Tool's data
    * @param data - data in Image Tool format
    */
-  private set data(data: ImageToolData) {
+  public set data(data: ImageToolData) {
     this.image = data.file;
 
     this._data.caption = data.caption || '';
     this.ui.fillCaption(this._data.caption);
 
-    ImageTool.tunes.forEach(({ name: tune }) => {
+    const tunes = this.getTunes();
+
+    tunes.forEach(({ name: tune }) => {
       const value = typeof data[tune as keyof ImageToolData] !== 'undefined' ? data[tune as keyof ImageToolData] === true || data[tune as keyof ImageToolData] === 'true' : false;
 
       this.setTune(tune as keyof ImageToolData, value);
@@ -349,7 +358,7 @@ export default class ImageTool implements BlockTool {
   /**
    * Return Tool data
    */
-  private get data(): ImageToolData {
+  public get data(): ImageToolData {
     return this._data;
   }
 
@@ -357,11 +366,42 @@ export default class ImageTool implements BlockTool {
    * Set new image file
    * @param file - uploaded file data
    */
-  private set image(file: ImageSetterParam | undefined) {
+  public set image(file: ImageSetterParam | undefined) {
     this._data.file = file || { url: '' };
 
     if (file && file.url) {
       this.ui.fillImage(file.url);
+    }
+  }
+
+  /**
+   * Callback fired when Block Tune is activated
+   * @param tuneName - tune that has been clicked
+   */
+  public tuneToggled(tuneName: keyof ImageToolData): void {
+    // inverse tune state
+    this.setTune(tuneName, !(this._data[tuneName] as boolean));
+  }
+
+  /**
+   * Set one tune
+   * @param tuneName - {@link Tunes.tunes}
+   * @param value - tune state
+   */
+  public setTune(tuneName: keyof ImageToolData, value: boolean): void {
+    (this._data[tuneName] as boolean) = value;
+
+    this.ui.applyTune(tuneName, value);
+    if (tuneName === 'stretched') {
+      /**
+       * Wait until the API is ready
+       */
+      Promise.resolve().then(() => {
+        this.block.stretched = value;
+      })
+        .catch((err) => {
+          console.error(err);
+        });
     }
   }
 
@@ -389,37 +429,6 @@ export default class ImageTool implements BlockTool {
       style: 'error',
     });
     this.ui.hidePreloader();
-  }
-
-  /**
-   * Callback fired when Block Tune is activated
-   * @param tuneName - tune that has been clicked
-   */
-  private tuneToggled(tuneName: keyof ImageToolData): void {
-    // inverse tune state
-    this.setTune(tuneName, !(this._data[tuneName] as boolean));
-  }
-
-  /**
-   * Set one tune
-   * @param tuneName - {@link Tunes.tunes}
-   * @param value - tune state
-   */
-  private setTune(tuneName: keyof ImageToolData, value: boolean): void {
-    (this._data[tuneName] as boolean) = value;
-
-    this.ui.applyTune(tuneName, value);
-    if (tuneName === 'stretched') {
-      /**
-       * Wait until the API is ready
-       */
-      Promise.resolve().then(() => {
-        this.block.stretched = value;
-      })
-        .catch((err) => {
-          console.error(err);
-        });
-    }
   }
 
   /**
