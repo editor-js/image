@@ -48,23 +48,55 @@
     color: #707684;
     font-weight: normal;
     text-align: center;
-
-    &[contentEditable="true"][data-placeholder]::before {
-      position: absolute !important;
-      content: attr(data-placeholder);
+  
+    &[contentEditable="true"][data-placeholder] {
+      position: relative;
+  
+      &::before {
+        position: absolute !important;
+        content: attr(data-placeholder);
+        color: #707684;
+        font-weight: normal;
+        display: none;
+        width: 100%;
+        text-align: center;
+        top: 0;
+        left: 0;
+      }
+  
+      &:empty {
+        &::before {
+          display: block;
+        }
+  
+        &:focus::before {
+          display: none;
+        }
+      }
+    }
+  
+    &::placeholder {
+      text-align: center;
       color: #707684;
-      font-weight: normal;
-      display: none;
     }
 
-    &[contentEditable="true"][data-placeholder]:empty {
-      &::before {
-        display: block;
-      }
-
-      &:focus::before {
-        display: none;
-      }
+    &::-webkit-input-placeholder {
+      text-align: center;
+      color: #707684;
+    }
+    &:-moz-placeholder {
+      text-align: center;
+      color: #707684;
+      opacity: 1;
+    }
+    &::-moz-placeholder {
+      text-align: center;
+      color: #707684;
+      opacity: 1;
+    }
+    &:-ms-input-placeholder {
+      text-align: center;
+      color: #707684;
     }
   }
 

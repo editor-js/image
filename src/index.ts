@@ -221,8 +221,8 @@ export default class ImageTool implements BlockTool {
     const caption = this.ui.nodes.caption;
     const height = this.ui.nodes.numberInput;
 
-    this._data.caption = caption.innerHTML;
-    this._data.height = height.innerHTML;
+    this._data.caption = caption.textContent?.trim() ?? '';
+    this._data.height = height.textContent?.trim() ?? '';
 
     return this.data;
   }
