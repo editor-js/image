@@ -116,13 +116,12 @@ actions: [
 
 **_NOTE:_**  return value of `action` callback for settings whether action button should be toggled or not is *deprecated*. Consider using `toggle` option instead.
 
-You can enable/disable features such as border, background tunes and caption by adding `features` array in the configuration:
+You can disable features such as border, background tunes and caption by defining `features` in the configuration:
 ```js
 features: {
-  background: boolean,
-  border: boolean,
-  caption: boolean | 'optional',
-  stretched: boolean
+  border: false,
+  caption: 'optional',
+  stretched: false
 }
 ```
 

@@ -99,7 +99,7 @@ export default class ImageTool implements BlockTool {
       buttonContent: config.buttonContent,
       uploader: config.uploader,
       actions: config.actions,
-      features: config.features,
+      features: config.features || {},
     };
 
     /**
@@ -191,7 +191,7 @@ export default class ImageTool implements BlockTool {
    * Renders Block content
    */
   public render(): HTMLDivElement {
-    if (this.config.features?.caption === true || (this.config.features?.caption === 'optional' && this.data.caption)) {
+    if (this.config.features?.caption === true || this.config.features?.caption === undefined || (this.config.features?.caption === 'optional' && this.data.caption)) {
       this.ui.applyTune('caption', true);
     }
 
@@ -226,12 +226,12 @@ export default class ImageTool implements BlockTool {
     // Merge default tunes with the ones that might be added by user
     // @see https://github.com/editor-js/image/pull/49
     const tunes = ImageTool.tunes.concat(this.config.actions || []);
-    const featureTuneMap = new Map<string, string>([
-      ['border', 'withBorder'],
-      ['background', 'withBackground'],
-      ['stretched', 'stretched'],
-      ['caption', 'caption'],
-    ]);
+    const featureTuneMap: Record<string, string> = {
+      border: 'withBorder',
+      background: 'withBackground',
+      stretched: 'stretched',
+      caption: 'caption',
+    };
 
     if (this.config.features?.caption === 'optional') {
       tunes.push({
@@ -243,19 +243,13 @@ export default class ImageTool implements BlockTool {
     }
 
     const availableTunes = tunes.filter((tune) => {
-      if (this.config.features) {
-        const featureKey = [...featureTuneMap.entries()].find(
-          ([, value]) => value === tune.name
-        )?.[0];
+      const featureKey = Object.keys(featureTuneMap).find(key => featureTuneMap[key] === tune.name);
 
-        if (featureKey != null) {
-          return this.config.features[featureKey as keyof FeaturesConfig];
-        }
-
-        return false;
+      if (featureKey === 'caption') {
+        return this.config.features?.caption !== false;
       }
 
-      return false;
+      return featureKey == null || this.config.features?.[featureKey as keyof FeaturesConfig] !== false;
     });
 
     return availableTunes.map(tune => ({

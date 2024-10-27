@@ -107,20 +107,20 @@ export type FeaturesConfig = {
   /**
    * Flag to enable/disable tune - background.
    */
-  background: boolean;
+  background?: boolean;
   /**
    * Flag to enable/disable tune - border.
    */
-  border: boolean;
+  border?: boolean;
   /**
    * Flag to enable/disable caption.
    * Can be set to 'optional' to allow users to toggle via block tunes.
    */
-  caption: boolean | 'optional';
+  caption?: boolean | 'optional';
   /**
    * Flag to enable/disable tune - stretched
    */
-  stretched: boolean;
+  stretched?: boolean;
 };
 
 /**
