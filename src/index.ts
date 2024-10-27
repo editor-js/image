@@ -229,7 +229,7 @@ export default class ImageTool implements BlockTool {
     const featureTuneMap: Record<string, string> = {
       border: 'withBorder',
       background: 'withBackground',
-      stretched: 'stretched',
+      stretch: 'stretched',
       caption: 'caption',
     };
 
@@ -421,6 +421,12 @@ export default class ImageTool implements BlockTool {
   private tuneToggled(tuneName: keyof ImageToolData): void {
     // inverse tune state
     this.setTune(tuneName, !(this._data[tuneName] as boolean));
+
+    // reset caption on toggle
+    if (tuneName === 'caption' && !this._data[tuneName]) {
+      this._data.caption = '';
+      this.ui.fillCaption('');
+    }
   }
 
   /**

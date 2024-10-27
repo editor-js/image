@@ -120,7 +120,7 @@ export type FeaturesConfig = {
   /**
    * Flag to enable/disable tune - stretched
    */
-  stretched?: boolean;
+  stretch?: boolean;
 };
 
 /**
