@@ -121,7 +121,7 @@ You can disable features such as border, background tunes and caption by definin
 features: {
   border: false,
   caption: 'optional',
-  stretched: false
+  stretch: false
 }
 ```
 
