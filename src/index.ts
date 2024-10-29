@@ -9,7 +9,6 @@
  *  1) index.ts — main Tool's interface, public API and methods for working with data
  *  2) uploader.ts — module that has methods for sending files via AJAX: from device, by URL or File pasting
  *  3) ui.ts — module for UI manipulations: render, showing preloader, etc
- *  4) tunes.js — working with Block Tunes: render buttons, handle clicks
  *
  * For debug purposes there is a testing server
  * that can save uploaded files and return a Response {@link UploadResponseFormat}
@@ -36,8 +35,8 @@ import './index.css';
 import Ui from './ui';
 import Uploader from './uploader';
 
-import { IconAddBorder, IconStretch, IconAddBackground, IconPicture } from '@codexteam/icons';
-import type { ActionConfig, UploadResponseFormat, ImageToolData, ImageConfig, HTMLPasteEventDetailExtended, ImageSetterParam } from './types/types';
+import { IconAddBorder, IconStretch, IconAddBackground, IconPicture, IconText } from '@codexteam/icons';
+import type { ActionConfig, UploadResponseFormat, ImageToolData, ImageConfig, HTMLPasteEventDetailExtended, ImageSetterParam, FeaturesConfig } from './types/types';
 
 type ImageToolConstructorOptions = BlockToolConstructorOptions<ImageToolData, ImageConfig>;
 
@@ -49,11 +48,6 @@ export default class ImageTool implements BlockTool {
    * Editor.js API instance
    */
   private api: API;
-
-  /**
-   * Flag indicating read-only mode
-   */
-  private readOnly: boolean;
 
   /**
    * Current Block API instance
@@ -90,7 +84,6 @@ export default class ImageTool implements BlockTool {
    */
   constructor({ data, config, api, readOnly, block }: ImageToolConstructorOptions) {
     this.api = api;
-    this.readOnly = readOnly;
     this.block = block;
 
     /**
@@ -106,6 +99,7 @@ export default class ImageTool implements BlockTool {
       buttonContent: config.buttonContent,
       uploader: config.uploader,
       actions: config.actions,
+      features: config.features || {},
     };
 
     /**
@@ -197,6 +191,10 @@ export default class ImageTool implements BlockTool {
    * Renders Block content
    */
   public render(): HTMLDivElement {
+    if (this.config.features?.caption === true || this.config.features?.caption === undefined || (this.config.features?.caption === 'optional' && this.data.caption)) {
+      this.ui.applyTune('caption', true);
+    }
+
     return this.ui.render(this.data) as HTMLDivElement;
   }
 
@@ -228,8 +226,33 @@ export default class ImageTool implements BlockTool {
     // Merge default tunes with the ones that might be added by user
     // @see https://github.com/editor-js/image/pull/49
     const tunes = ImageTool.tunes.concat(this.config.actions || []);
+    const featureTuneMap: Record<string, string> = {
+      border: 'withBorder',
+      background: 'withBackground',
+      stretch: 'stretched',
+      caption: 'caption',
+    };
 
-    return tunes.map(tune => ({
+    if (this.config.features?.caption === 'optional') {
+      tunes.push({
+        name: 'caption',
+        icon: IconText,
+        title: 'With caption',
+        toggle: true,
+      });
+    }
+
+    const availableTunes = tunes.filter((tune) => {
+      const featureKey = Object.keys(featureTuneMap).find(key => featureTuneMap[key] === tune.name);
+
+      if (featureKey === 'caption') {
+        return this.config.features?.caption !== false;
+      }
+
+      return featureKey == null || this.config.features?.[featureKey as keyof FeaturesConfig] !== false;
+    });
+
+    return availableTunes.map(tune => ({
       icon: tune.icon,
       label: this.api.i18n.t(tune.title),
       name: tune.name,
@@ -398,6 +421,12 @@ export default class ImageTool implements BlockTool {
   private tuneToggled(tuneName: keyof ImageToolData): void {
     // inverse tune state
     this.setTune(tuneName, !(this._data[tuneName] as boolean));
+
+    // reset caption on toggle
+    if (tuneName === 'caption' && !this._data[tuneName]) {
+      this._data.caption = '';
+      this.ui.fillCaption('');
+    }
   }
 
   /**

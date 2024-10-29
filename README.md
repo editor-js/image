@@ -12,7 +12,7 @@ Image Block for the [Editor.js](https://editorjs.io).
 - Pasting copied content from the web
 - Pasting images by drag-n-drop
 - Pasting files and screenshots from Clipboard
-- Allows adding a border, and a background
+- Allows adding a border, a background and a caption
 - Allows stretching an image to the container's full-width
 
 **Notes**
@@ -83,6 +83,7 @@ Image Tool supports these configuration parameters:
 | buttonContent | `string` | Allows to override HTML content of «Select file» button |
 | uploader | `{{uploadByFile: function, uploadByUrl: function}}` | Optional custom uploading methods. See details below. |
 | actions | `array` | Array with custom actions to show in the tool's settings menu. See details below. |
+| features | `object` | Allows you to enable/disable additional features such as border, background tunes and caption. See details below. |
 
 Note that if you don't implement your custom uploader methods, the `endpoints` param is required.
 
@@ -95,6 +96,8 @@ Note that if you don't implement your custom uploader methods, the `endpoints` p
 2. Stretch to full-width
 
 3. Add background
+
+4. Add caption
 
 Add extra setting-buttons by adding them to the `actions`-array in the configuration:
 ```js
@@ -112,6 +115,17 @@ actions: [
 ```
 
 **_NOTE:_**  return value of `action` callback for settings whether action button should be toggled or not is *deprecated*. Consider using `toggle` option instead.
+
+You can disable features such as border, background tunes and caption by defining `features` in the configuration:
+```js
+features: {
+  border: false,
+  caption: 'optional',
+  stretch: false
+}
+```
+
+**_NOTE:_** set caption to `optional` in order to configure caption as a tune.
 
 ## Output data
 
@@ -136,7 +150,7 @@ This Tool returns `data` with following format
         "caption" : "Roadster // tesla.com",
         "withBorder" : false,
         "withBackground" : false,
-        "stretched" : true
+        "stretched" : true,
     }
 }
 ```
