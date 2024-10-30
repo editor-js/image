@@ -8,8 +8,8 @@
   <body>
     <div id="editorjs"></div>
     <script src="https://cdn.jsdelivr.net/npm/@editorjs/editorjs@latest/dist/editor.js"></script>
-    <script src="../dist/image.umd.js"></script>
-    <script>
+    <script type="module">
+      import ImageTool from "../src/index.ts"
       const editor = new EditorJS({
         holder: "editorjs",
         tools: {

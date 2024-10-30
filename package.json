@@ -24,7 +24,7 @@
     }
   },
   "scripts": {
-    "dev": "vite",
+    "dev": "concurrently \"vite\" \"node ./dev/server.js\"",
     "build": "vite build",
     "lint": "eslint",
     "lint:errors": "eslint --quiet",
@@ -39,6 +39,7 @@
     "@editorjs/editorjs": "2.30.0-rc.12",
     "@typescript-eslint/eslint-plugin": "^7.16.1",
     "@typescript-eslint/parser": "^7.16.1",
+    "concurrently": "^9.0.1",
     "eslint": "^9.7.0",
     "eslint-config-codex": "^2.0.1",
     "eslint-loader": "^4.0.2",

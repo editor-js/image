@@ -19,6 +19,8 @@ const fs = require('fs');
 const request = require('request');
 const crypto = require('crypto');
 
+const SERVER_PORT = 8008;
+
 class ServerExample {
   constructor({port, fieldName}) {
     this.uploadDir = __dirname + '/\.tmp';
@@ -46,12 +48,17 @@ class ServerExample {
 
     const {method, url} = request;
 
+    console.log('Got request on the ', url);
+
+    if (method.toLowerCase() === 'get' && url.startsWith('/image/')) {
+      this.serveImage(url, response);
+      return;
+    }
+
     if (method.toLowerCase() !== 'post') {
       response.end();
       return;
     }
-
-    console.log('Got request on the ', url);
 
     switch (url) {
       case '/uploadFile':
@@ -75,6 +82,30 @@ class ServerExample {
   }
 
   /**
+   * Serves image from upload directory
+   * @param {string} url - request URL
+   * @param {http.ServerResponse} response - server response
+   */
+  serveImage(url, response) {
+    const filename = url.split('/image/')[1];
+    const filePath = `${this.uploadDir}/${filename}`;
+
+    // Check if the file exists at the specified path. F_OK stands for "File OK", which means "check if the file exists".
+    fs.access(filePath, fs.constants.F_OK, (err) => {
+      if (err) {
+        response.writeHead(404, { 'Content-Type': 'application/json' });
+        response.end(JSON.stringify({ success: 0, message: 'File not found' }));
+        return;
+      }
+  
+      const fileStream = fs.createReadStream(filePath);
+      response.writeHead(200, { 'Content-Type': 'image/png' });
+      // Pipe the file stream to the response, sending the file content directly to the client
+      fileStream.pipe(response);
+    });
+  }
+
+  /**
    * Handles uploading by file
    * @param request
    * @param response
@@ -90,7 +121,7 @@ class ServerExample {
 
         responseJson.success = 1;
         responseJson.file = {
-          url: 'file://' + image.filepath,
+          url: `http://localhost:${SERVER_PORT}/image/` + image.newFilename,
           name: image.newFilename,
           size: image.size
         };
@@ -194,6 +225,6 @@ class ServerExample {
 }
 
 new ServerExample({
-  port: 8008,
+  port: SERVER_PORT,
   fieldName: 'image'
 });
