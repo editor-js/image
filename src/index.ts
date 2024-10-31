@@ -28,17 +28,44 @@
  * },
  */
 
-import type { TunesMenuConfig } from '@editorjs/editorjs/types/tools';
-import type { API, ToolboxConfig, PasteConfig, BlockToolConstructorOptions, BlockTool, BlockAPI, PasteEvent, PatternPasteEventDetail, FilePasteEventDetail } from '@editorjs/editorjs';
-import './index.css';
+import type { TunesMenuConfig } from "@editorjs/editorjs/types/tools";
+import type {
+  API,
+  ToolboxConfig,
+  PasteConfig,
+  BlockToolConstructorOptions,
+  BlockTool,
+  BlockAPI,
+  PasteEvent,
+  PatternPasteEventDetail,
+  FilePasteEventDetail,
+} from "@editorjs/editorjs";
+import "./index.css";
 
-import Ui from './ui';
-import Uploader from './uploader';
+import Ui from "./ui";
+import Uploader from "./uploader";
 
-import { IconAddBorder, IconStretch, IconAddBackground, IconPicture, IconText } from '@codexteam/icons';
-import type { ActionConfig, UploadResponseFormat, ImageToolData, ImageConfig, HTMLPasteEventDetailExtended, ImageSetterParam, FeaturesConfig } from './types/types';
+import {
+  IconAddBorder,
+  IconStretch,
+  IconAddBackground,
+  IconPicture,
+  IconText,
+} from "@codexteam/icons";
+import type {
+  ActionConfig,
+  UploadResponseFormat,
+  ImageToolData,
+  ImageConfig,
+  HTMLPasteEventDetailExtended,
+  ImageSetterParam,
+  FeaturesConfig,
+} from "./types/types";
 
-type ImageToolConstructorOptions = BlockToolConstructorOptions<ImageToolData, ImageConfig>;
+type ImageToolConstructorOptions = BlockToolConstructorOptions<
+  ImageToolData,
+  ImageConfig
+>;
 
 /**
  * Implementation of ImageTool class
@@ -82,7 +109,13 @@ export default class ImageTool implements BlockTool {
    * @param tool.readOnly - read-only mode flag
    * @param tool.block - current Block API
    */
-  constructor({ data, config, api, readOnly, block }: ImageToolConstructorOptions) {
+  constructor({
+    data,
+    config,
+    api,
+    readOnly,
+    block,
+  }: ImageToolConstructorOptions) {
     this.api = api;
     this.block = block;
 
@@ -95,7 +128,9 @@ export default class ImageTool implements BlockTool {
       additionalRequestHeaders: config.additionalRequestHeaders,
       field: config.field,
       types: config.types,
-      captionPlaceholder: this.api.i18n.t(config.captionPlaceholder ?? 'Caption'),
+      captionPlaceholder: this.api.i18n.t(
+        config.captionPlaceholder ?? "Caption"
+      ),
       buttonContent: config.buttonContent,
       uploader: config.uploader,
       actions: config.actions,
@@ -118,11 +153,14 @@ export default class ImageTool implements BlockTool {
       api,
       config: this.config,
       onSelectFile: () => {
-        this.uploader.uploadSelectedFile({
+        this.uploader.selectFile({
           onPreview: (src: string) => {
             this.ui.showPreloader(src);
           },
         });
+      },
+      onUploadFile: () => {
+        this.uploader.uploadFile();
       },
       readOnly,
     });
@@ -131,12 +169,12 @@ export default class ImageTool implements BlockTool {
      * Set saved state
      */
     this._data = {
-      caption: '',
+      caption: "",
       withBorder: false,
       withBackground: false,
       stretched: false,
       file: {
-        url: '',
+        url: "",
       },
     };
     this.data = data;
@@ -157,7 +195,7 @@ export default class ImageTool implements BlockTool {
   public static get toolbox(): ToolboxConfig {
     return {
       icon: IconPicture,
-      title: 'Image',
+      title: "Image",
     };
   }
 
@@ -167,21 +205,21 @@ export default class ImageTool implements BlockTool {
   public static get tunes(): Array<ActionConfig> {
     return [
       {
-        name: 'withBorder',
+        name: "withBorder",
         icon: IconAddBorder,
-        title: 'With border',
+        title: "With border",
         toggle: true,
       },
       {
-        name: 'stretched',
+        name: "stretched",
         icon: IconStretch,
-        title: 'Stretch image',
+        title: "Stretch image",
         toggle: true,
       },
       {
-        name: 'withBackground',
+        name: "withBackground",
         icon: IconAddBackground,
-        title: 'With background',
+        title: "With background",
         toggle: true,
       },
     ];
@@ -191,8 +229,12 @@ export default class ImageTool implements BlockTool {
    * Renders Block content
    */
   public render(): HTMLDivElement {
-    if (this.config.features?.caption === true || this.config.features?.caption === undefined || (this.config.features?.caption === 'optional' && this.data.caption)) {
-      this.ui.applyTune('caption', true);
+    if (
+      this.config.features?.caption === true ||
+      this.config.features?.caption === undefined ||
+      (this.config.features?.caption === "optional" && this.data.caption)
+    ) {
+      this.ui.applyTune("caption", true);
     }
 
     return this.ui.render(this.data) as HTMLDivElement;
@@ -227,32 +269,37 @@ export default class ImageTool implements BlockTool {
     // @see https://github.com/editor-js/image/pull/49
     const tunes = ImageTool.tunes.concat(this.config.actions || []);
     const featureTuneMap: Record<string, string> = {
-      border: 'withBorder',
-      background: 'withBackground',
-      stretch: 'stretched',
-      caption: 'caption',
+      border: "withBorder",
+      background: "withBackground",
+      stretch: "stretched",
+      caption: "caption",
     };
 
-    if (this.config.features?.caption === 'optional') {
+    if (this.config.features?.caption === "optional") {
       tunes.push({
-        name: 'caption',
+        name: "caption",
         icon: IconText,
-        title: 'With caption',
+        title: "With caption",
         toggle: true,
       });
     }
 
     const availableTunes = tunes.filter((tune) => {
-      const featureKey = Object.keys(featureTuneMap).find(key => featureTuneMap[key] === tune.name);
+      const featureKey = Object.keys(featureTuneMap).find(
+        (key) => featureTuneMap[key] === tune.name
+      );
 
-      if (featureKey === 'caption') {
+      if (featureKey === "caption") {
         return this.config.features?.caption !== false;
       }
 
-      return featureKey == null || this.config.features?.[featureKey as keyof FeaturesConfig] !== false;
+      return (
+        featureKey == null ||
+        this.config.features?.[featureKey as keyof FeaturesConfig] !== false
+      );
     });
 
-    return availableTunes.map(tune => ({
+    return availableTunes.map((tune) => ({
       icon: tune.icon,
       label: this.api.i18n.t(tune.title),
       name: tune.name,
@@ -260,7 +307,7 @@ export default class ImageTool implements BlockTool {
       isActive: this.data[tune.name as keyof ImageToolData] as boolean,
       onActivate: () => {
         /** If it'a user defined tune, execute it's callback stored in action property */
-        if (typeof tune.action === 'function') {
+        if (typeof tune.action === "function") {
           tune.action(tune.name);
 
           return;
@@ -268,14 +315,6 @@ export default class ImageTool implements BlockTool {
         this.tuneToggled(tune.name as keyof ImageToolData);
       },
     }));
-  }
-
-  /**
-   * Fires after clicks on the Toolbox Image Icon
-   * Initiates click on the Select File button
-   */
-  public appendCallback(): void {
-    this.ui.nodes.fileButton.click();
   }
 
   /**
@@ -303,7 +342,7 @@ export default class ImageTool implements BlockTool {
        * Drag n drop file from into the Editor
        */
       files: {
-        mimeTypes: ['image/*'],
+        mimeTypes: ["image/*"],
       },
     };
   }
@@ -316,7 +355,7 @@ export default class ImageTool implements BlockTool {
    */
   public async onPaste(event: PasteEvent): Promise<void> {
     switch (event.type) {
-      case 'tag': {
+      case "tag": {
         const image = (event.detail as HTMLPasteEventDetailExtended).data;
 
         /** Images from PDF */
@@ -332,13 +371,13 @@ export default class ImageTool implements BlockTool {
         this.uploadUrl(image.src);
         break;
       }
-      case 'pattern': {
+      case "pattern": {
         const url = (event.detail as PatternPasteEventDetail).data;
 
         this.uploadUrl(url);
         break;
       }
-      case 'file': {
+      case "file": {
         const file = (event.detail as FilePasteEventDetail).file;
 
         this.uploadFile(file);
@@ -359,11 +398,15 @@ export default class ImageTool implements BlockTool {
   private set data(data: ImageToolData) {
     this.image = data.file;
 
-    this._data.caption = data.caption || '';
+    this._data.caption = data.caption || "";
     this.ui.fillCaption(this._data.caption);
 
     ImageTool.tunes.forEach(({ name: tune }) => {
-      const value = typeof data[tune as keyof ImageToolData] !== 'undefined' ? data[tune as keyof ImageToolData] === true || data[tune as keyof ImageToolData] === 'true' : false;
+      const value =
+        typeof data[tune as keyof ImageToolData] !== "undefined"
+          ? data[tune as keyof ImageToolData] === true ||
+            data[tune as keyof ImageToolData] === "true"
+          : false;
 
       this.setTune(tune as keyof ImageToolData, value);
     });
@@ -381,7 +424,7 @@ export default class ImageTool implements BlockTool {
    * @param file - uploaded file data
    */
   private set image(file: ImageSetterParam | undefined) {
-    this._data.file = file || { url: '' };
+    this._data.file = file || { url: "" };
 
     if (file && file.url) {
       this.ui.fillImage(file.url);
@@ -396,7 +439,7 @@ export default class ImageTool implements BlockTool {
     if (response.success && Boolean(response.file)) {
       this.image = response.file;
     } else {
-      this.uploadingFailed('incorrect response: ' + JSON.stringify(response));
+      this.uploadingFailed("incorrect response: " + JSON.stringify(response));
     }
   }
 
@@ -405,11 +448,11 @@ export default class ImageTool implements BlockTool {
    * @param errorText - uploading error info
    */
   private uploadingFailed(errorText: string): void {
-    console.log('Image Tool: uploading failed because of', errorText);
+    console.log("Image Tool: uploading failed because of", errorText);
 
     this.api.notifier.show({
-      message: this.api.i18n.t('Couldn’t upload image. Please try another.'),
-      style: 'error',
+      message: this.api.i18n.t("Couldn’t upload image. Please try another."),
+      style: "error",
     });
     this.ui.hidePreloader();
   }
@@ -423,9 +466,9 @@ export default class ImageTool implements BlockTool {
     this.setTune(tuneName, !(this._data[tuneName] as boolean));
 
     // reset caption on toggle
-    if (tuneName === 'caption' && !this._data[tuneName]) {
-      this._data.caption = '';
-      this.ui.fillCaption('');
+    if (tuneName === "caption" && !this._data[tuneName]) {
+      this._data.caption = "";
+      this.ui.fillCaption("");
     }
   }
 
@@ -438,13 +481,14 @@ export default class ImageTool implements BlockTool {
     (this._data[tuneName] as boolean) = value;
 
     this.ui.applyTune(tuneName, value);
-    if (tuneName === 'stretched') {
+    if (tuneName === "stretched") {
       /**
        * Wait until the API is ready
        */
-      Promise.resolve().then(() => {
-        this.block.stretched = value;
-      })
+      Promise.resolve()
+        .then(() => {
+          this.block.stretched = value;
+        })
         .catch((err) => {
           console.error(err);
         });

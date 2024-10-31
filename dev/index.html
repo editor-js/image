@@ -9,27 +9,6 @@
     <div id="editorjs"></div>
     <script src="https://cdn.jsdelivr.net/npm/@editorjs/editorjs@latest/dist/editor.js"></script>
     <script src="../dist/image.umd.js"></script>
-    <script>
-      const editor = new EditorJS({
-        holder: "editorjs",
-        tools: {
-          code: {
-            class: ImageTool,
-            config: {
-              endpoints: {
-                byFile: "http://localhost:8008/uploadFile",
-                byUrl: "http://localhost:8008/fetchUrl",
-              },
-              features: {
-                // caption: false,
-                border: false,
-                background: false,
-                stretch: false,
-              },
-            },
-          },
-        },
-      });
-    </script>
+    <script src="./dev.js"></script>
   </body>
 </html>
