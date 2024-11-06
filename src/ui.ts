@@ -56,6 +56,11 @@ interface Nodes {
    * Caption element for the image.
    */
   caption: HTMLElement;
+
+  /**
+   * Alt element for the image.
+   */
+  alt: HTMLElement;
 }
 
 /**
@@ -133,6 +138,9 @@ export default class Ui {
       caption: make('div', [this.CSS.input, this.CSS.caption], {
         contentEditable: !this.readOnly,
       }),
+      alt: make('div', [this.CSS.input, this.CSS.alt], {
+        contentEditable: !this.readOnly,
+      }),
     };
 
     /**
@@ -146,9 +154,11 @@ export default class Ui {
      *  </wrapper>
      */
     this.nodes.caption.dataset.placeholder = this.config.captionPlaceholder;
+    this.nodes.alt.dataset.placeholder = this.config.altPlaceholder;
     this.nodes.imageContainer.appendChild(this.nodes.imagePreloader);
     this.nodes.wrapper.appendChild(this.nodes.imageContainer);
     this.nodes.wrapper.appendChild(this.nodes.caption);
+    this.nodes.wrapper.appendChild(this.nodes.alt);
     this.nodes.wrapper.appendChild(this.nodes.fileButton);
   }
 
@@ -265,6 +275,16 @@ export default class Ui {
   }
 
   /**
+   * Shows alt input
+   * @param text - alt text
+   */
+  fillAlt(text: string) {
+    if (this.nodes.alt !== undefined) {
+      this.nodes.alt.innerHTML = text;
+    }
+  }
+
+  /**
    * CSS classes
    */
   private get CSS(): Record<string, string> {
@@ -282,6 +302,7 @@ export default class Ui {
       imagePreloader: 'image-tool__image-preloader',
       imageEl: 'image-tool__image-picture',
       caption: 'image-tool__caption',
+      alt: 'image-tool__alt',
     };
   };
 

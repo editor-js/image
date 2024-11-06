@@ -74,6 +74,11 @@ export type ImageToolData<Actions = {}, AdditionalFileData = {}> = {
   caption: string;
 
   /**
+   * Alt for the image.
+   */
+  alt: string;
+
+  /**
    * Flag indicating whether the image has a border.
    */
   withBorder: boolean;
@@ -118,6 +123,11 @@ export type FeaturesConfig = {
    */
   caption?: boolean | 'optional';
   /**
+   * Flag to enable/disable caption.
+   * Can be set to 'optional' to allow users to toggle via block tunes.
+   */
+  alt?: boolean | 'optional';
+  /**
    * Flag to enable/disable tune - stretched
    */
   stretch?: boolean;
@@ -158,6 +168,11 @@ export interface ImageConfig {
    * Placeholder text for the caption field.
    */
   captionPlaceholder?: string;
+
+  /**
+   * Placeholder text for the alt field.
+   */
+  altPlaceholder?: string;
 
   /**
    * Additional data to send with requests.
