@@ -72,9 +72,9 @@
   }
 
   &--empty,
-  &--loading {
+  &--uploading {
     ^&__caption {
-      display: none;
+      display: none !important;
     }
   }
 
@@ -101,7 +101,7 @@
     }
   }
 
-  &--loading {
+  &--uploading {
     ^&__image {
       min-height: 200px;
       display: flex;
