@@ -367,6 +367,10 @@ export default class ImageTool implements BlockTool {
 
       this.setTune(tune as keyof ImageToolData, value);
     });
+
+    if (data.caption) {
+      this.setTune('caption', true);
+    }
   }
 
   /**
@@ -419,11 +423,13 @@ export default class ImageTool implements BlockTool {
    * @param tuneName - tune that has been clicked
    */
   private tuneToggled(tuneName: keyof ImageToolData): void {
-    // inverse tune state
-    this.setTune(tuneName, !(this._data[tuneName] as boolean));
+    // check the tune state
+    const currentState = this.ui.isTuneActive(tuneName);
+
+    this.setTune(tuneName, !currentState);
 
     // reset caption on toggle
-    if (tuneName === 'caption' && !this._data[tuneName]) {
+    if (tuneName === 'caption' && !this.ui.isTuneActive(tuneName)) {
       this._data.caption = '';
       this.ui.fillCaption('');
     }
