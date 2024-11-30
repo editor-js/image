@@ -7,6 +7,7 @@
     border-radius: 3px;
     overflow: hidden;
     margin-bottom: 10px;
+    padding-bottom: 0;
 
     &-picture {
       max-width: 100%;
@@ -44,7 +45,11 @@
   }
 
   &__caption {
-    display: none;
+    visibility: hidden;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    margin-bottom: 10px;
 
     &[contentEditable="true"][data-placeholder]::before {
       position: absolute !important;
@@ -112,10 +117,6 @@
         display: none;
       }
     }
-
-    .cdx-button {
-      display: none;
-    }
   }
 
   /**
@@ -151,8 +152,10 @@
 
   &--caption {
     ^&__caption {
-      display: block;
+      visibility: visible;
     }
+
+    padding-bottom: 50px
   }
 }
 

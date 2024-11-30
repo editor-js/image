@@ -162,6 +162,15 @@ export default class Ui {
   }
 
   /**
+   * Utility to determine if a tune is currently active
+   * @param tuneName - one of available tunes {@link Tunes.tunes}
+   * @returns - true for active and vice versa
+   */
+  public isTuneActive(tuneName: string): boolean {
+    return this.nodes.wrapper.classList.contains(`${this.CSS.wrapper}--${tuneName}`);
+  }
+
+  /**
    * Renders tool UI
    * @param toolData - saved tool data
    */
