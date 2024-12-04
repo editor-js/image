@@ -195,16 +195,18 @@ export default class Ui {
 
   /**
    * Shows an image
-   * @param url - image source
+   * @param fileData - image Tool's file data
    */
-  public fillImage(url: string): void {
+  public fillImage(fileData: ImageToolData['file']): void {
     /**
      * Check for a source extension to compose element correctly: video tag for mp4, img — for others
      */
-    const tag = /\.mp4$/.test(url) ? 'VIDEO' : 'IMG';
+    const tag = /\.mp4$/.test(fileData.url) ? 'VIDEO' : 'IMG';
+    const { url, ...restFileData } = fileData;
 
     const attributes: { [key: string]: string | boolean } = {
       src: url,
+      ...restFileData,
     };
 
     /**

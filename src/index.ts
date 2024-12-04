@@ -382,9 +382,8 @@ export default class ImageTool implements BlockTool {
    */
   private set image(file: ImageSetterParam | undefined) {
     this._data.file = file || { url: '' };
-
-    if (file && file.url) {
-      this.ui.fillImage(file.url);
+    if (this._data.file.url) {
+      this.ui.fillImage(this._data.file);
     }
   }
 
