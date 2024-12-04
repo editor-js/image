@@ -1,6 +1,6 @@
 {
-  "name": "@editorjs/image",
-  "version": "2.10.1",
+  "name": "@editorjs/image-x",
+  "version": "2.11.0",
   "keywords": [
     "codex editor",
     "image",
@@ -9,7 +9,7 @@
   ],
   "description": "Image Tool for Editor.js",
   "license": "MIT",
-  "repository": "https://github.com/editor-js/image",
+  "repository": "https://github.com/nnmax/image",
   "files": [
     "dist"
   ],
@@ -34,6 +34,12 @@
     "name": "CodeX",
     "email": "team@ifmo.su"
   },
+  "contributors": [
+    {
+      "name": "Max",
+      "email": "hi.max@foxmail.com"
+    }
+  ],
   "devDependencies": {
     "@codexteam/ajax": "^4.2.0",
     "@editorjs/editorjs": "2.30.0-rc.12",

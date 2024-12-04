@@ -38,7 +38,9 @@ import Uploader from './uploader';
 import { IconAddBorder, IconStretch, IconAddBackground, IconPicture, IconText } from '@codexteam/icons';
 import type { ActionConfig, UploadResponseFormat, ImageToolData, ImageConfig, HTMLPasteEventDetailExtended, ImageSetterParam, FeaturesConfig } from './types/types';
 
-type ImageToolConstructorOptions = BlockToolConstructorOptions<ImageToolData, ImageConfig>;
+export * from './types/types';
+
+export type ImageToolConstructorOptions = BlockToolConstructorOptions<ImageToolData, ImageConfig>;
 
 /**
  * Implementation of ImageTool class
