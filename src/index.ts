@@ -132,6 +132,7 @@ export default class ImageTool implements BlockTool {
      */
     this._data = {
       caption: '',
+      withCaption: false,
       withBorder: false,
       withBackground: false,
       stretched: false,
@@ -192,7 +193,7 @@ export default class ImageTool implements BlockTool {
    */
   public render(): HTMLDivElement {
     if (this.config.features?.caption === true || this.config.features?.caption === undefined || (this.config.features?.caption === 'optional' && this.data.caption)) {
-      this.ui.applyTune('caption', true);
+      this.ui.applyTune('withCaption', true);
     }
 
     return this.ui.render(this.data) as HTMLDivElement;
@@ -230,12 +231,12 @@ export default class ImageTool implements BlockTool {
       border: 'withBorder',
       background: 'withBackground',
       stretch: 'stretched',
-      caption: 'caption',
+      caption: 'withCaption',
     };
 
     if (this.config.features?.caption === 'optional') {
       tunes.push({
-        name: 'caption',
+        name: 'withCaption',
         icon: IconText,
         title: 'With caption',
         toggle: true,
@@ -367,6 +368,10 @@ export default class ImageTool implements BlockTool {
 
       this.setTune(tune as keyof ImageToolData, value);
     });
+
+    if (data.caption) {
+      this.setTune('withCaption', true);
+    }
   }
 
   /**
@@ -419,11 +424,13 @@ export default class ImageTool implements BlockTool {
    * @param tuneName - tune that has been clicked
    */
   private tuneToggled(tuneName: keyof ImageToolData): void {
-    // inverse tune state
-    this.setTune(tuneName, !(this._data[tuneName] as boolean));
+    // check the tune state
+    const currentState = this._data[tuneName] as boolean;
+
+    this.setTune(tuneName, !currentState);
 
     // reset caption on toggle
-    if (tuneName === 'caption' && !this._data[tuneName]) {
+    if (tuneName === 'caption') {
       this._data.caption = '';
       this.ui.fillCaption('');
     }
