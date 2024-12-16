@@ -74,6 +74,11 @@ export type ImageToolData<Actions = {}, AdditionalFileData = {}> = {
   caption: string;
 
   /**
+   * Flag indicating whether the image has a caption.
+   */
+  withCaption: boolean;
+
+  /**
    * Flag indicating whether the image has a border.
    */
   withBorder: boolean;

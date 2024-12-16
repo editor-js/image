@@ -79,7 +79,7 @@
   &--empty,
   &--uploading {
     ^&__caption {
-      display: none !important;
+      visibility: hidden !important;
     }
   }
 
@@ -150,7 +150,7 @@
     }
   }
 
-  &--caption {
+  &--withCaption {
     ^&__caption {
       visibility: visible;
     }
