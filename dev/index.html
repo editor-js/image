@@ -7,13 +7,31 @@
   </head>
   <body>
     <div id="editorjs"></div>
-    <script src="https://cdn.jsdelivr.net/npm/@editorjs/editorjs@latest/dist/editor.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/editorjs@latest"></script>
     <script type="module">
       import ImageTool from "../src/index.ts"
-      const editor = new EditorJS({
+      window.editor = new EditorJS({
         holder: "editorjs",
+        data: {
+          time: 1700475383740,
+          blocks: [
+            // {
+            //   id: "hZAjSnqYMX",
+            //   type: "image",
+            //   data: {
+            //     file: {
+            //       url: "https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+            //     },
+            //     withBorder: false,
+            //     withBackground: false,
+            //     stretched: false,
+            //     caption: "kimitsu no yayiba",
+            //   },
+            // },
+          ],
+        },
         tools: {
-          code: {
+          image: {
             class: ImageTool,
             config: {
               endpoints: {
@@ -21,7 +39,7 @@
                 byUrl: "http://localhost:8008/fetchUrl",
               },
               features: {
-                // caption: false,
+                caption: 'optional',
                 border: false,
                 background: false,
                 stretch: false,

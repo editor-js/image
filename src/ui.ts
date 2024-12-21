@@ -21,7 +21,7 @@ enum UiState {
    * The UI is in a filled state, with an image successfully loaded.
    */
   Filled = 'filled'
-};
+}
 
 /**
  * Nodes interface representing various elements in the UI.
@@ -126,7 +126,7 @@ export default class Ui {
     this.readOnly = readOnly;
     this.nodes = {
       wrapper: make('div', [this.CSS.baseClass, this.CSS.wrapper]),
-      imageContainer: make('div', [this.CSS.imageContainer]),
+      imageContainer: make('div', [ this.CSS.imageContainer ]),
       fileButton: this.createFileButton(),
       imageEl: undefined,
       imagePreloader: make('div', this.CSS.imagePreloader),
@@ -154,6 +154,7 @@ export default class Ui {
 
   /**
    * Apply visual representation of activated tune
+   *
    * @param tuneName - one of available tunes {@link Tunes.tunes}
    * @param status - true for enable, false for disable
    */
@@ -163,13 +164,22 @@ export default class Ui {
 
   /**
    * Renders tool UI
+   *
    * @param toolData - saved tool data
    */
   public render(toolData: ImageToolData): HTMLElement {
+    // console.trace('render');
+
+    /**
+     * @todo this.file should be null initially
+     */
+    console.warn('toolData.file', toolData.file);
+    console.warn('Object.keys(toolData.file).length === 0', Object.keys(toolData.file).length === 0);
+
     if (toolData.file === undefined || Object.keys(toolData.file).length === 0) {
       this.toggleStatus(UiState.Empty);
     } else {
-      this.toggleStatus(UiState.Uploading);
+      // this.toggleStatus(UiState.Uploading);
     }
 
     return this.nodes.wrapper;
@@ -177,6 +187,7 @@ export default class Ui {
 
   /**
    * Shows uploading preloader
+   *
    * @param src - preview source
    */
   public showPreloader(src: string): void {
@@ -195,6 +206,7 @@ export default class Ui {
 
   /**
    * Shows an image
+   *
    * @param url - image source
    */
   public fillImage(url: string): void {
@@ -256,6 +268,7 @@ export default class Ui {
 
   /**
    * Shows caption input
+   *
    * @param text - caption content text
    */
   public fillCaption(text: string): void {
@@ -283,13 +296,13 @@ export default class Ui {
       imageEl: 'image-tool__image-picture',
       caption: 'image-tool__caption',
     };
-  };
+  }
 
   /**
    * Creates upload-file button
    */
   private createFileButton(): HTMLElement {
-    const button = make('div', [this.CSS.button]);
+    const button = make('div', [ this.CSS.button ]);
 
     button.innerHTML = this.config.buttonContent ?? `${IconPicture} ${this.api.i18n.t('Select an Image')}`;
 
@@ -302,12 +315,15 @@ export default class Ui {
 
   /**
    * Changes UI status
+   *
    * @param status - see {@link Ui.status} constants
    */
   private toggleStatus(status: UiState): void {
     for (const statusType in UiState) {
       if (Object.prototype.hasOwnProperty.call(UiState, statusType)) {
-        this.nodes.wrapper.classList.toggle(`${this.CSS.wrapper}--${UiState[statusType as keyof typeof UiState]}`, status === UiState[statusType as keyof typeof UiState]);
+        const state = UiState[statusType as keyof typeof UiState];
+
+        this.nodes.wrapper.classList.toggle(`${this.CSS.wrapper}--${state}`, state === status);
       }
     }
   }

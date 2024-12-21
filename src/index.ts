@@ -1,5 +1,6 @@
 /**
  * Image Tool for the Editor.js
+ *
  * @author CodeX <team@codex.so>
  * @license MIT
  * @see {@link https://github.com/editor-js/image}
@@ -75,6 +76,14 @@ export default class ImageTool implements BlockTool {
   private _data: ImageToolData;
 
   /**
+   * Caption enabled state
+   * Null when user has not toggled the caption tune
+   * True when user has toggled the caption tune
+   * False when user has toggled the caption tune
+   */
+  private isCaptionEnabled: boolean | null = null;
+
+  /**
    * @param tool - tool properties got from editor.js
    * @param tool.data - previously saved data
    * @param tool.config - user config for Tool
@@ -135,9 +144,7 @@ export default class ImageTool implements BlockTool {
       withBorder: false,
       withBackground: false,
       stretched: false,
-      file: {
-        url: '',
-      },
+      file: null, // @todo handle this type of data
     };
     this.data = data;
   }
@@ -200,6 +207,7 @@ export default class ImageTool implements BlockTool {
 
   /**
    * Validate data: check if Image exists
+   *
    * @param savedData — data received after saving
    * @returns false if saved data is not correct, otherwise true
    */
@@ -220,6 +228,7 @@ export default class ImageTool implements BlockTool {
 
   /**
    * Returns configuration for block tunes: add background, add border, stretch image
+   *
    * @returns TunesMenuConfig
    */
   public renderSettings(): TunesMenuConfig {
@@ -232,6 +241,7 @@ export default class ImageTool implements BlockTool {
       stretch: 'stretched',
       caption: 'caption',
     };
+
 
     if (this.config.features?.caption === 'optional') {
       tunes.push({
@@ -252,12 +262,27 @@ export default class ImageTool implements BlockTool {
       return featureKey == null || this.config.features?.[featureKey as keyof FeaturesConfig] !== false;
     });
 
+    /**
+     * Check if the tune is active
+     *
+     * @param tune - tune to check
+     */
+    const isActive = (tune: ActionConfig): boolean => {
+      let currentState = this.data[tune.name as keyof ImageToolData] as boolean;
+
+      if (tune.name === 'caption') {
+        currentState = this.isCaptionEnabled ?? currentState;
+      }
+
+      return currentState;
+    };
+
     return availableTunes.map(tune => ({
       icon: tune.icon,
       label: this.api.i18n.t(tune.title),
       name: tune.name,
       toggle: tune.toggle,
-      isActive: this.data[tune.name as keyof ImageToolData] as boolean,
+      isActive: isActive(tune),
       onActivate: () => {
         /** If it'a user defined tune, execute it's callback stored in action property */
         if (typeof tune.action === 'function') {
@@ -265,7 +290,19 @@ export default class ImageTool implements BlockTool {
 
           return;
         }
-        this.tuneToggled(tune.name as keyof ImageToolData);
+
+        let newState = !isActive(tune);
+
+        /**
+         * For the caption tune, we can't rely on the this._data
+         * because it can be manualy toggled by user
+         */
+        if (tune.name === 'caption') {
+          this.isCaptionEnabled = !this.isCaptionEnabled;
+          newState = this.isCaptionEnabled;
+        }
+
+        this.tuneToggled(tune.name as keyof ImageToolData, newState);
       },
     }));
   }
@@ -280,6 +317,7 @@ export default class ImageTool implements BlockTool {
 
   /**
    * Specify paste substitutes
+   *
    * @see {@link https://github.com/codex-team/editor.js/blob/master/docs/tools.md#paste-handling}
    */
   public static get pasteConfig(): PasteConfig {
@@ -303,13 +341,14 @@ export default class ImageTool implements BlockTool {
        * Drag n drop file from into the Editor
        */
       files: {
-        mimeTypes: ['image/*'],
+        mimeTypes: [ 'image/*' ],
       },
     };
   }
 
   /**
    * Specify paste handlers
+   *
    * @see {@link https://github.com/codex-team/editor.js/blob/master/docs/tools.md#paste-handling}
    * @param event - editor.js custom paste event
    *                              {@link https://github.com/codex-team/editor.js/blob/master/types/tools/paste-events.d.ts}
@@ -354,6 +393,7 @@ export default class ImageTool implements BlockTool {
 
   /**
    * Stores all Tool's data
+   *
    * @param data - data in Image Tool format
    */
   private set data(data: ImageToolData) {
@@ -378,6 +418,7 @@ export default class ImageTool implements BlockTool {
 
   /**
    * Set new image file
+   *
    * @param file - uploaded file data
    */
   private set image(file: ImageSetterParam | undefined) {
@@ -390,6 +431,7 @@ export default class ImageTool implements BlockTool {
 
   /**
    * File uploading callback
+   *
    * @param response - uploading server response
    */
   private onUpload(response: UploadResponseFormat): void {
@@ -402,6 +444,7 @@ export default class ImageTool implements BlockTool {
 
   /**
    * Handle uploader errors
+   *
    * @param errorText - uploading error info
    */
   private uploadingFailed(errorText: string): void {
@@ -416,21 +459,35 @@ export default class ImageTool implements BlockTool {
 
   /**
    * Callback fired when Block Tune is activated
+   *
    * @param tuneName - tune that has been clicked
+   * @param state - new state
    */
-  private tuneToggled(tuneName: keyof ImageToolData): void {
-    // inverse tune state
-    this.setTune(tuneName, !(this._data[tuneName] as boolean));
+  private tuneToggled(tuneName: keyof ImageToolData, state: boolean): void {
+    switch (tuneName) {
+      case 'caption':
+        this.ui.applyTune(tuneName, state);
 
-    // reset caption on toggle
-    if (tuneName === 'caption' && !this._data[tuneName]) {
-      this._data.caption = '';
-      this.ui.fillCaption('');
+        /**
+         * Clear caption on toggle off
+         */
+        if (state === false) {
+          this._data.caption = '';
+          this.ui.fillCaption('');
+        }
+        break;
+      default:
+        /**
+         * Inverse tune state
+         */
+        this.setTune(tuneName, state);
+        break;
     }
   }
 
   /**
    * Set one tune
+   *
    * @param tuneName - {@link Tunes.tunes}
    * @param value - tune state
    */
@@ -453,6 +510,7 @@ export default class ImageTool implements BlockTool {
 
   /**
    * Show preloader and upload image file
+   *
    * @param file - file that is currently uploading (from paste)
    */
   private uploadFile(file: Blob): void {
@@ -465,6 +523,7 @@ export default class ImageTool implements BlockTool {
 
   /**
    * Show preloader and upload image by target url
+   *
    * @param url - url pasted
    */
   private uploadUrl(url: string): void {
