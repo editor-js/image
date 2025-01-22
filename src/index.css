@@ -73,6 +73,10 @@
   &--empty {
     ^&__image {
       display: none;
+
+      &-preloader {
+        display: none;
+      }
     }
   }
 
@@ -117,6 +121,10 @@
         display: none;
       }
     }
+
+    .cdx-button {
+      display: none;
+    }
   }
 
   /**
@@ -150,7 +158,7 @@
     }
   }
 
-  &--withCaption {
+  &--caption {
     ^&__caption {
       visibility: visible;
     }

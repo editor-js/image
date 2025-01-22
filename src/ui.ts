@@ -6,9 +6,9 @@ import type { ImageToolData, ImageConfig } from './types/types';
 /**
  * Enumeration representing the different states of the UI.
  */
-enum UiState {
+export enum UiState {
   /**
-   * The UI is in an empty state, with no image loaded or being uploaded.
+   * The UI is in an empty state, with no image loaded or being selected.
    */
   Empty = 'empty',
 
@@ -169,7 +169,7 @@ export default class Ui {
     if (toolData.file === undefined || Object.keys(toolData.file).length === 0) {
       this.toggleStatus(UiState.Empty);
     } else {
-      this.toggleStatus(UiState.Uploading);
+      this.toggleStatus(UiState.Empty);
     }
 
     return this.nodes.wrapper;
@@ -265,6 +265,20 @@ export default class Ui {
   }
 
   /**
+   * Changes UI status
+   * @param status - see {@link Ui.status} constants
+   */
+  public toggleStatus(status: UiState): void {
+    for (const statusType in UiState) {
+      if (Object.prototype.hasOwnProperty.call(UiState, statusType)) {
+        const state = UiState[statusType as keyof typeof UiState];
+
+        this.nodes.wrapper.classList.toggle(`${this.CSS.wrapper}--${state}`, state === status);
+      }
+    }
+  }
+
+  /**
    * CSS classes
    */
   private get CSS(): Record<string, string> {
@@ -298,17 +312,5 @@ export default class Ui {
     });
 
     return button;
-  }
-
-  /**
-   * Changes UI status
-   * @param status - see {@link Ui.status} constants
-   */
-  private toggleStatus(status: UiState): void {
-    for (const statusType in UiState) {
-      if (Object.prototype.hasOwnProperty.call(UiState, statusType)) {
-        this.nodes.wrapper.classList.toggle(`${this.CSS.wrapper}--${UiState[statusType as keyof typeof UiState]}`, status === UiState[statusType as keyof typeof UiState]);
-      }
-    }
   }
 }

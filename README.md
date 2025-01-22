@@ -135,7 +135,6 @@ This Tool returns `data` with following format
 | -------------- | --------- | ------------------------------- |
 | file           | `object`  | Uploaded file data. Any data got from backend uploader. Always contain the `url` property |
 | caption        | `string`  | image's caption                 |
-| withCaption    | `boolean` | add caption to image            |
 | withBorder     | `boolean` | add border to image             |
 | withBackground | `boolean` | need to add background          |
 | stretched      | `boolean` | stretch image to screen's width |
@@ -149,7 +148,6 @@ This Tool returns `data` with following format
             "url" : "https://www.tesla.com/tesla_theme/assets/img/_vehicle_redesign/roadster_and_semi/roadster/hero.jpg"
         },
         "caption" : "Roadster // tesla.com",
-        "withCaption": true,
         "withBorder" : false,
         "withBackground" : false,
         "stretched" : true,
