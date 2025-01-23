@@ -329,8 +329,7 @@ export default class ImageTool implements BlockTool {
        * Paste URL of image into the Editor
        */
       patterns: {
-        // image: /https?:\/\/\S+\.(gif|jpe?g|tiff|png|svg|webp)(\?[a-z0-9=]*)?$/i,
-        image: /https?:\/\/\S+/i,
+        image: /https?:\/\/\S+\.(gif|jpe?g|tiff|png|svg|webp)(\?[a-z0-9=]*)?$/i,
       },
 
       /**
