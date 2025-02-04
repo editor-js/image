@@ -162,6 +162,16 @@
     ^&__image-picture {
       border: 1px solid var(--border-color);
     }
+
+    &.image-tool--withBackground {
+      .image-tool__image {
+        border: 1px solid var(--border-color);
+      }
+
+      .image-tool__image-picture {
+        border: none;
+      }
+    }
   }
 
   &--withBackground {
