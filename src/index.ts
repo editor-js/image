@@ -203,7 +203,7 @@ export default class ImageTool implements BlockTool {
       this.isCaptionEnabled = true;
     }
 
-    return this.ui.render(this.data) as HTMLDivElement;
+    return this.ui.render() as HTMLDivElement;
   }
 
   /**

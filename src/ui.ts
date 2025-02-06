@@ -1,7 +1,7 @@
 import { IconPicture } from '@codexteam/icons';
 import { make } from './utils/dom';
 import type { API } from '@editorjs/editorjs';
-import type { ImageToolData, ImageConfig } from './types/types';
+import type { ImageConfig } from './types/types';
 
 /**
  * Enumeration representing the different states of the UI.
@@ -163,14 +163,9 @@ export default class Ui {
 
   /**
    * Renders tool UI
-   * @param toolData - saved tool data
    */
-  public render(toolData: ImageToolData): HTMLElement {
-    if (toolData.file === undefined || Object.keys(toolData.file).length === 0) {
-      this.toggleStatus(UiState.Empty);
-    } else {
-      this.toggleStatus(UiState.Empty);
-    }
+  public render(): HTMLElement {
+    this.toggleStatus(UiState.Empty);
 
     return this.nodes.wrapper;
   }
