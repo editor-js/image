@@ -22,7 +22,7 @@ const crypto = require('crypto');
 const SERVER_PORT = 8008;
 
 class ServerExample {
-  constructor({port, fieldName}) {
+  constructor({ port, fieldName }) {
     this.uploadDir = __dirname + '/\.tmp';
     this.fieldName = fieldName;
     this.server = http.createServer((req, res) => {
@@ -46,7 +46,7 @@ class ServerExample {
   onRequest(request, response) {
     this.allowCors(response);
 
-    const {method, url} = request;
+    const { method, url } = request;
 
     console.log('Got request on the ', url);
 
@@ -97,7 +97,7 @@ class ServerExample {
         response.end(JSON.stringify({ success: 0, message: 'File not found' }));
         return;
       }
-  
+
       const fileStream = fs.createReadStream(filePath);
       response.writeHead(200, { 'Content-Type': 'image/png' });
       // Pipe the file stream to the response, sending the file content directly to the client
@@ -114,9 +114,8 @@ class ServerExample {
     let responseJson = {
       success: 0
     };
-
     this.getForm(request)
-      .then(({files}) => {
+      .then(({ files }) => {
         let image = files[this.fieldName][0] || {};
 
         responseJson.success = 1;
@@ -130,7 +129,7 @@ class ServerExample {
         console.log('Uploading error', error);
       })
       .finally(() => {
-        response.writeHead(200, {'Content-Type': 'application/json'});
+        response.writeHead(200, { 'Content-Type': 'application/json' });
         response.end(JSON.stringify(responseJson));
       });
   }
@@ -144,21 +143,22 @@ class ServerExample {
     let responseJson = {
       success: 0
     };
-
     this.getForm(request)
-      .then(({files, fields}) => {
+      .then(({ files, fields }) => {
         let url = fields.url;
 
         const results = url.match(/https?:\/\/\S+\.(gif|jpe?g|tiff|png|svg|webp)(\?[a-z0-9=]*)?$/i);
-        const extension = results ? results[1] : '.png';
-        
-        let filename = this.uploadDir + '/' + this.md5(url) + `.${extension}`;
+        const extension = results ? results[1] : 'png';
 
-        return this.downloadImage(url, filename)
-          .then((path) => {
+        const filename = `${this.md5(url)}.${extension}`;
+        const filePath = `${this.uploadDir}/${filename}`;
+        const publicUrl = `http://localhost:${SERVER_PORT}/image/${filename}`; // Public URL for serving the image
+
+        return this.downloadImage(url, filePath)
+          .then(() => {
             responseJson.success = 1;
             responseJson.file = {
-              url: path
+              url: publicUrl, // Return the public URL instead of the file path
             };
           });
       })
@@ -166,7 +166,7 @@ class ServerExample {
         console.log('Uploading error', error);
       })
       .finally(() => {
-        response.writeHead(200, {'Content-Type': 'application/json'});
+        response.writeHead(200, { 'Content-Type': 'application/json' });
         response.end(JSON.stringify(responseJson));
       });
   }
@@ -191,7 +191,7 @@ class ServerExample {
         } else {
           console.log('fields', fields);
           console.log('files', files);
-          resolve({files, fields});
+          resolve({ files, fields });
         }
       });
     });
