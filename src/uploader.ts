@@ -1,8 +1,8 @@
-import ajax from '@codexteam/ajax';
-import type { AjaxResponse } from '@codexteam/ajax';
-import isPromise from './utils/isPromise';
-import type { UploadOptions } from './types/types';
-import type { UploadResponseFormat, ImageConfig } from './types/types';
+import ajax from "@codexteam/ajax";
+import type { AjaxResponse } from "@codexteam/ajax";
+import isPromise from "./utils/isPromise";
+import type { UploadOptions } from "./types/types";
+import type { UploadResponseFormat, ImageConfig } from "./types/types";
 
 /**
  * Params interface for Uploader constructor
@@ -55,7 +55,7 @@ export default class Uploader {
    * Fires ajax.transport()
    * @param onPreview - callback fired when preview is ready
    */
-  public uploadSelectedFile({ onPreview }: UploadOptions): void {
+  public uploadSelectedFile({ onPreview }: UploadOptions): Promise<void> {
     const preparePreview = function (file: File): void {
       const reader = new FileReader();
 
@@ -72,40 +72,58 @@ export default class Uploader {
     let upload: Promise<UploadResponseFormat>;
 
     // custom uploading
-    if (this.config.uploader && typeof this.config.uploader.uploadByFile === 'function') {
+    if (
+      this.config.uploader &&
+      typeof this.config.uploader.uploadByFile === "function"
+    ) {
       const uploadByFile = this.config.uploader.uploadByFile;
 
-      upload = ajax.selectFiles({ accept: this.config.types ?? 'image/*' }).then((files: File[]) => {
-        preparePreview(files[0]);
-
-        const customUpload = uploadByFile(files[0]);
-
-        if (!isPromise(customUpload)) {
-          console.warn('Custom uploader method uploadByFile should return a Promise');
-        }
-
-        return customUpload;
-      });
-
-    // default uploading
-    } else {
-      upload = ajax.transport({
-        url: this.config.endpoints.byFile,
-        data: this.config.additionalRequestData,
-        accept: this.config.types ?? 'image/*',
-        headers: this.config.additionalRequestHeaders as Record<string, string>,
-        beforeSend: (files: File[]) => {
+      upload = ajax
+        .selectFiles({ accept: this.config.types ?? "image/*" })
+        .then((files: File[]) => {
           preparePreview(files[0]);
-        },
-        fieldName: this.config.field ?? 'image',
-      }).then((response: AjaxResponse) => response.body as UploadResponseFormat);
+
+          const customUpload = uploadByFile(files[0]);
+
+          if (!isPromise(customUpload)) {
+            console.warn(
+              "Custom uploader method uploadByFile should return a Promise"
+            );
+          }
+
+          return customUpload;
+        });
+
+      // default uploading
+    } else {
+      upload = ajax
+        .transport({
+          url: this.config.endpoints.byFile,
+          data: this.config.additionalRequestData,
+          accept: this.config.types ?? "image/*",
+          headers: this.config.additionalRequestHeaders as Record<
+            string,
+            string
+          >,
+          beforeSend: (files: File[]) => {
+            preparePreview(files[0]);
+          },
+          fieldName: this.config.field ?? "image",
+        })
+        .then(
+          (response: AjaxResponse) => response.body as UploadResponseFormat
+        );
     }
 
-    upload.then((response) => {
-      this.onUpload(response);
-    }).catch((error: string) => {
-      this.onError(error);
-    });
+    upload
+      .then((response) => {
+        this.onUpload(response);
+      })
+      .catch((error: string) => {
+        this.onError(error);
+      });
+
+    return Promise.resolve();
   }
 
   /**
@@ -113,37 +131,56 @@ export default class Uploader {
    * Fires ajax.post()
    * @param url - image source url
    */
-  public uploadByUrl(url: string): void {
+  public uploadByUrl(url: string): Promise<void> {
     let upload;
 
     /**
      * Custom uploading
      */
-    if (this.config.uploader && typeof this.config.uploader.uploadByUrl === 'function') {
+    if (
+      this.config.uploader &&
+      typeof this.config.uploader.uploadByUrl === "function"
+    ) {
       upload = this.config.uploader.uploadByUrl(url);
 
       if (!isPromise(upload)) {
-        console.warn('Custom uploader method uploadByUrl should return a Promise');
+        console.warn(
+          "Custom uploader method uploadByUrl should return a Promise"
+        );
       }
     } else {
       /**
        * Default uploading
        */
-      upload = ajax.post({
-        url: this.config.endpoints.byUrl,
-        data: Object.assign({
-          url: url,
-        }, this.config.additionalRequestData),
-        type: ajax.contentType.JSON,
-        headers: this.config.additionalRequestHeaders as Record<string, string>,
-      }).then((response: AjaxResponse) => response.body as UploadResponseFormat);
+      upload = ajax
+        .post({
+          url: this.config.endpoints.byUrl,
+          data: Object.assign(
+            {
+              url: url,
+            },
+            this.config.additionalRequestData
+          ),
+          type: ajax.contentType.JSON,
+          headers: this.config.additionalRequestHeaders as Record<
+            string,
+            string
+          >,
+        })
+        .then(
+          (response: AjaxResponse) => response.body as UploadResponseFormat
+        );
     }
 
-    upload.then((response: UploadResponseFormat) => {
-      this.onUpload(response);
-    }).catch((error: string) => {
-      this.onError(error);
-    });
+    upload
+      .then((response: UploadResponseFormat) => {
+        this.onUpload(response);
+      })
+      .catch((error: string) => {
+        this.onError(error);
+      });
+
+    return Promise.resolve();
   }
 
   /**
@@ -152,7 +189,7 @@ export default class Uploader {
    * @param file - file pasted by drag-n-drop
    * @param onPreview - file pasted by drag-n-drop
    */
-  public uploadByFile(file: Blob, { onPreview }: UploadOptions): void {
+  public uploadByFile(file: Blob, { onPreview }: UploadOptions): Promise<void> {
     /**
      * Load file for preview
      */
@@ -168,11 +205,18 @@ export default class Uploader {
     /**
      * Custom uploading
      */
-    if (this.config.uploader && typeof this.config.uploader.uploadByFile === 'function') {
-      upload = this.config.uploader.uploadByFile(file);
+    if (
+      this.config.uploader &&
+      typeof this.config.uploader.uploadByFile === "function"
+    ) {
+      // Convert Blob to File with a dummy filename
+      const fileObj = new File([file], "pasted-image", { type: file.type });
+      upload = this.config.uploader.uploadByFile(fileObj);
 
       if (!isPromise(upload)) {
-        console.warn('Custom uploader method uploadByFile should return a Promise');
+        console.warn(
+          "Custom uploader method uploadByFile should return a Promise"
+        );
       }
     } else {
       /**
@@ -180,26 +224,42 @@ export default class Uploader {
        */
       const formData = new FormData();
 
-      formData.append(this.config.field ?? 'image', file);
+      formData.append(this.config.field ?? "image", file);
 
-      if (this.config.additionalRequestData && Object.keys(this.config.additionalRequestData).length) {
-        Object.entries(this.config.additionalRequestData).forEach(([name, value]: [string, string | Blob]) => {
-          formData.append(name, value);
-        });
+      if (
+        this.config.additionalRequestData &&
+        Object.keys(this.config.additionalRequestData).length
+      ) {
+        Object.entries(this.config.additionalRequestData).forEach(
+          ([name, value]: [string, string | Blob]) => {
+            formData.append(name, value);
+          }
+        );
       }
 
-      upload = ajax.post({
-        url: this.config.endpoints.byFile,
-        data: formData,
-        type: ajax.contentType.JSON,
-        headers: this.config.additionalRequestHeaders as Record<string, string>,
-      }).then((response: AjaxResponse) => response.body as UploadResponseFormat);
+      upload = ajax
+        .post({
+          url: this.config.endpoints.byFile,
+          data: formData,
+          type: ajax.contentType.JSON,
+          headers: this.config.additionalRequestHeaders as Record<
+            string,
+            string
+          >,
+        })
+        .then(
+          (response: AjaxResponse) => response.body as UploadResponseFormat
+        );
     }
 
-    upload.then((response) => {
-      this.onUpload(response);
-    }).catch((error: string) => {
-      this.onError(error);
-    });
+    upload
+      .then((response) => {
+        this.onUpload(response);
+      })
+      .catch((error: string) => {
+        this.onError(error);
+      });
+
+    return Promise.resolve();
   }
 }
