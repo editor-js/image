@@ -25,10 +25,12 @@
   },
   "scripts": {
     "dev": "concurrently \"vite\" \"node ./dev/server.js\"",
-    "build": "vite build",
-    "lint": "eslint",
-    "lint:errors": "eslint --quiet",
-    "lint:fix": "eslint --fix"
+    "build": "vite build && tsc --emitDeclarationOnly",
+    "lint": "eslint ./src --ext .ts",
+    "lint:errors": "eslint ./src --ext .ts --quiet",
+    "lint:fix": "eslint ./src --ext .ts --fix",
+    "type-check": "tsc --noEmit",
+    "type-check:watch": "tsc --noEmit --watch"
   },
   "author": {
     "name": "CodeX",

@@ -1,9 +1,17 @@
 /**
  * Module declaration for '@codexteam/ajax'.
  */
-declare module '@codexteam/ajax' {
+declare module "@codexteam/ajax" {
   /**
-   * Options for configuring an Ajax request.
+   * Options for configuring an AJAX request
+   * @typedef {Object} AjaxOptions
+   * @property {string} [url] - The target URL for the request
+   * @property {Object} [data] - Payload to send with the request
+   * @property {string} [accept] - MIME type to accept in response
+   * @property {Object} [headers] - Custom headers to include
+   * @property {function(File[]): void} [beforeSend] - Callback before sending files
+   * @property {string} [fieldName] - Form data field name for file uploads
+   * @property {string} [type] - HTTP method type (GET/POST/etc)
    */
   export interface AjaxOptions {
     /**
@@ -37,7 +45,9 @@ declare module '@codexteam/ajax' {
   }
 
   /**
-   * Parameter type of selectFiles function in AjaxOptions interface
+   * File selection options structure
+   * @typedef {Object} AjaxFileOptionsParam
+   * @property {string} accept - Allowed file types (e.g. 'image/*')
    */
   export type AjaxFileOptionsParam = {
     /**
@@ -47,35 +57,64 @@ declare module '@codexteam/ajax' {
   };
 
   /**
-   * Represents the response from an Ajax request.
-   * @template T - The type of the response body.
+   * AJAX response wrapper with typed body
+   * @template T - Type of the response body content
+   * @typedef {Object} AjaxResponse
+   * @property {number} status - HTTP status code
+   * @property {T} body - Parsed response content
    */
-  export interface AjaxResponse<T = object> {
-    /** The body of the response. */
+  export interface AjaxResponse<T = unknown> {
+    status: number;
     body: T;
   }
 
   /**
-   * Prompts the user to select files and returns a promise that resolves with the selected files.
-   * @param options - Options for file selection.
-   * @param options.accept - The accepted file types.
-   * @returns A promise that resolves with the selected files.
+   * File selection handler
+   * @function selectFiles
+   * @param {AjaxFileOptionsParam} options - File type restrictions
+   * @returns {Promise<File[]>} Array of selected files
    */
   export function selectFiles(options: AjaxFileOptionsParam): Promise<File[]>;
 
   /**
-   * Sends an Ajax request with the specified options.
-   * @param options - Options for the Ajax request.
-   * @returns A promise that resolves with the Ajax response.
+   * Core transport method for AJAX requests
+   * @function transport
+   * @template T - Expected response body type
+   * @param {Object} options - Transport configuration
+   * @param {string} options.url - Endpoint URL
+   * @param {FormData|Record<string, unknown>} [options.data] - Request payload
+   * @param {string} [options.accept] - Response MIME type
+   * @param {Record<string, string>} [options.headers] - Request headers
+   * @param {function(File[]): void} [options.beforeSend] - File preprocessor
+   * @param {string} [options.fieldName] - Form field name
+   * @returns {Promise<AjaxResponse<T>>} Response wrapper
    */
-  export function transport(options: AjaxOptions): Promise<AjaxResponse>;
+  export function transport<T = unknown>(options: {
+    url: string;
+    data?: FormData | Record<string, unknown>;
+    accept?: string;
+    headers?: Record<string, string>;
+    beforeSend?: (files: File[]) => void;
+    fieldName?: string;
+  }): Promise<AjaxResponse<T>>;
 
   /**
-   * Sends a POST request with the specified options.
-   * @param options - Options for the POST request.
-   * @returns A promise that resolves with the Ajax response.
+   * POST request shortcut
+   * @function post
+   * @template T - Expected response body type
+   * @param {Object} options - Request configuration
+   * @param {string} options.url - Target endpoint
+   * @param {FormData|Record<string, unknown>} options.data - POST payload
+   * @param {string} [options.type] - Content type header
+   * @param {Record<string, string>} [options.headers] - Custom headers
+   * @returns {Promise<AjaxResponse<T>>} Response wrapper
    */
-  export function post(options: AjaxOptions): Promise<AjaxResponse>;
+  export function post<T = unknown>(options: {
+    url: string;
+    data: FormData | Record<string, unknown>;
+    type?: string;
+    headers?: Record<string, string>;
+  }): Promise<AjaxResponse<T>>;
 
   /**
    * Represents common content types.
