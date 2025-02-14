@@ -135,7 +135,7 @@ export interface ImageConfig {
     /**
      * Endpoint for file upload.
      */
-    byFile: string;
+    byFile?: string;
 
     /**
      * Endpoints for URL upload.
@@ -161,7 +161,7 @@ export interface ImageConfig {
   /**
    * Additional data to send with requests.
    */
-  additionalRequestData?: Record<string, string>;
+  additionalRequestData?: Record<string, unknown>;
 
   /**
    * Additional headers to send with requests.
