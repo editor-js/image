@@ -1,4 +1,4 @@
-import ajax from '@codexteam/ajax';
+import ajax from "@codexteam/ajax";
 import type { AjaxResponse } from "@codexteam/ajax";
 import isPromise from "./utils/isPromise";
 import type { UploadOptions } from "./types/types";
@@ -98,7 +98,7 @@ export default class Uploader {
     } else {
       upload = ajax
         .transport({
-          url: this.config.endpoints.byFile,
+          url: this.config.endpoints.byFile ?? "",
           data: this.config.additionalRequestData,
           accept: this.config.types ?? "image/*",
           headers: this.config.additionalRequestHeaders as Record<
@@ -229,15 +229,15 @@ export default class Uploader {
         Object.keys(this.config.additionalRequestData).length
       ) {
         Object.entries(this.config.additionalRequestData).forEach(
-          ([name, value]: [string, string | Blob]) => {
-            formData.append(name, value);
+          ([name, value]) => {
+            formData.append(name, value as string | Blob);
           }
         );
       }
 
       upload = ajax
         .post({
-          url: this.config.endpoints.byFile,
+          url: this.config.endpoints.byFile ?? "",
           data: formData,
           type: ajax.contentType.JSON,
           headers: this.config.additionalRequestHeaders as Record<
