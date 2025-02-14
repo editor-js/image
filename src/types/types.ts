@@ -2,26 +2,17 @@ import type { HTMLPasteEventDetail } from "@editorjs/editorjs";
 
 /**
  * Configuration options for file upload preview handling
- * @typedef {Object} UploadOptions
- * @property {function(string): void} onPreview - Preview ready callback
  */
 export interface UploadOptions {
   /**
    * Callback when preview is available
    * @param {string} src - Preview image source URL
-   * @returns {void}
    */
   onPreview: (src: string) => void;
 }
 
 /**
  * Configuration for custom block tune actions
- * @typedef {Object} ActionConfig
- * @property {string} name - Unique action identifier
- * @property {string} icon - SVG icon string
- * @property {string} title - Display text for UI
- * @property {boolean} [toggle] - Whether the action is a toggle
- * @property {function(string): void} [action] - Action handler function
  */
 export interface ActionConfig {
   /**
@@ -52,11 +43,6 @@ export interface ActionConfig {
 
 /**
  * Standard upload response format
- * @template [AdditionalFileData={}] - Type for additional file metadata
- * @typedef {Object} UploadResponseFormat
- * @property {number} success - Upload status (1=success, 0=failure)
- * @property {Object} file - Uploaded file data
- * @property {string} file.url - File access URL
  */
 export interface UploadResponseFormat<AdditionalFileData = {}> {
   /**
@@ -66,8 +52,7 @@ export interface UploadResponseFormat<AdditionalFileData = {}> {
 
   /**
    * Object with file data.
-   *             'url' is required,
-   *             also can contain any additional data that will be saved and passed back
+   * 'url' is required, also can contain any additional data that will be saved and passed back
    */
   file: {
     /**
@@ -79,15 +64,6 @@ export interface UploadResponseFormat<AdditionalFileData = {}> {
 
 /**
  * Core image tool data structure
- * @template [Actions={}] - Type for custom actions
- * @template [AdditionalFileData={}] - Type for additional file metadata
- * @typedef {Object} ImageToolData
- * @property {string} caption - Image description text
- * @property {boolean} withBorder - Border display state
- * @property {boolean} withBackground - Background display state
- * @property {boolean} stretched - Stretch display state
- * @property {Object} file - File reference data
- * @property {string} file.url - Image source URL
  */
 export type ImageToolData<Actions = {}, AdditionalFileData = {}> = {
   /**
@@ -124,26 +100,24 @@ export type ImageToolData<Actions = {}, AdditionalFileData = {}> = {
 
 /**
  * Feature toggle configuration
- * @typedef {Object} FeaturesConfig
- * @property {boolean} [background] - Background toggle state
- * @property {boolean} [border] - Border toggle state
- * @property {boolean|'optional'} [caption] - Caption display mode
- * @property {boolean} [stretch] - Stretch toggle state
  */
 export type FeaturesConfig = {
   /**
    * Flag to enable/disable tune - background.
    */
   background?: boolean;
+
   /**
    * Flag to enable/disable tune - border.
    */
   border?: boolean;
+
   /**
    * Flag to enable/disable caption.
    * Can be set to 'optional' to allow users to toggle via block tunes.
    */
   caption?: boolean | "optional";
+
   /**
    * Flag to enable/disable tune - stretched
    */
@@ -152,21 +126,6 @@ export type FeaturesConfig = {
 
 /**
  * Main image tool configuration
- * @typedef {Object} ImageConfig
- * @property {Object} endpoints - Upload endpoint URLs
- * @property {string} endpoints.byFile - File upload endpoint
- * @property {string} endpoints.byUrl - URL upload endpoint
- * @property {string} [field] - Form field name for uploads
- * @property {string} [types] - Allowed MIME types
- * @property {string} [captionPlaceholder] - Caption input placeholder
- * @property {Object} [additionalRequestData] - Additional POST data
- * @property {Object} [additionalRequestHeaders] - Additional headers
- * @property {string} [buttonContent] - Custom button content
- * @property {Object} [uploader] - Custom uploader implementation
- * @property {function(File): Promise<UploadResponseFormat>} [uploader.uploadByFile] - Custom file upload handler
- * @property {function(string): Promise<UploadResponseFormat>} [uploader.uploadByUrl] - Custom URL upload handler
- * @property {ActionConfig[]} [actions] - Custom actions
- * @property {FeaturesConfig} [features] - Feature toggle states
  */
 export interface ImageConfig {
   /**
@@ -242,10 +201,6 @@ export interface ImageConfig {
 
 /**
  * Extended paste event details
- * @typedef {Object} HTMLPasteEventDetailExtended
- * @extends {HTMLPasteEventDetail}
- * @property {Object} data - Paste event payload
- * @property {string} data.src - Pasted image source URL
  */
 export interface HTMLPasteEventDetailExtended extends HTMLPasteEventDetail {
   /**
@@ -261,8 +216,6 @@ export interface HTMLPasteEventDetailExtended extends HTMLPasteEventDetail {
 
 /**
  * Image setter parameter type
- * @typedef {Object} ImageSetterParam
- * @property {string} url - Image source URL
  */
 export type ImageSetterParam = {
   /**
