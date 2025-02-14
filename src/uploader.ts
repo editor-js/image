@@ -1,8 +1,8 @@
-import ajax from "@codexteam/ajax";
-import type { AjaxResponse } from "@codexteam/ajax";
-import isPromise from "./utils/isPromise";
-import type { UploadOptions } from "./types/types";
-import type { UploadResponseFormat, ImageConfig } from "./types/types";
+import ajax from '@codexteam/ajax';
+import type { AjaxResponse } from '@codexteam/ajax';
+import isPromise from './utils/isPromise';
+import type { UploadOptions } from './types/types';
+import type { UploadResponseFormat, ImageConfig } from './types/types';
 
 /**
  * Params interface for Uploader constructor
@@ -74,12 +74,12 @@ export default class Uploader {
     // custom uploading
     if (
       this.config.uploader &&
-      typeof this.config.uploader.uploadByFile === "function"
+      typeof this.config.uploader.uploadByFile === 'function'
     ) {
       const uploadByFile = this.config.uploader.uploadByFile;
 
       upload = ajax
-        .selectFiles({ accept: this.config.types ?? "image/*" })
+        .selectFiles({ accept: this.config.types ?? 'image/*' })
         .then((files: File[]) => {
           preparePreview(files[0]);
 
@@ -87,7 +87,7 @@ export default class Uploader {
 
           if (!isPromise(customUpload)) {
             console.warn(
-              "Custom uploader method uploadByFile should return a Promise"
+              'Custom uploader method uploadByFile should return a Promise'
             );
           }
 
@@ -98,9 +98,9 @@ export default class Uploader {
     } else {
       upload = ajax
         .transport({
-          url: this.config.endpoints.byFile ?? "",
+          url: this.config.endpoints.byFile ?? '',
           data: this.config.additionalRequestData,
-          accept: this.config.types ?? "image/*",
+          accept: this.config.types ?? 'image/*',
           headers: this.config.additionalRequestHeaders as Record<
             string,
             string
@@ -108,7 +108,7 @@ export default class Uploader {
           beforeSend: (files: File[]) => {
             preparePreview(files[0]);
           },
-          fieldName: this.config.field ?? "image",
+          fieldName: this.config.field ?? 'image',
         })
         .then(
           (response: AjaxResponse) => response.body as UploadResponseFormat
@@ -138,13 +138,13 @@ export default class Uploader {
      */
     if (
       this.config.uploader &&
-      typeof this.config.uploader.uploadByUrl === "function"
+      typeof this.config.uploader.uploadByUrl === 'function'
     ) {
       upload = this.config.uploader.uploadByUrl(url);
 
       if (!isPromise(upload)) {
         console.warn(
-          "Custom uploader method uploadByUrl should return a Promise"
+          'Custom uploader method uploadByUrl should return a Promise'
         );
       }
     } else {
@@ -153,7 +153,7 @@ export default class Uploader {
        */
       upload = ajax
         .post({
-          url: this.config.endpoints.byUrl,
+          url: this.config.endpoints.byUrl ?? '',
           data: Object.assign(
             {
               url: url,
@@ -205,15 +205,15 @@ export default class Uploader {
      */
     if (
       this.config.uploader &&
-      typeof this.config.uploader.uploadByFile === "function"
+      typeof this.config.uploader.uploadByFile === 'function'
     ) {
       // Convert Blob to File with a dummy filename
-      const fileObj = new File([file], "pasted-image", { type: file.type });
+      const fileObj = new File([file], 'pasted-image', { type: file.type });
       upload = this.config.uploader.uploadByFile(fileObj);
 
       if (!isPromise(upload)) {
         console.warn(
-          "Custom uploader method uploadByFile should return a Promise"
+          'Custom uploader method uploadByFile should return a Promise'
         );
       }
     } else {
@@ -222,7 +222,7 @@ export default class Uploader {
        */
       const formData = new FormData();
 
-      formData.append(this.config.field ?? "image", file);
+      formData.append(this.config.field ?? 'image', file);
 
       if (
         this.config.additionalRequestData &&
@@ -237,7 +237,7 @@ export default class Uploader {
 
       upload = ajax
         .post({
-          url: this.config.endpoints.byFile ?? "",
+          url: this.config.endpoints.byFile ?? '',
           data: formData,
           type: ajax.contentType.JSON,
           headers: this.config.additionalRequestHeaders as Record<
