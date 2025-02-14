@@ -1,4 +1,4 @@
-import ajax from "@codexteam/ajax";
+import ajax from '@codexteam/ajax';
 import type { AjaxResponse } from "@codexteam/ajax";
 import isPromise from "./utils/isPromise";
 import type { UploadOptions } from "./types/types";

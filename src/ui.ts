@@ -1,7 +1,7 @@
-import { IconPicture } from "@codexteam/icons";
-import { make } from "./utils/dom";
-import type { API } from "@editorjs/editorjs";
-import type { ImageConfig } from "./types/types";
+import { IconPicture } from '@codexteam/icons';
+import { make } from './utils/dom';
+import type { API } from '@editorjs/editorjs';
+import type { ImageConfig } from './types/types';
 
 /**
  * Enumeration representing the different states of the UI.
@@ -10,17 +10,17 @@ export enum UiState {
   /**
    * The UI is in an empty state, with no image loaded or being selected.
    */
-  Empty = "empty",
+  Empty = 'empty',
 
   /**
    * The UI is in an uploading state, indicating an image is currently being uploaded.
    */
-  Uploading = "uploading",
+  Uploading = 'uploading',
 
   /**
    * The UI is in a filled state, with an image successfully loaded.
    */
-  Filled = "filled",
+  Filled = 'filled',
 }
 
 /**
@@ -125,12 +125,12 @@ export default class Ui {
     this.onSelectFile = onSelectFile;
     this.readOnly = readOnly;
     this.nodes = {
-      wrapper: make("div", [this.CSS.baseClass, this.CSS.wrapper]),
-      imageContainer: make("div", [this.CSS.imageContainer]),
+      wrapper: make('div', [this.CSS.baseClass, this.CSS.wrapper]),
+      imageContainer: make('div', [this.CSS.imageContainer]),
       fileButton: this.createFileButton() as HTMLButtonElement,
       imageEl: undefined,
-      imagePreloader: make("div", this.CSS.imagePreloader),
-      caption: make("div", [this.CSS.input, this.CSS.caption], {
+      imagePreloader: make('div', this.CSS.imagePreloader),
+      caption: make('div', [this.CSS.input, this.CSS.caption], {
         contentEditable: !this.readOnly,
       }),
     };
@@ -187,7 +187,7 @@ export default class Ui {
    * Hide uploading preloader
    */
   public hidePreloader(): void {
-    this.nodes.imagePreloader.style.backgroundImage = "";
+    this.nodes.imagePreloader.style.backgroundImage = '';
     this.toggleStatus(UiState.Empty);
   }
 
@@ -199,7 +199,7 @@ export default class Ui {
     /**
      * Check for a source extension to compose element correctly: video tag for mp4, img — for others
      */
-    const tag = /\.mp4$/.test(url) ? "VIDEO" : "IMG";
+    const tag = /\.mp4$/.test(url) ? 'VIDEO' : 'IMG';
 
     const attributes: { [key: string]: string | boolean } = {
       src: url,
@@ -210,12 +210,12 @@ export default class Ui {
      * - IMG: load
      * - VIDEO: loadeddata
      */
-    let eventName = "load";
+    let eventName = 'load';
 
     /**
      * Update attributes and eventName if source is a mp4 video
      */
-    if (tag === "VIDEO") {
+    if (tag === 'VIDEO') {
       /**
        * Add attributes for playing muted mp4 as a gif
        */
@@ -227,7 +227,7 @@ export default class Ui {
       /**
        * Change event to be listened
        */
-      eventName = "loadeddata";
+      eventName = 'loadeddata';
     }
 
     /**
@@ -245,7 +245,7 @@ export default class Ui {
        * Preloader does not exists on first rendering with presaved data
        */
       if (this.nodes.imagePreloader !== undefined) {
-        this.nodes.imagePreloader.style.backgroundImage = "";
+        this.nodes.imagePreloader.style.backgroundImage = '';
       }
     });
 
@@ -292,11 +292,11 @@ export default class Ui {
       /**
        * Tool's classes
        */
-      wrapper: "image-tool",
-      imageContainer: "image-tool__image",
-      imagePreloader: "image-tool__image-preloader",
-      imageEl: "image-tool__image-picture",
-      caption: "image-tool__caption",
+      wrapper: 'image-tool',
+      imageContainer: 'image-tool__image',
+      imagePreloader: 'image-tool__image-preloader',
+      imageEl: 'image-tool__image-picture',
+      caption: 'image-tool__caption',
     };
   }
 
@@ -304,13 +304,13 @@ export default class Ui {
    * Creates upload-file button
    */
   private createFileButton(): HTMLElement {
-    const button = make("div", [this.CSS.button]);
+    const button = make('div', [this.CSS.button]);
 
     button.innerHTML =
       this.config.buttonContent ??
-      `${IconPicture} ${this.api.i18n.t("Select an Image")}`;
+      `${IconPicture} ${this.api.i18n.t('Select an Image')}`;
 
-    button.addEventListener("click", () => {
+    button.addEventListener('click', () => {
       this.onSelectFile();
     });
 
