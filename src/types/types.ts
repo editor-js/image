@@ -140,7 +140,7 @@ export interface ImageConfig {
     /**
      * Endpoints for URL upload.
      */
-    byUrl: string;
+    byUrl?: string;
   };
 
   /**
