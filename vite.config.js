@@ -16,14 +16,6 @@ export default {
       formats: ['es', 'umd']
     },
     sourcemap: true,
-    rollupOptions: {
-      external: ['@editorjs/editorjs'],
-      output: {
-        globals: {
-          '@editorjs/editorjs': 'EditorJS'
-        }
-      }
-    }
   },
   server: {
     open: './dev/index.html',
