@@ -177,12 +177,12 @@ export default class ImageTool implements BlockTool {
      * Set saved state
      */
     this._data = {
-      caption: "",
+      caption: '',
       withBorder: false,
       withBackground: false,
       stretched: false,
       file: {
-        url: "",
+        url: '',
       },
     };
     this.data = data;
