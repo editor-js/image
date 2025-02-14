@@ -115,15 +115,14 @@ export default class Uploader {
         );
     }
 
-    upload
+    // Return the upload promise instead of resolving immediately
+    return upload
       .then((response) => {
         this.onUpload(response);
       })
       .catch((error: string) => {
         this.onError(error);
       });
-
-    return Promise.resolve();
   }
 
   /**
@@ -172,15 +171,14 @@ export default class Uploader {
         );
     }
 
-    upload
+    // Return the upload promise instead of resolving immediately
+    return upload
       .then((response: UploadResponseFormat) => {
         this.onUpload(response);
       })
       .catch((error: string) => {
         this.onError(error);
       });
-
-    return Promise.resolve();
   }
 
   /**
@@ -252,14 +250,13 @@ export default class Uploader {
         );
     }
 
-    upload
+    // Return the upload promise instead of resolving immediately
+    return upload
       .then((response) => {
         this.onUpload(response);
       })
       .catch((error: string) => {
         this.onError(error);
       });
-
-    return Promise.resolve();
   }
 }
