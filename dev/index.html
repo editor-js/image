@@ -35,6 +35,9 @@
           image: {
             class: ImageTool,
             config: {
+              renderPreHook: function (data) {
+                return data;
+              },
               endpoints: {
                 byFile: "http://localhost:8008/uploadFile",
                 byUrl: "http://localhost:8008/fetchUrl",
