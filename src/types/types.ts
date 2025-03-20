@@ -40,7 +40,7 @@ export interface ActionConfig {
    * An optional action function to be executed when the tune is activated.
    */
   action?: Function;
-};
+}
 
 /**
  * UploadResponseFormat interface representing the response format expected from the backend on file uploading.
@@ -65,7 +65,7 @@ export interface UploadResponseFormat<AdditionalFileData = {}> {
 }
 
 /**
- * ImageToolData type representing the input and output data format for the image tool, including optional custome actions.
+ * ImageToolData type representing the input and output data format for the image tool, including optional custom actions.
  */
 export type ImageToolData<Actions = {}, AdditionalFileData = {}> = {
   /**
@@ -89,8 +89,7 @@ export type ImageToolData<Actions = {}, AdditionalFileData = {}> = {
   stretched: boolean;
 
   /**
-   * Object containing the URL of the image file.
-   * Also can contain any additional data.
+   * Object containing the URL of the image file, can also contain additional data.
    */
   file: {
     /**
@@ -143,6 +142,13 @@ export interface ImageConfig {
      */
     byUrl?: string;
   };
+
+  /**
+   * Optional function that is run prior to rendering the image. This can prove useful for e.g. images that are
+   * uploaded to private s3 buckets and need a pre-signed url generate before they can be viewed.
+   * Input is a function that is allowed to mutate the imageToolData object.
+   */
+  renderPreHook?: (data: ImageToolData) => ImageToolData;
 
   /**
    * Field name for the uploaded image.
