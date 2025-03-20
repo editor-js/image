@@ -21,6 +21,7 @@
               data: {
                 file: {
                   url: "https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+                  imageId: "this is a test"
                 },
                 withBorder: false,
                 withBackground: false,
@@ -35,6 +36,12 @@
           image: {
             class: ImageTool,
             config: {
+              renderPreHook: function (data) {
+                if (data.file.imageId !== undefined) {
+                  data.file.url = "https://plus.unsplash.com/premium_photo-1741194732785-4624b6e5f0b5?q=80&w=2433&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                }
+                return data;
+              },
               endpoints: {
                 byFile: "http://localhost:8008/uploadFile",
                 byUrl: "http://localhost:8008/fetchUrl",

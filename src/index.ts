@@ -98,6 +98,7 @@ export default class ImageTool implements BlockTool {
      * Tool's initial config
      */
     this.config = {
+      renderPreHook: config.renderPreHook,
       endpoints: config.endpoints,
       additionalRequestData: config.additionalRequestData,
       additionalRequestHeaders: config.additionalRequestHeaders,
@@ -281,7 +282,7 @@ export default class ImageTool implements BlockTool {
       toggle: tune.toggle,
       isActive: isActive(tune),
       onActivate: () => {
-        /** If it'a user defined tune, execute it's callback stored in action property */
+        /** If it's a user defined tune, execute its callback stored in action property */
         if (typeof tune.action === 'function') {
           tune.action(tune.name);
 
@@ -291,7 +292,7 @@ export default class ImageTool implements BlockTool {
 
         /**
          * For the caption tune, we can't rely on the this._data
-         * because it can be manualy toggled by user
+         * because it can be manually toggled by user
          */
         if (tune.name === 'caption') {
           this.isCaptionEnabled = !(this.isCaptionEnabled ?? false);
@@ -307,7 +308,7 @@ export default class ImageTool implements BlockTool {
    * Fires after clicks on the Toolbox Image Icon
    * Initiates click on the Select File button
    */
-  public appendCallback(): void {
+  public rendered(): void {
     this.ui.nodes.fileButton.click();
   }
 
@@ -420,6 +421,10 @@ export default class ImageTool implements BlockTool {
   private set image(file: ImageSetterParam | undefined) {
     this._data.file = file || { url: '' };
 
+    if (this.config.renderPreHook !== undefined) {
+      this._data = this.config.renderPreHook(this._data);
+    }
+
     if (file && file.url) {
       this.ui.fillImage(file.url);
     }
@@ -460,7 +465,7 @@ export default class ImageTool implements BlockTool {
     if (tuneName === 'caption') {
       this.ui.applyTune(tuneName, state);
 
-      if (state == false) {
+      if (!state) {
         this._data.caption = '';
         this.ui.fillCaption('');
       }
