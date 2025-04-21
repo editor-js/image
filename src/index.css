@@ -86,7 +86,9 @@
   &--empty,
   &--loading {
     ^&__caption {
-      display: none;
+      /* display: none; */
+      visibility: hidden;
+      position: absolute;
     }
   }
 
