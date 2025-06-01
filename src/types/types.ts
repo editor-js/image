@@ -10,6 +10,12 @@ export interface UploadOptions {
    * @returns void
    */
   onPreview: (src: string) => void;
+
+  /**
+   * Performs an action before the upload starts.
+   * @returns void
+   */
+  onPreUpload?: () => void;
 }
 
 /**
@@ -40,7 +46,7 @@ export interface ActionConfig {
    * An optional action function to be executed when the tune is activated.
    */
   action?: Function;
-};
+}
 
 /**
  * UploadResponseFormat interface representing the response format expected from the backend on file uploading.
@@ -74,24 +80,14 @@ export type ImageToolData<Actions = {}, AdditionalFileData = {}> = {
   caption: string;
 
   /**
-   * Caption for the image.
+   * Height of the image.
    */
   height: string;
 
   /**
-   * Flag indicating whether the image has a border.
+   * Width of the image.
    */
-  withBorder: boolean;
-
-  /**
-   * Flag indicating whether the image has a background.
-   */
-  withBackground: boolean;
-
-  /**
-   * Flag indicating whether the image is stretched.
-   */
-  stretched: boolean;
+  width: string;
 
   /**
    * Object containing the URL of the image file.
@@ -114,7 +110,6 @@ export interface ImageConfig {
    * Endpoints for upload, whether using file or URL.
    */
   endpoints: {
-
     /**
      * Endpoint for file upload.
      */
@@ -135,16 +130,10 @@ export interface ImageConfig {
    * Allowed mime-types for the uploaded image.
    */
   types?: string;
-
   /**
    * Placeholder text for the caption field.
    */
   captionPlaceholder?: string;
-
-  /**
-   * numberInputPlaceholder text for the image height field.
-   */
-  numberInputPlaceholder?: string;
 
   /**
    * Additional data to send with requests.
@@ -165,7 +154,6 @@ export interface ImageConfig {
    * Optional custom uploader.
    */
   uploader?: {
-
     /**
      * Method to upload an image by file.
      */
@@ -181,11 +169,6 @@ export interface ImageConfig {
    * Additional actions for the tool.
    */
   actions?: ActionConfig[];
-
-  /**
-   * Display tool tunes
-   */
-  showTunes?: boolean;
 
   /**
    * Display image height input

@@ -20,8 +20,8 @@ enum UiState {
   /**
    * The UI is in a filled state, with an image successfully loaded.
    */
-  Filled = 'filled'
-};
+  Filled = 'filled',
+}
 
 /**
  * Nodes interface representing various elements in the UI.
@@ -45,7 +45,7 @@ interface Nodes {
   /**
    * Represents the image element in the UI, if one is present; otherwise, it's undefined.
    */
-  imageEl?: HTMLElement;
+  imageEl?: HTMLImageElement | HTMLVideoElement;
 
   /**
    * Preloader element for the image.
@@ -56,11 +56,6 @@ interface Nodes {
    * Caption element for the image.
    */
   caption: HTMLElement;
-
-  /**
-   * Caption element for the image.
-   */
-  numberInput: HTMLElement;
 }
 
 /**
@@ -89,7 +84,6 @@ interface ConstructorParams {
  * Class for working with UI:
  *  - rendering base structure
  *  - show/hide preview
- *  - apply tune view
  */
 export default class Ui {
   /**
@@ -101,6 +95,8 @@ export default class Ui {
    * API instance for Editor.js.
    */
   private api: API;
+
+  private isResizing: boolean = false;
 
   /**
    * Configuration for the image tool.
@@ -116,6 +112,8 @@ export default class Ui {
    * Flag indicating if the UI is in read-only mode.
    */
   private readOnly: boolean;
+
+  private contentRatio: number = 1;
 
   /**
    * @param ui - image tool Ui module
@@ -138,10 +136,12 @@ export default class Ui {
       caption: make('div', [this.CSS.caption], {
         contentEditable: !this.readOnly,
       }),
-      numberInput: make('div', [this.CSS.input], {
-        contentEditable: !this.readOnly,
-      }),
     };
+
+    // Bind methods to the class instance
+    this.resizeImage = this.resizeImage.bind(this);
+    this.addFileButton = this.addFileButton.bind(this);
+    this.removeFileButton = this.removeFileButton.bind(this);
 
     /**
      * Create base structure
@@ -155,24 +155,11 @@ export default class Ui {
      *  </wrapper>
      */
     this.nodes.caption.dataset.placeholder = this.config.captionPlaceholder;
-    this.nodes.numberInput.dataset.placeholder = this.config.numberInputPlaceholder;
+
     this.nodes.imageContainer.appendChild(this.nodes.imagePreloader);
     this.nodes.wrapper.appendChild(this.nodes.imageContainer);
 
-    if (this.config.showHeightInput ?? false) {
-      this.nodes.wrapper.appendChild(this.nodes.numberInput);
-    }
-
     this.nodes.wrapper.appendChild(this.nodes.fileButton);
-  }
-
-  /**
-   * Apply visual representation of activated tune
-   * @param tuneName - one of available tunes {@link Tunes.tunes}
-   * @param status - true for enable, false for disable
-   */
-  public applyTune(tuneName: string, status: boolean): void {
-    this.nodes.wrapper.classList.toggle(`${this.CSS.wrapper}--${tuneName}`, status);
   }
 
   /**
@@ -180,7 +167,10 @@ export default class Ui {
    * @param toolData - saved tool data
    */
   public render(toolData: ImageToolData): HTMLElement {
-    if (toolData.file === undefined || Object.keys(toolData.file).length === 0) {
+    if (
+      toolData.file === undefined ||
+      Object.keys(toolData.file).length === 0
+    ) {
       this.toggleStatus(UiState.Empty);
     } else {
       this.toggleStatus(UiState.Uploading);
@@ -195,7 +185,6 @@ export default class Ui {
    */
   public showPreloader(src: string): void {
     this.nodes.imagePreloader.style.backgroundImage = `url(${src})`;
-
     this.toggleStatus(UiState.Uploading);
   }
 
@@ -211,7 +200,7 @@ export default class Ui {
    * Shows an image
    * @param url - image source
    */
-  public fillImage(url: string): void {
+  public fillImage(url: string, height?: string, width?: string): void {
     /**
      * Check for a source extension to compose element correctly: video tag for mp4, img — for others
      */
@@ -250,14 +239,27 @@ export default class Ui {
     /**
      * Compose tag with defined attributes
      */
-    this.nodes.imageEl = make(tag, this.CSS.imageEl, attributes);
+    this.nodes.imageEl = make(
+      tag,
+      [this.CSS.imageEl, 'resizable-image'],
+      attributes
+    ) as HTMLImageElement | HTMLVideoElement;
 
     /**
      * Add load event listener
      */
-    this.nodes.imageEl.addEventListener(eventName, () => {
+    this.nodes.imageEl.addEventListener(eventName, (e: Event) => {
       this.toggleStatus(UiState.Filled);
+      if (height !== undefined && width !== undefined) {
+        this.nodes.imageEl!.style.width = `${width}px`;
 
+        this.nodes.imageEl!.style.height = `${height}px`;
+        this.contentRatio = parseInt(height, 10) / parseInt(width, 10);
+      } else {
+        this.contentRatio =
+          (this.nodes.imageEl?.clientHeight ?? 1) /
+          (this.nodes.imageEl?.clientWidth ?? 1);
+      }
       /**
        * Preloader does not exists on first rendering with presaved data
        */
@@ -266,11 +268,50 @@ export default class Ui {
       }
     });
 
-    this.nodes.imageContainer.appendChild(this.nodes.imageEl);
+    const contentWrapper = make('div', ['content-wrapper']);
 
-    if (this.config.showCaption ?? true) {
-      this.nodes.imageContainer.appendChild(this.nodes.caption);
+    const imageContainer = make('div', ['image-container']);
+
+    imageContainer.appendChild(this.nodes.imageEl);
+    contentWrapper.appendChild(imageContainer);
+    this.nodes.imageContainer.appendChild(contentWrapper);
+    if (!this.readOnly) {
+      this.nodes.imageContainer.classList.add('resizable-container');
+
+      imageContainer.appendChild(this.createResizer('left'));
+      imageContainer.appendChild(this.createResizer('right'));
     }
+    if (this.config.showCaption ?? true) {
+      contentWrapper.appendChild(this.nodes.caption);
+    }
+  }
+
+  /**
+   *
+   * @param e - mouse event
+   * @param align - left or right
+   */
+  public resizeImage(e: MouseEvent, align: 'left' | 'right'): void {
+    if (!this.isResizing || this.nodes.imageEl === undefined) {
+      return;
+    }
+    const rect = this.nodes.imageEl.getBoundingClientRect();
+
+    let offset = rect.left - e.clientX;
+
+    if (align === 'right') {
+      offset = e.clientX - rect.right;
+    }
+
+    let newWidth = rect.width + offset;
+
+    // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+    newWidth = Math.max(newWidth, 30);
+    const newHeight = newWidth * this.contentRatio;
+
+    this.nodes.imageEl.style.width = `${newWidth}px`;
+
+    this.nodes.imageEl.style.height = `${newHeight}px`;
   }
 
   /**
@@ -280,16 +321,6 @@ export default class Ui {
   public fillCaption(text: string): void {
     if (this.nodes.caption !== undefined) {
       this.nodes.caption.innerHTML = text;
-    }
-  }
-
-  /**
-   * Shows height input
-   * @param text - height content text
-   */
-  public fillHeight(text: string): void {
-    if (this.nodes.numberInput !== undefined) {
-      this.nodes.numberInput.innerHTML = text;
     }
   }
 
@@ -311,9 +342,8 @@ export default class Ui {
       imagePreloader: 'image-tool__image-preloader',
       imageEl: 'image-tool__image-picture',
       caption: 'image-tool__caption',
-      numberInput: 'image-tool__number-input',
     };
-  };
+  }
 
   /**
    * Creates upload-file button
@@ -321,7 +351,9 @@ export default class Ui {
   private createFileButton(): HTMLElement {
     const button = make('div', [this.CSS.button]);
 
-    button.innerHTML = this.config.buttonContent ?? `${IconPicture} ${this.api.i18n.t('Select an Image')}`;
+    button.innerHTML =
+      this.config.buttonContent ??
+      `${IconPicture} ${this.api.i18n.t('Select an Image')}`;
 
     button.addEventListener('click', () => {
       this.onSelectFile();
@@ -337,8 +369,55 @@ export default class Ui {
   private toggleStatus(status: UiState): void {
     for (const statusType in UiState) {
       if (Object.prototype.hasOwnProperty.call(UiState, statusType)) {
-        this.nodes.wrapper.classList.toggle(`${this.CSS.wrapper}--${UiState[statusType as keyof typeof UiState]}`, status === UiState[statusType as keyof typeof UiState]);
+        this.nodes.wrapper.classList.toggle(
+          `${this.CSS.wrapper}--${UiState[statusType as keyof typeof UiState]}`,
+          status === UiState[statusType as keyof typeof UiState]
+        );
       }
     }
+  }
+
+  /**
+   *
+   * @param align - left or right
+   * @returns HTMLElement
+   */
+  private createResizer(align: 'left' | 'right'): HTMLElement {
+    const container = make('div', [`resize-container-${align}`]);
+
+    const resizeHandle = make('div', ['resize-handle']);
+
+    container.appendChild(resizeHandle);
+
+    container.addEventListener('mousedown', (e) => {
+      e.preventDefault();
+      this.isResizing = true;
+
+      const onMouseMove = (evt: MouseEvent): void => {
+        this.resizeImage(evt, align);
+      };
+
+      document.addEventListener('mousemove', onMouseMove);
+
+      const onMouseUp = (): void => {
+        this.isResizing = false;
+
+        document.removeEventListener('mousemove', onMouseMove);
+
+        document.removeEventListener('mouseup', onMouseUp);
+      };
+
+      document.addEventListener('mouseup', onMouseUp);
+    });
+
+    return container;
+  }
+
+  public removeFileButton(): void {
+    this.nodes.wrapper.removeChild(this.nodes.fileButton);
+  }
+
+  public addFileButton(): void {
+    this.nodes.wrapper.appendChild(this.nodes.fileButton);
   }
 }

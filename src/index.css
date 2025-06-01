@@ -12,7 +12,7 @@
       max-width: 100%;
       vertical-align: bottom;
       display: block;
-      margin: 0 auto;
+      /* margin: 0 auto; */
     }
 
     &-preloader {
@@ -26,7 +26,7 @@
       background-position: center center;
 
       &::after {
-        content: "";
+        content: '';
         position: absolute;
         z-index: 3;
         width: 60px;
@@ -47,11 +47,15 @@
   &__caption {
     color: #707684;
     font-weight: normal;
-    text-align: center;
-  
-    &[contentEditable="true"][data-placeholder] {
+    text-align: left;
+    width: 100%;
+    outline: none;
+    box-shadow: none;
+
+
+    &[contentEditable='true'][data-placeholder] {
       position: relative;
-  
+
       &::before {
         position: absolute !important;
         content: attr(data-placeholder);
@@ -63,18 +67,18 @@
         top: 0;
         left: 0;
       }
-  
+
       &:empty {
         &::before {
           display: block;
         }
-  
+
         &:focus::before {
           display: none;
         }
       }
     }
-  
+
     &::placeholder {
       text-align: center;
       color: #707684;
@@ -123,7 +127,7 @@
       margin: 0 6px 0 0;
     }
   }
-  
+
   &--filled {
     .cdx-button {
       display: none;
@@ -183,7 +187,6 @@
       }
     }
   }
-
 }
 
 @keyframes image-preloader-spin {
@@ -193,4 +196,82 @@
   100% {
     transform: rotate(360deg);
   }
+}
+
+.resizable-container {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+.resizable-image {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+.content-wrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto;
+}
+
+.image-container {
+  position: relative;
+  width: fit-content;  
+
+  &:hover {
+    .resize-handle {
+      opacity: 1;
+    }
+    .resize-container-left {
+      pointer-events: auto;
+    }
+    .resize-container-right {
+      pointer-events: auto;
+    }
+  }
+}
+
+.resize-container-left {
+  position: absolute;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  left: 0px;
+  top: 0px;
+  z-index: 1;
+  height: 100%;
+  width: 15px;
+  cursor: col-resize;
+}
+
+.resize-handle {
+  opacity: 0;
+  transition: opacity 200ms ease-in-out;
+  border-radius: 20px;
+  background: rgba(15, 15, 15, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  width: 6px;
+  height: 48px;
+  max-height: 50%;
+}
+
+.resize-container-right {
+  position: absolute;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  right: 0px;
+  top: 0px;
+  z-index: 1;
+  height: 100%;
+  width: 15px;
+  cursor: col-resize;
 }
