@@ -201,6 +201,7 @@ export default class ImageTool implements BlockTool {
   public render(): HTMLDivElement {
     if (this.config.features?.caption === true || this.config.features?.caption === undefined || (this.config.features?.caption === 'optional' && this.data.caption)) {
       this.isCaptionEnabled = true;
+      this.ui.applyTune('caption', true);
     }
 
     return this.ui.render() as HTMLDivElement;
@@ -402,6 +403,8 @@ export default class ImageTool implements BlockTool {
     });
 
     if (data.caption) {
+      this.setTune('caption', true);
+    } else if (this.config.features?.caption === true) {
       this.setTune('caption', true);
     }
   }
