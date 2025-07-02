@@ -29,16 +29,46 @@
  */
 
 import type { TunesMenuConfig } from '@editorjs/editorjs/types/tools';
-import type { API, ToolboxConfig, PasteConfig, BlockToolConstructorOptions, BlockTool, BlockAPI, PasteEvent, PatternPasteEventDetail, FilePasteEventDetail } from '@editorjs/editorjs';
+import type {
+  API,
+  ToolboxConfig,
+  PasteConfig,
+  BlockToolConstructorOptions,
+  BlockTool,
+  BlockAPI,
+  PasteEvent,
+  PatternPasteEventDetail,
+  FilePasteEventDetail,
+} from '@editorjs/editorjs';
 import './index.css';
 
 import Ui from './ui';
 import Uploader from './uploader';
 
-import { IconAddBorder, IconStretch, IconAddBackground, IconPicture, IconText } from '@codexteam/icons';
-import type { ActionConfig, UploadResponseFormat, ImageToolData, ImageConfig, HTMLPasteEventDetailExtended, ImageSetterParam, FeaturesConfig } from './types/types';
+import {
+  IconAddBorder,
+  IconStretch,
+  IconAddBackground,
+  IconPicture,
+  IconText,
+} from '@codexteam/icons';
+import type {
+  ActionConfig,
+  UploadResponseFormat,
+  ImageToolData,
+  ImageConfig,
+  HTMLPasteEventDetailExtended,
+  ImageSetterParam,
+  FeaturesConfig,
+} from './types/types';
 
-type ImageToolConstructorOptions = BlockToolConstructorOptions<ImageToolData, ImageConfig>;
+/**
+ * Constructor options for ImageTool
+ */
+type ImageToolConstructorOptions = BlockToolConstructorOptions<
+  ImageToolData,
+  ImageConfig
+>;
 
 /**
  * Implementation of ImageTool class
@@ -47,27 +77,27 @@ export default class ImageTool implements BlockTool {
   /**
    * Editor.js API instance
    */
-  private api: API;
+  private readonly api: API;
 
   /**
    * Current Block API instance
    */
-  private block: BlockAPI;
+  private readonly block: BlockAPI;
 
   /**
    * Configuration for the ImageTool
    */
-  private config: ImageConfig;
+  private readonly config: ImageConfig;
 
   /**
    * Uploader module instance
    */
-  private uploader: Uploader;
+  private readonly uploader: Uploader;
 
   /**
    * UI module instance
    */
-  private ui: Ui;
+  private readonly ui: Ui;
 
   /**
    * Stores current block data internally
@@ -90,7 +120,13 @@ export default class ImageTool implements BlockTool {
    * @param tool.readOnly - read-only mode flag
    * @param tool.block - current Block API
    */
-  constructor({ data, config, api, readOnly, block }: ImageToolConstructorOptions) {
+  constructor({
+    data,
+    config,
+    api,
+    readOnly,
+    block,
+  }: ImageToolConstructorOptions) {
     this.api = api;
     this.block = block;
 
@@ -103,7 +139,9 @@ export default class ImageTool implements BlockTool {
       additionalRequestHeaders: config.additionalRequestHeaders,
       field: config.field,
       types: config.types,
-      captionPlaceholder: this.api.i18n.t(config.captionPlaceholder ?? 'Caption'),
+      captionPlaceholder: this.api.i18n.t(
+        config.captionPlaceholder ?? 'Caption'
+      ),
       buttonContent: config.buttonContent,
       uploader: config.uploader,
       actions: config.actions,
@@ -199,7 +237,11 @@ export default class ImageTool implements BlockTool {
    * Renders Block content
    */
   public render(): HTMLDivElement {
-    if (this.config.features?.caption === true || this.config.features?.caption === undefined || (this.config.features?.caption === 'optional' && this.data.caption)) {
+    if (
+      this.config.features?.caption === true ||
+      this.config.features?.caption === undefined ||
+      (this.config.features?.caption === 'optional' && this.data.caption)
+    ) {
       this.isCaptionEnabled = true;
       this.ui.applyTune('caption', true);
     }
@@ -252,13 +294,18 @@ export default class ImageTool implements BlockTool {
     }
 
     const availableTunes = tunes.filter((tune) => {
-      const featureKey = Object.keys(featureTuneMap).find(key => featureTuneMap[key] === tune.name);
+      const featureKey = Object.keys(featureTuneMap).find(
+        (key) => featureTuneMap[key] === tune.name
+      );
 
       if (featureKey === 'caption') {
         return this.config.features?.caption !== false;
       }
 
-      return featureKey == null || this.config.features?.[featureKey as keyof FeaturesConfig] !== false;
+      return (
+        featureKey == null ||
+        this.config.features?.[featureKey as keyof FeaturesConfig] !== false
+      );
     });
 
     /**
@@ -275,7 +322,7 @@ export default class ImageTool implements BlockTool {
       return currentState;
     };
 
-    return availableTunes.map(tune => ({
+    return availableTunes.map((tune) => ({
       icon: tune.icon,
       label: this.api.i18n.t(tune.title),
       name: tune.name,
@@ -383,7 +430,7 @@ export default class ImageTool implements BlockTool {
 
   /**
    * Private methods
-   * ̿̿ ̿̿ ̿̿ ̿'̿'\̵͇̿̿\з= ( ▀ ͜͞ʖ▀) =ε/̵͇̿̿/’̿’̿ ̿ ̿̿ ̿̿ ̿̿
+   * ̿̿ ̿̿ ̿̿ ̿'̿'\̵͇̿̿\з= ( ▀ ͜͞ʖ▀) =ε/̵͇̿̿/’̿'̿ ̿ ̿̿ ̿̿ ̿̿
    */
 
   /**
@@ -397,7 +444,11 @@ export default class ImageTool implements BlockTool {
     this.ui.fillCaption(this._data.caption);
 
     ImageTool.tunes.forEach(({ name: tune }) => {
-      const value = typeof data[tune as keyof ImageToolData] !== 'undefined' ? data[tune as keyof ImageToolData] === true || data[tune as keyof ImageToolData] === 'true' : false;
+      const value =
+        typeof data[tune as keyof ImageToolData] !== 'undefined'
+          ? data[tune as keyof ImageToolData] === true ||
+            data[tune as keyof ImageToolData] === 'true'
+          : false;
 
       this.setTune(tune as keyof ImageToolData, value);
     });
@@ -448,7 +499,7 @@ export default class ImageTool implements BlockTool {
     console.log('Image Tool: uploading failed because of', errorText);
 
     this.api.notifier.show({
-      message: this.api.i18n.t('Couldn’t upload image. Please try another.'),
+      message: this.api.i18n.t("Couldn't upload image. Please try another."),
       style: 'error',
     });
     this.ui.hidePreloader();
@@ -488,9 +539,10 @@ export default class ImageTool implements BlockTool {
       /**
        * Wait until the API is ready
        */
-      Promise.resolve().then(() => {
-        this.block.stretched = value;
-      })
+      Promise.resolve()
+        .then(() => {
+          this.block.stretched = value;
+        })
         .catch((err) => {
           console.error(err);
         });

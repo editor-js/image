@@ -20,8 +20,8 @@ export enum UiState {
   /**
    * The UI is in a filled state, with an image successfully loaded.
    */
-  Filled = 'filled'
-};
+  Filled = 'filled',
+}
 
 /**
  * Nodes interface representing various elements in the UI.
@@ -30,32 +30,32 @@ interface Nodes {
   /**
    * Wrapper element in the UI.
    */
-  wrapper: HTMLElement;
+  wrapper: HTMLDivElement;
 
   /**
    * Container for the image element in the UI.
    */
-  imageContainer: HTMLElement;
+  imageContainer: HTMLDivElement;
 
   /**
    * Button for selecting files.
    */
-  fileButton: HTMLElement;
+  fileButton: HTMLButtonElement;
 
   /**
    * Represents the image element in the UI, if one is present; otherwise, it's undefined.
    */
-  imageEl?: HTMLElement;
+  imageEl?: HTMLImageElement | HTMLVideoElement;
 
   /**
    * Preloader element for the image.
    */
-  imagePreloader: HTMLElement;
+  imagePreloader: HTMLDivElement;
 
   /**
    * Caption element for the image.
    */
-  caption: HTMLElement;
+  caption: HTMLDivElement;
 }
 
 /**
@@ -127,7 +127,7 @@ export default class Ui {
     this.nodes = {
       wrapper: make('div', [this.CSS.baseClass, this.CSS.wrapper]),
       imageContainer: make('div', [this.CSS.imageContainer]),
-      fileButton: this.createFileButton(),
+      fileButton: this.createFileButton() as HTMLButtonElement,
       imageEl: undefined,
       imagePreloader: make('div', this.CSS.imagePreloader),
       caption: make('div', [this.CSS.input, this.CSS.caption], {
@@ -158,7 +158,10 @@ export default class Ui {
    * @param status - true for enable, false for disable
    */
   public applyTune(tuneName: string, status: boolean): void {
-    this.nodes.wrapper.classList.toggle(`${this.CSS.wrapper}--${tuneName}`, status);
+    this.nodes.wrapper.classList.toggle(
+      `${this.CSS.wrapper}--${tuneName}`,
+      status
+    );
   }
 
   /**
@@ -268,7 +271,10 @@ export default class Ui {
       if (Object.prototype.hasOwnProperty.call(UiState, statusType)) {
         const state = UiState[statusType as keyof typeof UiState];
 
-        this.nodes.wrapper.classList.toggle(`${this.CSS.wrapper}--${state}`, state === status);
+        this.nodes.wrapper.classList.toggle(
+          `${this.CSS.wrapper}--${state}`,
+          state === status
+        );
       }
     }
   }
@@ -292,7 +298,7 @@ export default class Ui {
       imageEl: 'image-tool__image-picture',
       caption: 'image-tool__caption',
     };
-  };
+  }
 
   /**
    * Creates upload-file button
@@ -300,7 +306,9 @@ export default class Ui {
   private createFileButton(): HTMLElement {
     const button = make('div', [this.CSS.button]);
 
-    button.innerHTML = this.config.buttonContent ?? `${IconPicture} ${this.api.i18n.t('Select an Image')}`;
+    button.innerHTML =
+      this.config.buttonContent ??
+      `${IconPicture} ${this.api.i18n.t('Select an Image')}`;
 
     button.addEventListener('click', () => {
       this.onSelectFile();

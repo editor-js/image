@@ -1,19 +1,18 @@
-import type { HTMLPasteEventDetail } from '@editorjs/editorjs';
+import type { HTMLPasteEventDetail } from "@editorjs/editorjs";
 
 /**
- * Represents options for uploading, including a function to handle previewing.
+ * Configuration options for file upload preview handling
  */
 export interface UploadOptions {
   /**
-   * Callback function to be called when the preview is ready.
-   * @param src - The source of the preview as a string.
-   * @returns void
+   * Callback when preview is available
+   * @param {string} src - Preview image source URL
    */
   onPreview: (src: string) => void;
 }
 
 /**
- * User configuration of Image block tunes. Allows to add custom tunes through the config
+ * Configuration for custom block tune actions
  */
 export interface ActionConfig {
   /**
@@ -39,11 +38,11 @@ export interface ActionConfig {
   /**
    * An optional action function to be executed when the tune is activated.
    */
-  action?: Function;
-};
+  action?: (name: string) => void;
+}
 
 /**
- * UploadResponseFormat interface representing the response format expected from the backend on file uploading.
+ * Standard upload response format
  */
 export interface UploadResponseFormat<AdditionalFileData = {}> {
   /**
@@ -53,8 +52,7 @@ export interface UploadResponseFormat<AdditionalFileData = {}> {
 
   /**
    * Object with file data.
-   *             'url' is required,
-   *             also can contain any additional data that will be saved and passed back
+   * 'url' is required, also can contain any additional data that will be saved and passed back
    */
   file: {
     /**
@@ -65,7 +63,7 @@ export interface UploadResponseFormat<AdditionalFileData = {}> {
 }
 
 /**
- * ImageToolData type representing the input and output data format for the image tool, including optional custome actions.
+ * Core image tool data structure
  */
 export type ImageToolData<Actions = {}, AdditionalFileData = {}> = {
   /**
@@ -101,22 +99,25 @@ export type ImageToolData<Actions = {}, AdditionalFileData = {}> = {
 } & (Actions extends Record<string, boolean> ? Actions : {});
 
 /**
- * @description Allows to enable or disable features.
+ * Feature toggle configuration
  */
 export type FeaturesConfig = {
   /**
    * Flag to enable/disable tune - background.
    */
   background?: boolean;
+
   /**
    * Flag to enable/disable tune - border.
    */
   border?: boolean;
+
   /**
    * Flag to enable/disable caption.
    * Can be set to 'optional' to allow users to toggle via block tunes.
    */
-  caption?: boolean | 'optional';
+  caption?: boolean | "optional";
+
   /**
    * Flag to enable/disable tune - stretched
    */
@@ -124,15 +125,13 @@ export type FeaturesConfig = {
 };
 
 /**
- *
- * @description Config supported by Tool
+ * Main image tool configuration
  */
 export interface ImageConfig {
   /**
    * Endpoints for upload, whether using file or URL.
    */
   endpoints: {
-
     /**
      * Endpoint for file upload.
      */
@@ -162,12 +161,12 @@ export interface ImageConfig {
   /**
    * Additional data to send with requests.
    */
-  additionalRequestData?: object;
+  additionalRequestData?: Record<string, unknown>;
 
   /**
    * Additional headers to send with requests.
    */
-  additionalRequestHeaders?: object;
+  additionalRequestHeaders?: Record<string, string>;
 
   /**
    * Custom content for the select file button.
@@ -178,11 +177,10 @@ export interface ImageConfig {
    * Optional custom uploader.
    */
   uploader?: {
-
     /**
      * Method to upload an image by file.
      */
-    uploadByFile?: (file: Blob) => Promise<UploadResponseFormat>;
+    uploadByFile?: (file: File) => Promise<UploadResponseFormat>;
 
     /**
      * Method to upload an image by URL.
@@ -202,8 +200,7 @@ export interface ImageConfig {
 }
 
 /**
- * Interface representing the details of a paste event for HTML elements.
- * Extends the `HTMLPasteEventDetail` interface to include additional data properties.
+ * Extended paste event details
  */
 export interface HTMLPasteEventDetailExtended extends HTMLPasteEventDetail {
   /**
@@ -218,7 +215,7 @@ export interface HTMLPasteEventDetailExtended extends HTMLPasteEventDetail {
 }
 
 /**
- * Parameter type of Image setter function in ImageTool
+ * Image setter parameter type
  */
 export type ImageSetterParam = {
   /**
