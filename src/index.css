@@ -13,6 +13,7 @@
       max-width: 100%;
       vertical-align: bottom;
       display: block;
+      cursor: pointer;
     }
 
     &-preloader {

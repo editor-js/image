@@ -246,7 +246,14 @@ export default class Ui {
       }
     });
 
-    this.nodes.imageContainer.appendChild(this.nodes.imageEl);
+    const imageEl = this.nodes.imageEl;
+    this.nodes.imageContainer.appendChild(imageEl);
+
+    this.nodes.imageEl.addEventListener('click', () => {
+        this.toggleStatus(UiState.Empty);
+        this.nodes.imageContainer.removeChild(imageEl);
+        this.onSelectFile();
+    });
   }
 
   /**
