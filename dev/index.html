@@ -9,7 +9,7 @@
     <div id="editorjs"></div>
     <script src="https://cdn.jsdelivr.net/npm/@editorjs/editorjs@latest"></script>
     <script type="module">
-      import ImageTool from "../src/index.ts";
+      import ImageTool from "../dist/image.mjs";
       const editor = new EditorJS({
         holder: "editorjs",
         data: {
@@ -26,6 +26,7 @@
                 withBackground: false,
                 stretched: false,
                 caption: "kimitsu no yayiba",
+                alt: "Picture of anime characters"
               },
             },
           ],
@@ -44,6 +45,7 @@
                 border: false,
                 background: false,
                 stretch: true,
+                alt: "optional",
               },
             },
           },
