@@ -221,7 +221,7 @@ export default class Ui {
 
     // Add alt attribute for IMG tags
     if (tag === 'IMG') {
-      attributes.alt = this.nodes.alt.innerHTML || '';
+      attributes.alt = this.nodes.alt.textContent || '';
     }
 
     /**

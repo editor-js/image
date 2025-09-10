@@ -84,11 +84,8 @@ export default class ImageTool implements BlockTool {
 
   /**
    * Alt text enabled state
-   * Null when user has not toggled the alt tune
-   * True when user has toggled the alt tune
-   * False when user has toggled the alt tune
    */
-  private isAltEnabled: boolean | null = null;
+  private isAltEnabled: boolean = false;
 
   /**
    * @param tool - tool properties got from editor.js
@@ -262,18 +259,18 @@ export default class ImageTool implements BlockTool {
 
     if (this.config.features?.caption === 'optional') {
       tunes.push({
-        name: 'caption',
+        name: this.api.i18n.t('caption'),
         icon: IconText,
-        title: 'With caption',
+        title: this.api.i18n.t('With caption'),
         toggle: true,
       });
     }
 
     if (this.config.features?.alt === 'optional') {
       tunes.push({
-        name: 'alt',
+        name: this.api.i18n.t('alt'),
         icon: IconText,
-        title: 'With alt text',
+        title: this.api.i18n.t('With alt text'),
         toggle: true,
       });
     }
@@ -304,7 +301,7 @@ export default class ImageTool implements BlockTool {
       }
 
       if (tune.name === 'alt') {
-        currentState = this.isAltEnabled ?? currentState;
+        currentState = this.isAltEnabled;
       }
 
       return currentState;
@@ -339,7 +336,7 @@ export default class ImageTool implements BlockTool {
          * because it can be manualy toggled by user
          */
         if (tune.name === 'alt') {
-          this.isAltEnabled = !(this.isAltEnabled ?? false);
+          this.isAltEnabled = !this.isAltEnabled;
           newState = this.isAltEnabled;
         }
 

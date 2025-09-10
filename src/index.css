@@ -44,32 +44,7 @@
     }
   }
 
-  &__caption {
-    visibility: hidden;
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    margin-bottom: 10px;
-
-    &[contentEditable="true"][data-placeholder]::before {
-      position: absolute !important;
-      content: attr(data-placeholder);
-      color: #707684;
-      font-weight: normal;
-      display: none;
-    }
-
-    &[contentEditable="true"][data-placeholder]:empty {
-      &::before {
-        display: block;
-      }
-
-      &:focus::before {
-        display: none;
-      }
-    }
-  }
-
+  &__caption,
   &__alt {
     visibility: hidden;
     position: absolute;
@@ -206,7 +181,11 @@
 
   &--caption&--alt {
     ^&__caption {
-      bottom: 30px;
+      bottom: 40px;
+    }
+
+    ^&__alt {
+      bottom: 0px;
     }
 
     padding-bottom: 80px;
