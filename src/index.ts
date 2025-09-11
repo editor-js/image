@@ -259,7 +259,7 @@ export default class ImageTool implements BlockTool {
 
     if (this.config.features?.caption === 'optional') {
       tunes.push({
-        name: this.api.i18n.t('caption'),
+        name: 'caption',
         icon: IconText,
         title: this.api.i18n.t('With caption'),
         toggle: true,
@@ -268,7 +268,7 @@ export default class ImageTool implements BlockTool {
 
     if (this.config.features?.alt === 'optional') {
       tunes.push({
-        name: this.api.i18n.t('alt'),
+        name: 'alt',
         icon: IconText,
         title: this.api.i18n.t('With alt text'),
         toggle: true,
