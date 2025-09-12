@@ -83,6 +83,11 @@ export default class ImageTool implements BlockTool {
   private isCaptionEnabled: boolean | null = null;
 
   /**
+   * Alt text enabled state
+   */
+  private isAltEnabled: boolean = false;
+
+  /**
    * @param tool - tool properties got from editor.js
    * @param tool.data - previously saved data
    * @param tool.config - user config for Tool
@@ -104,6 +109,7 @@ export default class ImageTool implements BlockTool {
       field: config.field,
       types: config.types,
       captionPlaceholder: this.api.i18n.t(config.captionPlaceholder ?? 'Caption'),
+      altPlaceholder: this.api.i18n.t(config.altPlaceholder ?? 'Alt text'),
       buttonContent: config.buttonContent,
       uploader: config.uploader,
       actions: config.actions,
@@ -140,6 +146,7 @@ export default class ImageTool implements BlockTool {
      */
     this._data = {
       caption: '',
+      alt: '',
       withBorder: false,
       withBackground: false,
       stretched: false,
@@ -204,6 +211,11 @@ export default class ImageTool implements BlockTool {
       this.ui.applyTune('caption', true);
     }
 
+    if (this.config.features?.alt === true || (this.config.features?.alt === 'optional' && this.data.alt)) {
+      this.isAltEnabled = true;
+      this.ui.applyTune('alt', true);
+    }
+
     return this.ui.render() as HTMLDivElement;
   }
 
@@ -221,8 +233,10 @@ export default class ImageTool implements BlockTool {
    */
   public save(): ImageToolData {
     const caption = this.ui.nodes.caption;
+    const alt = this.ui.nodes.alt;
 
     this._data.caption = caption.innerHTML;
+    this._data.alt = alt.innerHTML;
 
     return this.data;
   }
@@ -240,13 +254,23 @@ export default class ImageTool implements BlockTool {
       background: 'withBackground',
       stretch: 'stretched',
       caption: 'caption',
+      alt: 'alt',
     };
 
     if (this.config.features?.caption === 'optional') {
       tunes.push({
         name: 'caption',
         icon: IconText,
-        title: 'With caption',
+        title: this.api.i18n.t('With caption'),
+        toggle: true,
+      });
+    }
+
+    if (this.config.features?.alt === 'optional') {
+      tunes.push({
+        name: 'alt',
+        icon: IconText,
+        title: this.api.i18n.t('With alt text'),
         toggle: true,
       });
     }
@@ -256,6 +280,10 @@ export default class ImageTool implements BlockTool {
 
       if (featureKey === 'caption') {
         return this.config.features?.caption !== false;
+      }
+
+      if (featureKey === 'alt') {
+        return this.config.features?.alt !== false;
       }
 
       return featureKey == null || this.config.features?.[featureKey as keyof FeaturesConfig] !== false;
@@ -270,6 +298,10 @@ export default class ImageTool implements BlockTool {
 
       if (tune.name === 'caption') {
         currentState = this.isCaptionEnabled ?? currentState;
+      }
+
+      if (tune.name === 'alt') {
+        currentState = this.isAltEnabled;
       }
 
       return currentState;
@@ -297,6 +329,15 @@ export default class ImageTool implements BlockTool {
         if (tune.name === 'caption') {
           this.isCaptionEnabled = !(this.isCaptionEnabled ?? false);
           newState = this.isCaptionEnabled;
+        }
+
+        /**
+         * For the alt tune, we can't rely on the this._data
+         * because it can be manualy toggled by user
+         */
+        if (tune.name === 'alt') {
+          this.isAltEnabled = !this.isAltEnabled;
+          newState = this.isAltEnabled;
         }
 
         this.tuneToggled(tune.name as keyof ImageToolData, newState);
@@ -396,6 +437,9 @@ export default class ImageTool implements BlockTool {
     this._data.caption = data.caption || '';
     this.ui.fillCaption(this._data.caption);
 
+    this._data.alt = data.alt || '';
+    this.ui.fillAlt(this._data.alt);
+
     ImageTool.tunes.forEach(({ name: tune }) => {
       const value = typeof data[tune as keyof ImageToolData] !== 'undefined' ? data[tune as keyof ImageToolData] === true || data[tune as keyof ImageToolData] === 'true' : false;
 
@@ -406,6 +450,12 @@ export default class ImageTool implements BlockTool {
       this.setTune('caption', true);
     } else if (this.config.features?.caption === true) {
       this.setTune('caption', true);
+    }
+
+    if (data.alt) {
+      this.setTune('alt', true);
+    } else if (this.config.features?.alt === true) {
+      this.setTune('alt', true);
     }
   }
 
@@ -466,6 +516,13 @@ export default class ImageTool implements BlockTool {
       if (state == false) {
         this._data.caption = '';
         this.ui.fillCaption('');
+      }
+    } else if (tuneName === 'alt') {
+      this.ui.applyTune(tuneName, state);
+
+      if (state == false) {
+        this._data.alt = '';
+        this.ui.fillAlt('');
       }
     } else {
       /**

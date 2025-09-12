@@ -44,7 +44,8 @@
     }
   }
 
-  &__caption {
+  &__caption,
+  &__alt {
     visibility: hidden;
     position: absolute;
     bottom: 0;
@@ -83,6 +84,10 @@
   &--empty,
   &--uploading {
     ^&__caption {
+      visibility: hidden !important;
+    }
+
+    ^&__alt {
       visibility: hidden !important;
     }
   }
@@ -163,7 +168,27 @@
       visibility: visible;
     }
 
-    padding-bottom: 50px
+    padding-bottom: 50px;
+  }
+
+  &--alt {
+    ^&__alt {
+      visibility: visible;
+    }
+
+    padding-bottom: 50px;
+  }
+
+  &--caption&--alt {
+    ^&__caption {
+      bottom: 40px;
+    }
+
+    ^&__alt {
+      bottom: 0px;
+    }
+
+    padding-bottom: 80px;
   }
 }
 

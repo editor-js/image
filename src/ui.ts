@@ -56,6 +56,11 @@ interface Nodes {
    * Caption element for the image.
    */
   caption: HTMLElement;
+
+  /**
+   * Alt text element for the image.
+   */
+  alt: HTMLElement;
 }
 
 /**
@@ -133,6 +138,9 @@ export default class Ui {
       caption: make('div', [this.CSS.input, this.CSS.caption], {
         contentEditable: !this.readOnly,
       }),
+      alt: make('div', [this.CSS.input, this.CSS.alt], {
+        contentEditable: !this.readOnly,
+      }),
     };
 
     /**
@@ -142,13 +150,22 @@ export default class Ui {
      *      <image-preloader />
      *    </image-container>
      *    <caption />
+     *    <alt />
      *    <select-file-button />
      *  </wrapper>
      */
     this.nodes.caption.dataset.placeholder = this.config.captionPlaceholder;
+    this.nodes.alt.dataset.placeholder = this.config.altPlaceholder || this.api.i18n.t('Alt text');
+    
+    // Add event listener to update alt attribute when alt text changes
+    this.nodes.alt.addEventListener('input', () => {
+      this.updateImageAlt(this.nodes.alt.innerHTML);
+    });
+    
     this.nodes.imageContainer.appendChild(this.nodes.imagePreloader);
     this.nodes.wrapper.appendChild(this.nodes.imageContainer);
     this.nodes.wrapper.appendChild(this.nodes.caption);
+    this.nodes.wrapper.appendChild(this.nodes.alt);
     this.nodes.wrapper.appendChild(this.nodes.fileButton);
   }
 
@@ -201,6 +218,11 @@ export default class Ui {
     const attributes: { [key: string]: string | boolean } = {
       src: url,
     };
+
+    // Add alt attribute for IMG tags
+    if (tag === 'IMG') {
+      attributes.alt = this.nodes.alt.textContent || '';
+    }
 
     /**
      * We use eventName variable because IMG and VIDEO tags have different event to be called on source load
@@ -260,6 +282,28 @@ export default class Ui {
   }
 
   /**
+   * Shows alt text input
+   * @param text - alt text content
+   */
+  public fillAlt(text: string): void {
+    if (this.nodes.alt !== undefined) {
+      this.nodes.alt.innerHTML = text;
+      // Update the alt attribute on the image element if it exists
+      this.updateImageAlt(text);
+    }
+  }
+
+  /**
+   * Updates the alt attribute on the image element
+   * @param altText - alt text to set
+   */
+  public updateImageAlt(altText: string): void {
+    if (this.nodes.imageEl && this.nodes.imageEl.tagName === 'IMG') {
+      this.nodes.imageEl.setAttribute('alt', altText);
+    }
+  }
+
+  /**
    * Changes UI status
    * @param status - see {@link Ui.status} constants
    */
@@ -291,6 +335,7 @@ export default class Ui {
       imagePreloader: 'image-tool__image-preloader',
       imageEl: 'image-tool__image-picture',
       caption: 'image-tool__caption',
+      alt: 'image-tool__alt',
     };
   };
 
