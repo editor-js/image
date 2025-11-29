@@ -140,6 +140,7 @@ export default class ImageTool implements BlockTool {
      */
     this._data = {
       caption: '',
+      width: undefined,
       withBorder: false,
       withBackground: false,
       stretched: false,
@@ -223,6 +224,7 @@ export default class ImageTool implements BlockTool {
     const caption = this.ui.nodes.caption;
 
     this._data.caption = caption.innerHTML;
+    this._data.width = this.ui.getWidth();
 
     return this.data;
   }
@@ -394,7 +396,9 @@ export default class ImageTool implements BlockTool {
     this.image = data.file;
 
     this._data.caption = data.caption || '';
+    this._data.width = typeof data.width === 'number' ? data.width : undefined;
     this.ui.fillCaption(this._data.caption);
+    this.ui.applyWidth(this._data.width);
 
     ImageTool.tunes.forEach(({ name: tune }) => {
       const value = typeof data[tune as keyof ImageToolData] !== 'undefined' ? data[tune as keyof ImageToolData] === true || data[tune as keyof ImageToolData] === 'true' : false;

@@ -8,6 +8,7 @@
     overflow: hidden;
     margin-bottom: 10px;
     padding-bottom: 0;
+    position: relative;
 
     &-picture {
       max-width: 100%;
@@ -41,6 +42,30 @@
         animation: image-preloader-spin 2s infinite linear;
         box-sizing: border-box;
       }
+    }
+
+    &-resize-handle {
+      position: absolute;
+      top: 50%;
+      right: 4px;
+      width: 14px;
+      height: 120px;
+      max-height: calc(100% - 8px);
+      background: rgba(0, 0, 0, 0.35);
+      border: 2px solid rgba(255, 255, 255, 0.95);
+      border-radius: 12px;
+      cursor: ew-resize;
+      transform: translateY(-50%);
+      opacity: 0;
+      transition: opacity 0.15s ease, background 0.15s ease;
+    }
+
+    &:hover &-resize-handle {
+      opacity: 1;
+    }
+
+    &-resize-handle:hover {
+      background: rgba(0, 0, 0, 0.5);
     }
   }
 

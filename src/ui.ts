@@ -56,6 +56,11 @@ interface Nodes {
    * Caption element for the image.
    */
   caption: HTMLElement;
+
+  /**
+   * Resize handle element.
+   */
+  resizeHandle?: HTMLElement;
 }
 
 /**
@@ -111,6 +116,11 @@ export default class Ui {
    * Flag indicating if the UI is in read-only mode.
    */
   private readOnly: boolean;
+
+  /**
+   * Tracked width in pixels.
+   */
+  private currentWidth?: number;
 
   /**
    * @param ui - image tool Ui module
@@ -244,9 +254,71 @@ export default class Ui {
       if (this.nodes.imagePreloader !== undefined) {
         this.nodes.imagePreloader.style.backgroundImage = '';
       }
+      this.applyWidth(this.currentWidth);
+      this.ensureResizeHandle();
     });
 
     this.nodes.imageContainer.appendChild(this.nodes.imageEl);
+  }
+
+  /**
+   * Apply a specific width (px) to the image container.
+   */
+  public applyWidth(width?: number): void {
+    const MIN = 40;
+    const parentWidth = this.nodes.wrapper.parentElement?.getBoundingClientRect()?.width;
+    const max = parentWidth && Number.isFinite(parentWidth) ? Math.max(MIN, parentWidth) : undefined;
+    let next = width;
+    if (typeof next === 'number' && next > 0) {
+      if (max) next = Math.min(next, max);
+      next = Math.max(MIN, next);
+      this.currentWidth = next;
+      this.nodes.imageContainer.style.width = `${next}px`;
+    } else {
+      this.currentWidth = undefined;
+      this.nodes.imageContainer.style.width = '';
+    }
+  }
+
+  /**
+   * Returns current width if set.
+   */
+  public getWidth(): number | undefined {
+    if (typeof this.currentWidth === 'number') return this.currentWidth;
+    const inline = parseFloat(this.nodes.imageContainer.style.width);
+    return Number.isFinite(inline) ? inline : undefined;
+  }
+
+  /**
+   * Ensure resize handle exists and is wired.
+   */
+  private ensureResizeHandle(): void {
+    if (this.readOnly || this.nodes.resizeHandle) return;
+    const handle = make('div', this.CSS.resizeHandle);
+    let startX = 0;
+    let startWidth = 0;
+
+    const onMove = (event: MouseEvent) => {
+      const delta = event.clientX - startX;
+      const next = startWidth + delta;
+      this.applyWidth(next);
+    };
+
+    const onUp = () => {
+      document.removeEventListener('mousemove', onMove);
+      document.removeEventListener('mouseup', onUp);
+    };
+
+    handle.addEventListener('mousedown', (event: MouseEvent) => {
+      event.preventDefault();
+      startX = event.clientX;
+      startWidth = this.nodes.imageContainer.getBoundingClientRect().width;
+      document.addEventListener('mousemove', onMove);
+      document.addEventListener('mouseup', onUp);
+    });
+
+    this.nodes.imageContainer.appendChild(handle);
+    this.nodes.resizeHandle = handle;
   }
 
   /**
@@ -291,6 +363,7 @@ export default class Ui {
       imagePreloader: 'image-tool__image-preloader',
       imageEl: 'image-tool__image-picture',
       caption: 'image-tool__caption',
+      resizeHandle: 'image-tool__image-resize-handle',
     };
   };
 

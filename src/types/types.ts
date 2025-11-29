@@ -72,6 +72,10 @@ export type ImageToolData<Actions = {}, AdditionalFileData = {}> = {
    * Caption for the image.
    */
   caption: string;
+  /**
+   * Optional width (in pixels) applied to the image container.
+   */
+  width?: number;
 
   /**
    * Flag indicating whether the image has a border.
