@@ -71,8 +71,12 @@ export default class Uploader {
      */
     let upload: Promise<UploadResponseFormat>;
 
-    // custom uploading
-    if (this.config.uploader && typeof this.config.uploader.uploadByFile === 'function') {
+    // custom file select
+    if (this.config.selectFiles && typeof this.config.selectFiles === 'function') {
+      upload = this.config.selectFiles();
+
+      // custom uploading
+    } else if (this.config.uploader && typeof this.config.uploader.uploadByFile === 'function') {
       const uploadByFile = this.config.uploader.uploadByFile;
 
       upload = ajax.selectFiles({ accept: this.config.types ?? 'image/*' }).then((files: File[]) => {

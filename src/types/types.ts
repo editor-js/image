@@ -191,6 +191,11 @@ export interface ImageConfig {
   };
 
   /**
+   * Method to select images using a custom file manager.
+   */
+  selectFiles?: () => Promise<UploadResponseFormat>;
+
+  /**
    * Additional actions for the tool.
    */
   actions?: ActionConfig[];

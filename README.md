@@ -277,16 +277,30 @@ var editor = EditorJS({
            */
           uploadByUrl(url){
             // your ajax request for uploading
-            return MyAjax.upload(file).then(() => {
+            return MyAjax.upload(url).then(() => {
               return {
                 success: 1,
                 file: {
-                  url: 'https://codex.so/upload/redactor_images/o_e48549d1855c7fc1807308dd14990126.jpg',,
+                  url: 'https://codex.so/upload/redactor_images/o_e48549d1855c7fc1807308dd14990126.jpg',
                   // any other image data you want to store, such as width, height, color, extension, etc
                 }
               }
             })
           }
+        },
+        /**
+         * Custom file picker
+         */
+        selectFiles(){
+          return MyFilePicker.select().then(() => {
+            return {
+              success: 1,
+              file: {
+                url: 'https://codex.so/upload/redactor_images/o_80beea670e49f04931ce9e3b2122ac70.jpg',
+                // any other image data you want to store, such as width, height, color, extension, etc
+              }
+            };
+          })
         }
       }
     }
