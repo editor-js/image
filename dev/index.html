@@ -10,6 +10,23 @@
     <script src="https://cdn.jsdelivr.net/npm/@editorjs/editorjs@latest"></script>
     <script type="module">
       import ImageTool from "../src/index.ts";
+
+      /**
+       * Long document to test lazy loading: watch the Network tab while scrolling
+       */
+      const lazyBlocks = Array.from({ length: 15 }, (_, i) => [
+        {
+          type: "paragraph",
+          data: { text: `Image #${i + 1} below` },
+        },
+        {
+          type: "image",
+          data: {
+            file: { url: `https://picsum.photos/id/${10 + i}/1200/800` },
+            caption: `picsum #${10 + i}`,
+          },
+        },
+      ]).flat();
       const editor = new EditorJS({
         holder: "editorjs",
         data: {
@@ -26,6 +43,18 @@
                 withBackground: false,
                 stretched: false,
                 caption: "kimitsu no yayiba",
+              },
+            },
+            ...lazyBlocks,
+            {
+              type: "paragraph",
+              data: { text: "Broken image below: should fall back to the \"Select an Image\" button" },
+            },
+            {
+              type: "image",
+              data: {
+                file: { url: "https://example.invalid/broken.jpg" },
+                caption: "broken image",
               },
             },
           ],
@@ -45,6 +74,7 @@
                 background: false,
                 stretch: true,
               },
+              lazyLoading: true,
             },
           },
         },

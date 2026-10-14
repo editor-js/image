@@ -165,7 +165,15 @@ export default class Ui {
    * Renders tool UI
    */
   public render(): HTMLElement {
-    this.toggleStatus(UiState.Empty);
+    /**
+     * Keep the status set before rendering (e.g. "uploading" while a lazy image is pending),
+     * otherwise the hidden image container would never let the lazy image load
+     */
+    const hasStatus = Object.values(UiState).some(state => this.nodes.wrapper.classList.contains(`${this.CSS.wrapper}--${state}`));
+
+    if (!hasStatus) {
+      this.toggleStatus(UiState.Empty);
+    }
 
     return this.nodes.wrapper;
   }
@@ -225,6 +233,23 @@ export default class Ui {
        * Change event to be listened
        */
       eventName = 'loadeddata';
+    } else if (this.config.lazyLoading === true) {
+      /**
+       * Let the browser defer fetching until the image approaches the viewport
+       */
+      attributes.loading = 'lazy';
+
+      /**
+       * Re-add src after loading: some browsers start fetching as soon as src is set
+       */
+      delete attributes.src;
+      attributes.src = url;
+
+      /**
+       * Show the preloader as a placeholder until the image is loaded.
+       * The image stays in the layout (but invisible) while uploading, so native lazy loading can trigger
+       */
+      this.toggleStatus(UiState.Uploading);
     }
 
     /**
@@ -245,6 +270,16 @@ export default class Ui {
         this.nodes.imagePreloader.style.backgroundImage = '';
       }
     });
+
+    /**
+     * If a lazy image fails to load, leave the preloader and show the empty state,
+     * so the image can be selected again (same as a failed non-lazy image)
+     */
+    if (attributes.loading === 'lazy') {
+      this.nodes.imageEl.addEventListener('error', () => {
+        this.toggleStatus(UiState.Empty);
+      });
+    }
 
     this.nodes.imageContainer.appendChild(this.nodes.imageEl);
   }

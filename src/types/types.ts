@@ -199,6 +199,13 @@ export interface ImageConfig {
    * Tunes to be enabled.
    */
   features?: FeaturesConfig;
+
+  /**
+   * Enables native lazy loading for images (loading="lazy").
+   * When true, images are only fetched when they approach the viewport.
+   * @default false
+   */
+  lazyLoading?: boolean;
 }
 
 /**

@@ -116,9 +116,17 @@
       display: flex;
       border: 1px solid var(--border-color);
       background-color: #fff;
+      position: relative;
 
+      /**
+       * Keep the picture in the layout (but invisible) instead of display: none,
+       * so native lazy loading (loading="lazy") can detect when it approaches the viewport
+       */
       &-picture {
-        display: none;
+        position: absolute;
+        top: 0;
+        left: 0;
+        visibility: hidden;
       }
     }
 
